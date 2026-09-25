@@ -27,9 +27,9 @@ jobs:
           WINDOWS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["windows"])')"
           echo "START_TS=$START_TS" >> "$GITHUB_ENV"
           echo "WINDOWS=$WINDOWS" >> "$GITHUB_ENV"
-          python -m tools.research.world_pm_pm_maker_first_shadow_r1 --start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://solana-rpc.publicnode.com --out artifacts/maker.json > artifacts/maker-console.txt 2>&1 &
+          python -m tools.research.world_pm_pm_maker_first_shadow_r1 --start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/maker.json > artifacts/maker-console.txt 2>&1 &
           MP=$!
-          python -m tools.research.world_pm_two_leg_paper_bot_r1 --first-window-start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://solana-rpc.publicnode.com --out artifacts/taker.json --ledger artifacts/taker-ledger.jsonl --checkpoint artifacts/taker-checkpoint.json > artifacts/taker-console.txt 2>&1 &
+          python -m tools.research.world_pm_two_leg_paper_bot_r1 --first-window-start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/taker.json --ledger artifacts/taker-ledger.jsonl --checkpoint artifacts/taker-checkpoint.json > artifacts/taker-console.txt 2>&1 &
           TP=$!
           wait "$MP"; wait "$TP"
       - name: Manifest
