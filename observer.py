@@ -82,9 +82,6 @@ def discover_world(start):
             continue
         if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
         checked+=1
-        logs=(tx.get("meta") or {}).get("logMessages") or []
-        if not any("InitializeMarket" in str(x) or "Instruction: InitializeMarket" in str(x) for x in logs):
-            continue
         for ins in all_instructions(tx):
             if ins.get("programId")!=PREDICT or not isinstance(ins.get("data"),str): continue
             try: raw=b58(ins["data"])
