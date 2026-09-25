@@ -185,7 +185,7 @@ def observe(start):
         "schemaVersion":"WORLD_PM_PUBLIC_SETTLEMENT_OBSERVATION_R2",
         "startTs":start,"endTs":start+300,
         "expectedWorldDescription":expected_description(start),
-        "observedAt":time.time(),"noTrade":True,
+        "observedAt":time.time(),"sampleClass":"PROSPECTIVE_LIVE_IDENTITY_FREEZE","noTrade":True,
     }
     try:
         market=discover_world(start)
@@ -222,7 +222,7 @@ def main():
     args=ap.parse_args()
     start=args.start_ts
     if start is None:
-        start=(int(time.time())//300-2)*300
+        start=(int(time.time())//300)*300
     p=Path(args.output)
     p.parent.mkdir(parents=True,exist_ok=True)
     try:
