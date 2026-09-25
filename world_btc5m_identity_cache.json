@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "WORLD_BTC5M_IDENTITY_CACHE_R1",
+  "source": "PayBox World official read-only plugin",
+  "generatedAt": "2026-09-25T09:50:00Z",
+  "entries": [
+    {
+      "startTs": 1790330100,
+      "endTs": 1790330400,
+      "eventTicker": "WXBTC5M-26SEP250955",
+      "marketTicker": "WXBTC5M-26SEP250955-5",
+      "marketLedger": "6Pj1G5PNtgvyT6mZMoFv9zZrXKnDSPjebCMdrLAcMjz2",
+      "yesMint": "Hg8Y1nnvm2eB8vXqzUMs4zWUSSUSUKSSs5ZroQjoE5Pg",
+      "noMint": "ASQttp7jbvcY9hdapS8qU6e5AcRGkThiKa11g82n8YaQ"
+    },
+    {
+      "startTs": 1790330400,
+      "endTs": 1790330700,
+      "eventTicker": "WXBTC5M-26SEP251000",
+      "marketTicker": "WXBTC5M-26SEP251000-5",
+      "marketLedger": "Uifjnzfj2PRXwoFqp5qkeQj8T9UhfEs8duJDFCzLygN",
+      "yesMint": "HhaN8fACnDehF5bqGS2kFNAKqYcAEAbif7KT8cyqEu5f",
+      "noMint": "GqpKzDVVMV9BkroEnKtHfcu2j1mvpE1yqKPyHtqN5SKT"
+    },
+    {
+      "startTs": 1790330700,
+      "endTs": 1790331000,
+      "eventTicker": "WXBTC5M-26SEP251005",
+      "marketTicker": "WXBTC5M-26SEP251005-5",
+      "marketLedger": "9Z9jpak2cVhUR6fDdbcXvREh7FsHK7zRErSTfU3B5iun",
+      "yesMint": "5hXMUc3LXs6GCuCJcgRFkzVxfGxRq6gfAPmMFaN3aBUJ",
+      "noMint": "5Xojo57SLcV59ihr1GzxVxiiMkxNqAcJrDy4jjQYuAtT"
+    },
+    {
+      "startTs": 1790331000,
+      "endTs": 1790331300,
+      "eventTicker": "WXBTC5M-26SEP251010",
+      "marketTicker": "WXBTC5M-26SEP251010-5",
+      "marketLedger": "GmBadJK9Snb65z96nPpnBj1nCwaPWBAUiVJjjh6uE7Gw",
+      "yesMint": "9rLpSG6cuMnT75fQrXqzAPBzAPa3Rqe8krVdGvDHSgvG",
+      "noMint": "3yWV8jnYdBsHjCQp7QFDVP9b1YSt6mNUAbK1ZGrVF26D"
+    }
+  ]
+}
