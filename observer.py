@@ -6,7 +6,8 @@ import requests
 
 GAMMA="https://gamma-api.polymarket.com/events"
 RPC="https://solana-rpc.publicnode.com"
-PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"\nOPERATOR="DDucv2DeUsTsg1rfAcWAnUSUVpqfdHEzxX66ARB2JYVg"
+PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"
+OPERATOR="DDucv2DeUsTsg1rfAcWAnUSUVpqfdHEzxX66ARB2JYVg"
 INIT=bytes.fromhex("2323bdc19b30aacb")
 REDEEM=bytes.fromhex("0011a762e91c6b34")
 BURN=bytes.fromhex("b080ce016e205a2d")
