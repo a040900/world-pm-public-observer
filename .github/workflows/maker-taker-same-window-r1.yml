@@ -1,4 +1,4 @@
-name: WORLD_PM_MAKER_TAKER_SAME_WINDOW_R1
+name: WORLD_PM_MAKER_TAKER_SPLIT_RUNNER_AB_R1
 on:
   push:
     branches: [main]
@@ -7,47 +7,66 @@ on:
 permissions:
   contents: read
 jobs:
-  observe:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2
+      - name: Fail-closed verification
+        run: |
+          set -euo pipefail
+          python -m unittest tests.test_public_runner_r1 -v
+          python -m py_compile tools/research/*.py
+
+  maker:
+    needs: qa
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.9'
+        with: {python-version: '3.11.9'}
       - run: python -m pip install requests==2.32.3 websockets==14.2
-      - name: Verify
+      - name: Maker-only prospective observer
         run: |
+          set -euo pipefail
           mkdir -p artifacts
-          python -m unittest tests.test_public_runner_r1 -v 2>&1 | tee artifacts/tests.txt
-          python -m py_compile tools/research/*.py
-      - name: Run same windows
-        run: |
           START_TS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["firstWindowStartTs"])')"
           WINDOWS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["windows"])')"
-          echo "START_TS=$START_TS" >> "$GITHUB_ENV"
-          echo "WINDOWS=$WINDOWS" >> "$GITHUB_ENV"
-          python -m tools.research.world_pm_pm_maker_first_shadow_r1 --start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/maker.json > artifacts/maker-console.txt 2>&1 &
-          MP=$!
-          python -m tools.research.world_pm_two_leg_paper_bot_r1 --first-window-start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/taker.json --ledger artifacts/taker-ledger.jsonl --checkpoint artifacts/taker-checkpoint.json > artifacts/taker-console.txt 2>&1 &
-          TP=$!
-          wait "$MP"; wait "$TP"
-      - name: Manifest
-        if: always()
-        run: |
-          python - <<'PY'
-          import json,os,pathlib
-          out={"schemaVersion":"WORLD_PM_MAKER_TAKER_SAME_WINDOW_ARTIFACT_R1","githubRunId":os.environ.get("GITHUB_RUN_ID"),"publicExecutionSha":os.environ.get("GITHUB_SHA"),"privateAuthorityResearchSha":"959a003d1ae117b6c7bf7c7ec9565fab57c63765","firstWindowStartTs":int(os.environ.get("START_TS") or 0),"windows":int(os.environ.get("WINDOWS") or 0),"noTrade":True}
-          for n in ("maker","taker"):
-           p=pathlib.Path("artifacts/"+n+".json")
-           if p.exists(): out[n+"Summary"]=json.load(open(p)).get("summary")
-          pathlib.Path("artifacts").mkdir(exist_ok=True)
-          json.dump(out,open("artifacts/comparison-manifest.json","w"),indent=2,sort_keys=True)
-          PY
+          python -m tools.research.world_pm_pm_maker_first_shadow_r1 --start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/maker.json > artifacts/maker-console.txt 2>&1
+          printf 'role=maker\nrun_id=%s\nsha=%s\nstart_ts=%s\nwindows=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$START_TS" "$WINDOWS" > artifacts/environment.txt
           find artifacts -type f ! -name artifacts.sha256 -print0 | sort -z | xargs -0 sha256sum > artifacts/artifacts.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: world-pm-maker-taker-same-window-r1-${{ github.run_id }}
+          name: maker-ab-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 90
+
+  taker:
+    needs: qa
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2
+      - name: Taker-only prospective observer
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          START_TS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["firstWindowStartTs"])')"
+          WINDOWS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["windows"])')"
+          python -m tools.research.world_pm_two_leg_paper_bot_r1 --first-window-start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/taker.json --ledger artifacts/taker-ledger.jsonl --checkpoint artifacts/taker-checkpoint.json > artifacts/taker-console.txt 2>&1
+          printf 'role=taker\nrun_id=%s\nsha=%s\nstart_ts=%s\nwindows=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$START_TS" "$WINDOWS" > artifacts/environment.txt
+          find artifacts -type f ! -name artifacts.sha256 -print0 | sort -z | xargs -0 sha256sum > artifacts/artifacts.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: taker-ab-${{ github.run_id }}
           path: artifacts/
           retention-days: 90
