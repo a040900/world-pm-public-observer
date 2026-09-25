@@ -61,73 +61,29 @@ def all_instructions(tx):
     return [x for x in out if isinstance(x,Mapping)]
 
 def discover_world(start):
-    end=start+300
-    cursor=None
-    pages=0
-    scanned=0
-    for _ in range(50):
-        params={"limit":100}
-        if cursor is not None:
-            params["cursor"]=cursor
-        r=requests.get(
-            WORLD_CATALOG,params=params,
-            headers={"Accept":"application/json","Origin":"https://world.xyz",
-                     "Referer":"https://world.xyz/","User-Agent":"world-pm-public-observer/4"},
-            timeout=20,
-        )
-        r.raise_for_status()
-        payload=r.json()
-        pages+=1
-        if isinstance(payload,list):
-            rows=payload
-            next_cursor=None
-        elif isinstance(payload,Mapping):
-            rows=payload.get("markets") or payload.get("items") or payload.get("data") or []
-            next_cursor=payload.get("cursor")
-            if next_cursor is None:
-                next_cursor=payload.get("nextCursor") or payload.get("next_cursor")
-        else:
-            return {"status":"UNKNOWN","reason":"WORLD_CATALOG_INVALID_PAYLOAD"}
-        if not isinstance(rows,list):
-            return {"status":"UNKNOWN","reason":"WORLD_CATALOG_INVALID_ROWS"}
-        for market in rows:
-            if not isinstance(market,Mapping): continue
-            scanned+=1
-            if str(market.get("seriesTicker") or "")!="WXBTC5M": continue
-            open_ts=int(market.get("openTime") or 0)
-            close_ts=int(market.get("closeTime") or market.get("expirationTime") or 0)
-            if open_ts!=start or close_ts!=end: continue
-            accounts=market.get("accounts") or {}
-            if not isinstance(accounts,Mapping): continue
-            choices=[]
-            for collateral,acct in accounts.items():
-                if isinstance(acct,Mapping) and acct.get("isInitialized"):
-                    choices.append((str(collateral),acct))
-            if not choices:
-                return {"status":"UNKNOWN","reason":"WORLD_CATALOG_MATCH_NOT_INITIALIZED",
-                        "ticker":market.get("ticker"),"pagesScanned":pages}
-            collateral,acct=choices[0]
-            ledger=str(acct.get("marketLedger") or "")
-            yes=str(acct.get("yesMint") or "")
-            no=str(acct.get("noMint") or "")
-            if not ledger or not yes or not no:
-                return {"status":"UNKNOWN","reason":"WORLD_CATALOG_IDENTITY_INCOMPLETE",
-                        "ticker":market.get("ticker"),"pagesScanned":pages}
-            rules=market.get("rulesPrimary") or {}
-            return {
-                "status":"FOUND","market":ledger,"yesMint":yes,"noMint":no,
-                "ticker":market.get("ticker"),"eventTicker":market.get("eventTicker"),
-                "openTime":open_ts,"closeTime":close_ts,
-                "collateralMint":collateral,
-                "discovery":"WORLD_PUBLIC_CATALOG_EXACT_WINDOW",
-                "pagesScanned":pages,"marketsScanned":scanned,
-                "rulesPrimary":rules,
-            }
-        if not next_cursor or not rows:
-            break
-        cursor=next_cursor
-    return {"status":"NOT_FOUND","reason":"WORLD_CATALOG_EXACT_BTC5M_NOT_FOUND",
-            "pagesScanned":pages,"marketsScanned":scanned}
+    cache_path=Path("world_btc5m_identity_cache.json")
+    if cache_path.exists():
+        try:
+            cache=json.loads(cache_path.read_text())
+            for item in cache.get("entries") or []:
+                if int(item.get("startTs") or 0)!=start: continue
+                if int(item.get("endTs") or 0)!=start+300: continue
+                return {
+                    "status":"FOUND",
+                    "market":str(item.get("marketLedger") or ""),
+                    "yesMint":str(item.get("yesMint") or ""),
+                    "noMint":str(item.get("noMint") or ""),
+                    "ticker":str(item.get("marketTicker") or ""),
+                    "eventTicker":str(item.get("eventTicker") or ""),
+                    "openTime":start,"closeTime":start+300,
+                    "discovery":"PRE_FROZEN_WORLD_IDENTITY_CACHE_R1",
+                    "cacheSchemaVersion":cache.get("schemaVersion"),
+                    "cacheSource":cache.get("source"),
+                }
+        except Exception as e:
+            return {"status":"UNKNOWN","reason":"WORLD_IDENTITY_CACHE_INVALID",
+                    "error":f"{type(e).__name__}:{e}"}
+    return {"status":"NOT_FOUND","reason":"WORLD_IDENTITY_CACHE_MISS"}
 
 def validate_known_world_market(start, yes_mint):
     want=expected_description(start)
