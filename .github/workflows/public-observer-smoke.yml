@@ -1,0 +1,46 @@
+name: public-observer-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_ts:
+        description: "Optional exact BTC5m window start Unix timestamp"
+        required: false
+        type: string
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Observe
+        env:
+          START_TS: ${{ inputs.start_ts }}
+        run: |
+          if [ -n "$START_TS" ]; then
+            python observer.py --start-ts "$START_TS"
+          else
+            python observer.py
+          fi
+      - name: Hash source and artifacts
+        if: always()
+        run: |
+          sha256sum observer.py requirements.txt > artifacts/source.sha256
+          cat artifacts/*.sha256 artifacts/source.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-pm-public-observation-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
