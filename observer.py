@@ -95,6 +95,30 @@ def discover_world(start):
     return {"status":"NOT_FOUND","reason":"WORLD_MARKET_NOT_DISCOVERED",
             "pagesScanned":pages,"candidateTransactionsChecked":checked}
 
+def validate_known_world_market(start, yes_mint):
+    want=expected_description(start)
+    rows=rpc("getSignaturesForAddress",[yes_mint,{"limit":1000,"commitment":"confirmed"}]) or []
+    checked=0
+    for row in rows:
+        if not isinstance(row,Mapping) or row.get("err") is not None or not row.get("signature"): continue
+        sig=str(row["signature"])
+        tx=rpc("getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}])
+        if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
+        checked+=1
+        logs=(tx.get("meta") or {}).get("logMessages") or []
+        if not any("Instruction: Split" in str(x) for x in logs): continue
+        for ins in all_instructions(tx):
+            acc=[str(x) for x in ins.get("accounts") or []]
+            if ins.get("programId")!=PREDICT or len(acc)<11 or yes_mint not in acc: continue
+            try: meta=get_json(f"https://m.world.xyz/{yes_mint}")
+            except Exception as e:
+                return {"status":"UNKNOWN","reason":"WORLD_METADATA_READ_FAILED","error":f"{type(e).__name__}:{e}"}
+            desc=str(meta.get("description") or "") if isinstance(meta,Mapping) else ""
+            return {"status":"PASS" if desc==want else "FAIL","market":acc[1],"yesMint":acc[3],
+                    "noMint":acc[4],"description":desc,"expectedDescription":want,
+                    "splitSignature":sig,"transactionsChecked":checked}
+    return {"status":"FAIL","reason":"KNOWN_YES_MINT_SPLIT_NOT_FOUND","transactionsChecked":checked}
+
 def world_settlement(m,end):
     sigs={}
     for mint in (m["yesMint"],m["noMint"]):
@@ -194,6 +218,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--start-ts",type=int)
     ap.add_argument("--output",default="artifacts/observation.json")
+    ap.add_argument("--known-yes-mint")
     args=ap.parse_args()
     start=args.start_ts
     if start is None:
@@ -201,7 +226,13 @@ def main():
     p=Path(args.output)
     p.parent.mkdir(parents=True,exist_ok=True)
     try:
-        row=observe(start)
+        if args.known_yes_mint:
+            row={"schemaVersion":"WORLD_PM_KNOWN_MARKET_REGRESSION_R1","startTs":start,
+                 "observedAt":time.time(),"noTrade":True,
+                 "regression":validate_known_world_market(start,args.known_yes_mint)}
+            row["status"]=row["regression"].get("status")
+        else:
+            row=observe(start)
     except Exception as e:
         row={"schemaVersion":"WORLD_PM_PUBLIC_SETTLEMENT_OBSERVATION_R2","startTs":start,
              "endTs":start+300,"observedAt":time.time(),"status":"UNKNOWN",
