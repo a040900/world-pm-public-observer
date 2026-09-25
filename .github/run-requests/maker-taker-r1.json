@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "WORLD_PM_MAKER_TAKER_SAME_WINDOW_REQUEST_R1",
+  "firstWindowStartTs": 1790350200,
+  "windows": 6,
+  "privateAuthorityRepo": "a040900/prediction-market-relative-value",
+  "privateAuthorityResearchSha": "959a003d1ae117b6c7bf7c7ec9565fab57c63765",
+  "mode": "NO_TRADE_PUBLIC_READ_ONLY_SAME_WINDOW"
+}

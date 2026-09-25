@@ -1,6 +1,6 @@
 {
   "schemaVersion": "WORLD_BTC5M_IDENTITY_CACHE_R1",
-  "source": "PayBox World official read-only plugin",
+  "source": "PayBox World official read-only plugin; prospectively pre-frozen",
   "generatedAt": "2026-09-25T09:50:00Z",
   "entries": [
     {
@@ -38,6 +38,54 @@
       "marketLedger": "GmBadJK9Snb65z96nPpnBj1nCwaPWBAUiVJjjh6uE7Gw",
       "yesMint": "9rLpSG6cuMnT75fQrXqzAPBzAPa3Rqe8krVdGvDHSgvG",
       "noMint": "3yWV8jnYdBsHjCQp7QFDVP9b1YSt6mNUAbK1ZGrVF26D"
+    },
+    {
+      "startTs": 1790350200,
+      "endTs": 1790350500,
+      "marketLedger": "52dBfCPUPeggatbZvw4Cf4oQ88mGR9HPq1a4Jsi9DAn5",
+      "yesMint": "Dcv1tNfkgLTe5inHHvzRUdD1WCTezxTmFWrBnZN1kvVj",
+      "noMint": "6VtXsBNXAP6r1xyYsAyC5btxKwXLZ5so2Y9hXsYhphHJ",
+      "eventTicker": "WXBTC5M-26SEP251530"
+    },
+    {
+      "startTs": 1790350500,
+      "endTs": 1790350800,
+      "marketLedger": "BqSXxTckFWcMmyk4st6XZHynCD3VGZYkh1DDprDVHNjK",
+      "yesMint": "3hxbyaqLVsEYQQnzSQLwCzxRNckhJWLBuLAoQvVy5T63",
+      "noMint": "2RUR479Fot9ypEAdxd3Py9HzUjeEoTNkg1BuRLoTvk7h",
+      "eventTicker": "WXBTC5M-26SEP251535"
+    },
+    {
+      "startTs": 1790350800,
+      "endTs": 1790351100,
+      "marketLedger": "AE2KWN7UGCw1HPMvuS9VBu8R5gYJfLVnjvaYPbHT83uu",
+      "yesMint": "EV9BorPcmBm2px4GiWupFwArv2QXQzkNYPq92t9GZ9LT",
+      "noMint": "4B4FjATfCB4drokNNTtJ8hQCK7Lw7knZZ9WP8yC1rwiT",
+      "eventTicker": "WXBTC5M-26SEP251540"
+    },
+    {
+      "startTs": 1790351100,
+      "endTs": 1790351400,
+      "marketLedger": "6E2JLfqNvXFXDPfR5zXbPwmqFcKS9AZnSPe64fZEKA5V",
+      "yesMint": "Eu4dGW6fpVWqwHGgai7iKxCJQgvm7X7chp5NzCiGomB7",
+      "noMint": "DjTwYijxmadX2EQwkyYrWEQyFYXCTkKMZdoxkfRRdR3c",
+      "eventTicker": "WXBTC5M-26SEP251545"
+    },
+    {
+      "startTs": 1790351400,
+      "endTs": 1790351700,
+      "marketLedger": "AVbhZygzR4BPSM9A98LHAeSDRdAz5qN6CSh9bJrJzV5E",
+      "yesMint": "5NBzpzhXoetaUqQvLZRXEL6pCEozhz7csGVMkfUCoTme",
+      "noMint": "BgxFWT4Jrzg7ztbNrNyfVQ9wj2Q1VL4po6dvXCzDQD6J",
+      "eventTicker": "WXBTC5M-26SEP251550"
+    },
+    {
+      "startTs": 1790351700,
+      "endTs": 1790352000,
+      "marketLedger": "6ocVLwvkYhZB6DMnp1qGXfM7oLSCVLXEBMXTnqSUtDS7",
+      "yesMint": "89HZA2wEAnFARFxuZdk3wEyBr1rEajrZ8AUwbPP6MWcU",
+      "noMint": "vj9uK2yeAroATsyXgnkWjnExYP54hxCgctqGDUA6WdJ",
+      "eventTicker": "WXBTC5M-26SEP251555"
     }
   ]
 }
