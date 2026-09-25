@@ -6,7 +6,7 @@ import requests
 
 GAMMA="https://gamma-api.polymarket.com/events"
 RPC="https://solana-rpc.publicnode.com"
-PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"
+PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"\nOPERATOR="DDucv2DeUsTsg1rfAcWAnUSUVpqfdHEzxX66ARB2JYVg"
 INIT=bytes.fromhex("2323bdc19b30aacb")
 REDEEM=bytes.fromhex("0011a762e91c6b34")
 BURN=bytes.fromhex("b080ce016e205a2d")
@@ -62,61 +62,80 @@ def discover_world(start):
     want=expected_description(start)
     target_start_ms=start*1000
     target_end_ms=(start+300)*1000
-    rows=rpc("getSignaturesForAddress",[PREDICT,{"limit":250,"commitment":"confirmed"}]) or []
-    if not isinstance(rows,list):
-        return {"status":"UNKNOWN","reason":"WORLD_SIGNATURE_LIST_INVALID"}
+    # World currently initializes BTC5m markets roughly a day ahead.
+    # Search the operator's signatures in a bounded creation-time window, then
+    # verify the exact on-chain start/end timestamps and metadata.
+    creation_from=start-(26*3600)
+    creation_to=start-(22*3600)
+    before=None
+    pages=0
     checked=0
     init_seen=[]
-    lower=start-900
-    upper=start+600
-    for row in rows:
-        if not isinstance(row,Mapping) or row.get("err") is not None: continue
-        bt=int(row.get("blockTime") or 0)
-        if bt and bt<lower: break
-        if bt and bt>upper: continue
-        sig=str(row.get("signature") or "")
-        if not sig: continue
-        try:
-            tx=rpc("getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}])
-        except Exception:
-            continue
-        if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
-        checked+=1
-        for ins in all_instructions(tx):
-            if ins.get("programId")!=PREDICT or not isinstance(ins.get("data"),str): continue
-            try: raw=b58(ins["data"])
-            except ValueError: continue
-            if len(raw)<65 or raw[:8]!=INIT: continue
-            start_ms=int.from_bytes(raw[49:57],"little")
-            end_ms=int.from_bytes(raw[57:65],"little")
-            acc=[str(x) for x in ins.get("accounts") or []]
-            init_seen.append({
-                "startMs":start_ms,"endMs":end_ms,
-                "durationSeconds":(end_ms-start_ms)/1000.0,
-                "blockTime":bt,"signature":sig,
-            })
-            if start_ms!=target_start_ms or end_ms!=target_end_ms or len(acc)<5: continue
-            market=acc[1]; yes=acc[3]; no=acc[4]
-            try: meta=get_json(f"https://m.world.xyz/{yes}")
-            except Exception as e:
-                return {"status":"UNKNOWN","reason":"WORLD_METADATA_READ_FAILED",
-                        "market":market,"yesMint":yes,"noMint":no,
-                        "error":f"{type(e).__name__}:{e}",
-                        "discovery":"INITIALIZE_MARKET_EXACT_WINDOW"}
-            desc=str(meta.get("description") or "") if isinstance(meta,Mapping) else ""
-            if desc!=want:
-                return {"status":"UNKNOWN","reason":"WORLD_DESCRIPTION_MISMATCH",
-                        "market":market,"yesMint":yes,"noMint":no,
-                        "description":desc,"expectedDescription":want,
-                        "discovery":"INITIALIZE_MARKET_EXACT_WINDOW"}
-            return {
-                "status":"FOUND","market":market,"yesMint":yes,"noMint":no,
-                "description":desc,"discovery":"INITIALIZE_MARKET_EXACT_WINDOW",
-                "initializeSignature":sig,"transactionsChecked":checked,
-            }
-    recent=sorted(init_seen,key=lambda x:x["startMs"],reverse=True)[:20]
+    for _ in range(8):
+        rows=rpc("getSignaturesForAddress",[OPERATOR,{"limit":1000,"commitment":"confirmed",**({"before":before} if before else {})}]) or []
+        pages+=1
+        if not isinstance(rows,list) or not rows: break
+        stop=False
+        for row in rows:
+            if not isinstance(row,Mapping) or row.get("err") is not None: continue
+            bt=int(row.get("blockTime") or 0)
+            if bt and bt<creation_from:
+                stop=True
+                break
+            if bt and bt>creation_to:
+                continue
+            sig=str(row.get("signature") or "")
+            if not sig: continue
+            try:
+                tx=rpc("getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}])
+            except Exception:
+                continue
+            if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
+            checked+=1
+            for ins in all_instructions(tx):
+                if ins.get("programId")!=PREDICT or not isinstance(ins.get("data"),str): continue
+                try: raw=b58(ins["data"])
+                except ValueError: continue
+                if len(raw)<66 or raw[:8]!=INIT: continue
+                # Current observed layout has one additional byte before the two u64 timestamps.
+                start_ms=int.from_bytes(raw[50:58],"little")
+                end_ms=int.from_bytes(raw[58:66],"little")
+                acc=[str(x) for x in ins.get("accounts") or []]
+                init_seen.append({
+                    "startMs":start_ms,"endMs":end_ms,
+                    "durationSeconds":(end_ms-start_ms)/1000.0,
+                    "blockTime":bt,"leadSeconds":start-(bt or start),
+                    "signature":sig,
+                })
+                if start_ms!=target_start_ms or end_ms!=target_end_ms or len(acc)<5: continue
+                market=acc[1]; yes=acc[3]; no=acc[4]
+                try: meta=get_json(f"https://m.world.xyz/{yes}")
+                except Exception as e:
+                    return {"status":"UNKNOWN","reason":"WORLD_METADATA_READ_FAILED",
+                            "market":market,"yesMint":yes,"noMint":no,
+                            "error":f"{type(e).__name__}:{e}",
+                            "discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW"}
+                desc=str(meta.get("description") or "") if isinstance(meta,Mapping) else ""
+                if desc!=want:
+                    return {"status":"UNKNOWN","reason":"WORLD_DESCRIPTION_MISMATCH",
+                            "market":market,"yesMint":yes,"noMint":no,
+                            "description":desc,"expectedDescription":want,
+                            "discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW"}
+                return {
+                    "status":"FOUND","market":market,"yesMint":yes,"noMint":no,
+                    "description":desc,"discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW",
+                    "initializeSignature":sig,"initializeBlockTime":bt,
+                    "leadSeconds":start-(bt or start),
+                    "pagesScanned":pages,"transactionsChecked":checked,
+                }
+        if stop: break
+        before=str(rows[-1].get("signature") or "")
+        if not before: break
+    recent=sorted(init_seen,key=lambda x:abs(x["startMs"]-target_start_ms))[:20]
     return {"status":"NOT_FOUND","reason":"WORLD_EXACT_5M_INITIALIZE_NOT_FOUND",
-            "transactionsChecked":checked,"recentInitializeMarkets":recent}
+            "pagesScanned":pages,"transactionsChecked":checked,
+            "creationSearchFrom":creation_from,"creationSearchTo":creation_to,
+            "nearbyInitializeMarkets":recent}
 
 def validate_known_world_market(start, yes_mint):
     want=expected_description(start)
