@@ -5,6 +5,7 @@ from typing import Any, Mapping
 import requests
 
 GAMMA="https://gamma-api.polymarket.com/events"
+WORLD_CATALOG="https://markets-api-proxy.world-xyz.workers.dev/api/v1/markets"
 RPC="https://solana-rpc.publicnode.com"
 PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"
 OPERATOR="DDucv2DeUsTsg1rfAcWAnUSUVpqfdHEzxX66ARB2JYVg"
@@ -60,83 +61,73 @@ def all_instructions(tx):
     return [x for x in out if isinstance(x,Mapping)]
 
 def discover_world(start):
-    want=expected_description(start)
-    target_start_ms=start*1000
-    target_end_ms=(start+300)*1000
-    # World currently initializes BTC5m markets roughly a day ahead.
-    # Search the operator's signatures in a bounded creation-time window, then
-    # verify the exact on-chain start/end timestamps and metadata.
-    creation_from=start-(26*3600)
-    creation_to=start-(22*3600)
-    before=None
+    end=start+300
+    cursor=None
     pages=0
-    checked=0
-    init_seen=[]
-    for _ in range(8):
-        rows=rpc("getSignaturesForAddress",[OPERATOR,{"limit":1000,"commitment":"confirmed",**({"before":before} if before else {})}]) or []
+    scanned=0
+    for _ in range(50):
+        params={"limit":100}
+        if cursor is not None:
+            params["cursor"]=cursor
+        r=requests.get(
+            WORLD_CATALOG,params=params,
+            headers={"Accept":"application/json","Origin":"https://world.xyz",
+                     "Referer":"https://world.xyz/","User-Agent":"world-pm-public-observer/4"},
+            timeout=20,
+        )
+        r.raise_for_status()
+        payload=r.json()
         pages+=1
-        if not isinstance(rows,list) or not rows: break
-        stop=False
-        for row in rows:
-            if not isinstance(row,Mapping) or row.get("err") is not None: continue
-            bt=int(row.get("blockTime") or 0)
-            if bt and bt<creation_from:
-                stop=True
-                break
-            if bt and bt>creation_to:
-                continue
-            sig=str(row.get("signature") or "")
-            if not sig: continue
-            try:
-                tx=rpc("getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}])
-            except Exception:
-                continue
-            if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
-            checked+=1
-            for ins in all_instructions(tx):
-                if ins.get("programId")!=PREDICT or not isinstance(ins.get("data"),str): continue
-                try: raw=b58(ins["data"])
-                except ValueError: continue
-                if len(raw)<66 or raw[:8]!=INIT: continue
-                # Current observed layout has one additional byte before the two u64 timestamps.
-                start_ms=int.from_bytes(raw[50:58],"little")
-                end_ms=int.from_bytes(raw[58:66],"little")
-                acc=[str(x) for x in ins.get("accounts") or []]
-                init_seen.append({
-                    "startMs":start_ms,"endMs":end_ms,
-                    "durationSeconds":(end_ms-start_ms)/1000.0,
-                    "blockTime":bt,"leadSeconds":start-(bt or start),
-                    "signature":sig,
-                })
-                if start_ms!=target_start_ms or end_ms!=target_end_ms or len(acc)<5: continue
-                market=acc[1]; yes=acc[3]; no=acc[4]
-                try: meta=get_json(f"https://m.world.xyz/{yes}")
-                except Exception as e:
-                    return {"status":"UNKNOWN","reason":"WORLD_METADATA_READ_FAILED",
-                            "market":market,"yesMint":yes,"noMint":no,
-                            "error":f"{type(e).__name__}:{e}",
-                            "discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW"}
-                desc=str(meta.get("description") or "") if isinstance(meta,Mapping) else ""
-                if desc!=want:
-                    return {"status":"UNKNOWN","reason":"WORLD_DESCRIPTION_MISMATCH",
-                            "market":market,"yesMint":yes,"noMint":no,
-                            "description":desc,"expectedDescription":want,
-                            "discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW"}
-                return {
-                    "status":"FOUND","market":market,"yesMint":yes,"noMint":no,
-                    "description":desc,"discovery":"OPERATOR_INITIALIZE_MARKET_EXACT_WINDOW",
-                    "initializeSignature":sig,"initializeBlockTime":bt,
-                    "leadSeconds":start-(bt or start),
-                    "pagesScanned":pages,"transactionsChecked":checked,
-                }
-        if stop: break
-        before=str(rows[-1].get("signature") or "")
-        if not before: break
-    recent=sorted(init_seen,key=lambda x:abs(x["startMs"]-target_start_ms))[:20]
-    return {"status":"NOT_FOUND","reason":"WORLD_EXACT_5M_INITIALIZE_NOT_FOUND",
-            "pagesScanned":pages,"transactionsChecked":checked,
-            "creationSearchFrom":creation_from,"creationSearchTo":creation_to,
-            "nearbyInitializeMarkets":recent}
+        if isinstance(payload,list):
+            rows=payload
+            next_cursor=None
+        elif isinstance(payload,Mapping):
+            rows=payload.get("markets") or payload.get("items") or payload.get("data") or []
+            next_cursor=payload.get("cursor")
+            if next_cursor is None:
+                next_cursor=payload.get("nextCursor") or payload.get("next_cursor")
+        else:
+            return {"status":"UNKNOWN","reason":"WORLD_CATALOG_INVALID_PAYLOAD"}
+        if not isinstance(rows,list):
+            return {"status":"UNKNOWN","reason":"WORLD_CATALOG_INVALID_ROWS"}
+        for market in rows:
+            if not isinstance(market,Mapping): continue
+            scanned+=1
+            if str(market.get("seriesTicker") or "")!="WXBTC5M": continue
+            open_ts=int(market.get("openTime") or 0)
+            close_ts=int(market.get("closeTime") or market.get("expirationTime") or 0)
+            if open_ts!=start or close_ts!=end: continue
+            accounts=market.get("accounts") or {}
+            if not isinstance(accounts,Mapping): continue
+            choices=[]
+            for collateral,acct in accounts.items():
+                if isinstance(acct,Mapping) and acct.get("isInitialized"):
+                    choices.append((str(collateral),acct))
+            if not choices:
+                return {"status":"UNKNOWN","reason":"WORLD_CATALOG_MATCH_NOT_INITIALIZED",
+                        "ticker":market.get("ticker"),"pagesScanned":pages}
+            collateral,acct=choices[0]
+            ledger=str(acct.get("marketLedger") or "")
+            yes=str(acct.get("yesMint") or "")
+            no=str(acct.get("noMint") or "")
+            if not ledger or not yes or not no:
+                return {"status":"UNKNOWN","reason":"WORLD_CATALOG_IDENTITY_INCOMPLETE",
+                        "ticker":market.get("ticker"),"pagesScanned":pages}
+            rules=market.get("rulesPrimary") or {}
+            return {
+                "status":"FOUND","market":ledger,"yesMint":yes,"noMint":no,
+                "ticker":market.get("ticker"),"eventTicker":market.get("eventTicker"),
+                "openTime":open_ts,"closeTime":close_ts,
+                "collateralMint":collateral,
+                "discovery":"WORLD_PUBLIC_CATALOG_EXACT_WINDOW",
+                "pagesScanned":pages,"marketsScanned":scanned,
+                "rulesPrimary":rules,
+            }
+        if not next_cursor or not rows:
+            break
+        cursor=next_cursor
+    return {"status":"NOT_FOUND","reason":"WORLD_CATALOG_EXACT_BTC5M_NOT_FOUND",
+            "pagesScanned":pages,"marketsScanned":scanned}
 
 def validate_known_world_market(start, yes_mint):
     want=expected_description(start)
