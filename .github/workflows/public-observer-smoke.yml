@@ -35,6 +35,9 @@ jobs:
           else
             python observer.py
           fi
+      - name: Known-good discovery regression
+        run: |
+          python observer.py --start-ts 1790206800 --output artifacts/known-good-1790206800.json
       - name: Hash source and artifacts
         if: always()
         run: |
