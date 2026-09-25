@@ -4,5 +4,6 @@
   "windows": 6,
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
   "privateAuthorityResearchSha": "959a003d1ae117b6c7bf7c7ec9565fab57c63765",
-  "mode": "NO_TRADE_PUBLIC_READ_ONLY_SPLIT_RUNNER_AB"
+  "mode": "NO_TRADE_PUBLIC_READ_ONLY_SPLIT_RUNNER_AB",
+  "requestId": "split-runner-ab-20260926-01"
 }
