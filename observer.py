@@ -7,6 +7,7 @@ import requests
 GAMMA="https://gamma-api.polymarket.com/events"
 RPC="https://solana-rpc.publicnode.com"
 PREDICT="prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM"
+INIT=bytes.fromhex("2323bdc19b30aacb")
 REDEEM=bytes.fromhex("0011a762e91c6b34")
 BURN=bytes.fromhex("b080ce016e205a2d")
 B58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -51,49 +52,64 @@ def all_instructions(tx):
 
 def discover_world(start):
     want=expected_description(start)
+    target_start_ms=start*1000
+    target_end_ms=(start+300)*1000
     before=None
     pages=0
     checked=0
-    for _ in range(20):
+    init_seen=[]
+    for _ in range(8):
         opts={"limit":1000,"commitment":"confirmed"}
         if before: opts["before"]=before
         rows=rpc("getSignaturesForAddress",[PREDICT,opts]) or []
         pages+=1
         if not isinstance(rows,list) or not rows: break
-        stop=False
         for row in rows:
             if not isinstance(row,Mapping) or row.get("err") is not None: continue
-            bt=int(row.get("blockTime") or 0)
-            if bt < start:
-                stop=True
-                break
-            if bt > start+300: continue
             sig=str(row.get("signature") or "")
             if not sig: continue
-            checked+=1
             tx=rpc("getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}])
             if not isinstance(tx,Mapping) or (tx.get("meta") or {}).get("err") is not None: continue
-            logs=(tx.get("meta") or {}).get("logMessages") or []
-            if not any("Instruction: Split" in str(x) for x in logs): continue
+            checked+=1
             for ins in all_instructions(tx):
+                if ins.get("programId")!=PREDICT or not isinstance(ins.get("data"),str): continue
+                try: raw=b58(ins["data"])
+                except ValueError: continue
+                if len(raw)<65 or raw[:8]!=INIT: continue
+                start_ms=int.from_bytes(raw[49:57],"little")
+                end_ms=int.from_bytes(raw[57:65],"little")
                 acc=[str(x) for x in ins.get("accounts") or []]
-                if ins.get("programId")!=PREDICT or len(acc)<11: continue
-                yes=acc[3]
-                try:
-                    meta=get_json(f"https://m.world.xyz/{yes}")
-                except Exception:
-                    continue
-                if not isinstance(meta,Mapping) or str(meta.get("description") or "")!=want: continue
+                init_seen.append({
+                    "startMs":start_ms,"endMs":end_ms,
+                    "durationSeconds":(end_ms-start_ms)/1000.0,
+                    "signature":sig,
+                })
+                if start_ms!=target_start_ms or end_ms!=target_end_ms or len(acc)<5: continue
+                market=acc[1]; yes=acc[3]; no=acc[4]
+                try: meta=get_json(f"https://m.world.xyz/{yes}")
+                except Exception as e:
+                    return {"status":"UNKNOWN","reason":"WORLD_METADATA_READ_FAILED",
+                            "market":market,"yesMint":yes,"noMint":no,
+                            "error":f"{type(e).__name__}:{e}",
+                            "discovery":"INITIALIZE_MARKET_EXACT_WINDOW"}
+                desc=str(meta.get("description") or "") if isinstance(meta,Mapping) else ""
+                if desc!=want:
+                    return {"status":"UNKNOWN","reason":"WORLD_DESCRIPTION_MISMATCH",
+                            "market":market,"yesMint":yes,"noMint":no,
+                            "description":desc,"expectedDescription":want,
+                            "discovery":"INITIALIZE_MARKET_EXACT_WINDOW"}
                 return {
-                    "status":"FOUND","market":acc[1],"yesMint":yes,"noMint":acc[4],
-                    "description":want,"discovery":"PUBLIC_SOLANA_PAGINATED_SPLIT",
-                    "pagesScanned":pages,"candidateTransactionsChecked":checked,
+                    "status":"FOUND","market":market,"yesMint":yes,"noMint":no,
+                    "description":desc,"discovery":"INITIALIZE_MARKET_EXACT_WINDOW",
+                    "initializeSignature":sig,"pagesScanned":pages,
+                    "transactionsChecked":checked,
                 }
-        if stop: break
         before=str(rows[-1].get("signature") or "")
         if not before: break
-    return {"status":"NOT_FOUND","reason":"WORLD_MARKET_NOT_DISCOVERED",
-            "pagesScanned":pages,"candidateTransactionsChecked":checked}
+    recent=sorted(init_seen,key=lambda x:x["startMs"],reverse=True)[:20]
+    return {"status":"NOT_FOUND","reason":"WORLD_EXACT_5M_INITIALIZE_NOT_FOUND",
+            "pagesScanned":pages,"transactionsChecked":checked,
+            "recentInitializeMarkets":recent}
 
 def validate_known_world_market(start, yes_mint):
     want=expected_description(start)
