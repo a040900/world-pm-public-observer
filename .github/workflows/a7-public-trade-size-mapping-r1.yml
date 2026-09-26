@@ -1,0 +1,31 @@
+name: A7 public trade size mapping R1
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: "Number of consecutive BTC 5m windows"
+        required: false
+        default: "6"
+
+permissions:
+  contents: read
+
+jobs:
+  a7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+      - name: Install public-read dependencies
+        run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: Run A7 public trade size mapping
+        run: python tools/research/a7_public_trade_size_mapping_r1.py --windows "${{ inputs.windows }}" --output artifacts/a7-size-mapping-r1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: a7-public-trade-size-mapping-r1
+          path: artifacts/a7-size-mapping-r1.json
+          if-no-files-found: error
