@@ -31,7 +31,7 @@ jobs:
       - name: Run A7 public trade size mapping
         env:
           A7_WINDOWS: ${{ inputs.windows || '6' }}
-        run: python tools/research/a7_public_trade_size_mapping_r1.py --windows "$A7_WINDOWS" --output artifacts/a7-size-mapping-r1.json
+        run: python -m tools.research.a7_public_trade_size_mapping_r1 --windows "$A7_WINDOWS" --output artifacts/a7-size-mapping-r1.json
       - uses: actions/upload-artifact@v4
         with:
           name: a7-public-trade-size-mapping-r1
