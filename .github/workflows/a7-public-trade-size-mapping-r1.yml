@@ -7,6 +7,12 @@ on:
         description: "Number of consecutive BTC 5m windows"
         required: false
         default: "6"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/a7-public-trade-size-mapping-r1.yml"
+      - "tools/research/a7_public_trade_size_mapping_r1.py"
 
 permissions:
   contents: read
@@ -23,7 +29,9 @@ jobs:
       - name: Install public-read dependencies
         run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
       - name: Run A7 public trade size mapping
-        run: python tools/research/a7_public_trade_size_mapping_r1.py --windows "${{ inputs.windows }}" --output artifacts/a7-size-mapping-r1.json
+        env:
+          A7_WINDOWS: ${{ inputs.windows || '6' }}
+        run: python tools/research/a7_public_trade_size_mapping_r1.py --windows "$A7_WINDOWS" --output artifacts/a7-size-mapping-r1.json
       - uses: actions/upload-artifact@v4
         with:
           name: a7-public-trade-size-mapping-r1
