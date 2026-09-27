@@ -1,5 +1,8 @@
 name: WORLD_PM_WORLD_SPECIFIC_INCREMENTAL_R1
 on:
+  push:
+    branches: [main]
+    paths: ['.github/run-requests/world-specific-incremental-r1.json']
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,6 +32,8 @@ jobs:
             'privateAuthorityProtocolCommit':'3ea107285b6c004bea53b20e63724f8f84261684',
             'windows':6,
             'mode':'PUBLIC_READ_ONLY_NO_TRADE',
+            'supersedesInvalidRun':36336976825,
+            'observerTimeRule':'LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA',
           }
           for k,v in expected.items():
               assert r.get(k)==v, (k,r.get(k),v)
