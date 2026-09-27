@@ -17,3 +17,5 @@ jobs:
           python -m unittest tests.test_world_specific_incremental_r1 -v
           python -m tools.research.world_pm_world_specific_incremental_r1 --self-test
           python -m py_compile tools/research/world_pm_world_specific_incremental_r1.py
+
+# validation-trigger: causal-cutoff-r1-20260928
