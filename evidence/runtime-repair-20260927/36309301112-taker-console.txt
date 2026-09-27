@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_two_leg_paper_bot_r1.py", line 1141, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_two_leg_paper_bot_r1.py", line 1136, in main
+    asyncio.run(run(args))
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_two_leg_paper_bot_r1.py", line 999, in run
+    raise ValueError("WINDOW_COUNT_OUT_OF_RANGE")
+ValueError: WINDOW_COUNT_OUT_OF_RANGE

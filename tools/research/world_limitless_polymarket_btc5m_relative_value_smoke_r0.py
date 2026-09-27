@@ -29,14 +29,8 @@ def _to_float(value: Any) -> float | None:
 
 
 def _discover_world_market(start_ts: int, rpc_url: str, deadline: float) -> wp.WorldMarket:
-    last_error: Exception | None = None
-    while time.time() < deadline:
-        try:
-            return wp.discover_world_market(start_ts, rpc_url=rpc_url)
-        except Exception as exc:
-            last_error = exc
-            time.sleep(1.0)
-    raise RuntimeError(f"WORLD_DISCOVERY_TIMEOUT:{type(last_error).__name__ if last_error else 'UNKNOWN'}:{last_error}")
+    return wp.discover_world_market(start_ts, rpc_url=rpc_url, deadline=deadline)
+
 
 
 class DflowQuotes:

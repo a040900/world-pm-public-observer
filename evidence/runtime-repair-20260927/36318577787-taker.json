@@ -1,0 +1,260 @@
+{
+  "cashBasisStatus": "ASSUMPTION_DEPENDENT_1_CASH_EQ_1_USD",
+  "cashDecimals": 6,
+  "clockCalibration": {
+    "medianServerMinusLocalSeconds": -0.47919464111328125,
+    "role": "DIAGNOSTIC_AND_WINDOW_ALIGNMENT_ONLY_NOT_A_BOOK_FRESHNESS_GATE",
+    "samples": [
+      {
+        "receivedAt": 1790511578.7190132,
+        "requestStartedAt": 1790511578.2803824,
+        "rttMs": 438.6308193206787,
+        "serverMinusLocalMidpointSeconds": -0.4996976852416992,
+        "serverTime": 1790511578.0
+      },
+      {
+        "receivedAt": 1790511578.9272356,
+        "requestStartedAt": 1790511578.7691298,
+        "rttMs": 158.10585021972656,
+        "serverMinusLocalMidpointSeconds": -0.8481826782226562,
+        "serverTime": 1790511578.0
+      },
+      {
+        "receivedAt": 1790511579.1364498,
+        "requestStartedAt": 1790511578.9773605,
+        "rttMs": 159.0893268585205,
+        "serverMinusLocalMidpointSeconds": -0.056905269622802734,
+        "serverTime": 1790511579.0
+      },
+      {
+        "receivedAt": 1790511579.3481305,
+        "requestStartedAt": 1790511579.186569,
+        "rttMs": 161.5614891052246,
+        "serverMinusLocalMidpointSeconds": -0.2673497200012207,
+        "serverTime": 1790511579.0
+      },
+      {
+        "receivedAt": 1790511579.5601306,
+        "requestStartedAt": 1790511579.3982584,
+        "rttMs": 161.87214851379395,
+        "serverMinusLocalMidpointSeconds": -0.47919464111328125,
+        "serverTime": 1790511579.0
+      }
+    ],
+    "serverNowEstimate": 1790511579.1310794
+  },
+  "completedAt": 1790514000.158228,
+  "firstWindowStartTs": 1790512200,
+  "invariants": {
+    "cashLedgerMatchesTrades": true,
+    "duplicateFillIds": false,
+    "exposureShares": {},
+    "pass": true,
+    "stopNewTradesConsistent": true
+  },
+  "ledgerState": {
+    "cashOutUsd": 0.0,
+    "orders": {},
+    "schemaVersion": "WORLD_PM_TWO_LEG_PAPER_EXECUTION_CORE_R1",
+    "seenEventIds": [],
+    "seenFillIds": [],
+    "settledPnlUsd": 0.0,
+    "spec": {
+      "cash_usd_assumption": 1.0,
+      "decision_latency_ms": 250.0,
+      "max_pair_cost_usd": 50.0,
+      "max_unhedged_hold_ms": 2000.0,
+      "max_unhedged_world_cost_usd": 12.0,
+      "max_unit_cost": 1.0,
+      "min_nominal_edge_usd": 0.0,
+      "pm_evidence_ttl_ms": 1000.0,
+      "quote_ttl_ms": 1000.0,
+      "second_leg_latency_ms": 250.0,
+      "world_cash_size": 10.0,
+      "world_fee_bps_assumption": null
+    },
+    "stopNewTrades": false,
+    "stopReasons": [],
+    "trades": {}
+  },
+  "legacyWorldFeeBpsAssumption": null,
+  "legacyWorldFeeBpsAssumptionApplied": false,
+  "mode": "PUBLIC_READ_ONLY_PAPER_NO_TRADE",
+  "noTradeBoundary": {
+    "capital": false,
+    "credentials": false,
+    "orderPlacement": false,
+    "privateKeys": false,
+    "signing": false,
+    "transactionSubmission": false
+  },
+  "pmSourceFreshnessGate": {
+    "calibrationOffsetApplied": false,
+    "clockBasis": "LOCAL_RECEIPT_VS_PM_MILLISECOND_SOURCE",
+    "futureToleranceMs": 250.0,
+    "maxAgeMs": 1000.0,
+    "sourceTimestampField": "Polymarket WSS sourceTimestampMs"
+  },
+  "requestedWindows": 6,
+  "researchBudget": {
+    "authority": "EXISTING_WORLD_PM_GLOBAL_60_WINDOW_BUDGET",
+    "consumedAfterRun": 48,
+    "consumedBeforeSmoke": 42,
+    "fullBudgetCompletionRequiredForThisAcceptance": false,
+    "limit": 60,
+    "plannedAfterSmoke": 48
+  },
+  "runState": "COMPLETED",
+  "runtime": {
+    "githubRunId": "36318577787",
+    "githubSha": "2ff6a19a7b73442d26d96514d1d2a6cb10472f4d",
+    "mode": "PUBLIC_READ_ONLY_NO_TRADE",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "pythonVersion": "3.11.9 (main, Jul 15 2024, 21:50:42) [GCC 13.2.0]"
+  },
+  "schemaVersion": "WORLD_PM_TWO_LEG_PAPER_BOT_R1",
+  "settlementObservationSummary": {
+    "method": "PUBLIC_SOLANA_REDEEM_OR_BURN_ACTION_PLUS_POLYMARKET_GAMMA_FINAL_OUTCOME",
+    "mismatchCount": 0,
+    "resolvedWindowCount": 0,
+    "sameDirectionCount": 0,
+    "settlementEquivalenceAssumed": false,
+    "status": "PARTIAL",
+    "windowCount": 6
+  },
+  "sourceSha256": {
+    "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_edge_lifetime_low_interference_r3.py": "5debf10d6f43fc1a006c839eb8db891d28f6843b53062e121933545ddc857bed",
+    "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_paper_execution_core_r1.py": "0e478f4347610e69a939bf86ea0788f24aa4315a5e265ba17d4acb38f05ab343",
+    "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_two_leg_paper_bot_r1.py": "55ebc77b9a47432d3ef2d115b65f930f775c2d5b0ca371254657a828e6739673",
+    "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_world_session_randomized_r2.py": "da84da861632a19c02c5c58942d71ef2dafc95fdcc5ce5d0ac6676464d21639d",
+    "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_polymarket_btc5m_executable_sync_r23.py": "a13a65cf6f9853d0238239640686a2ce0d34e2c7dde7fbbc38ce5fd05181fc90"
+  },
+  "spec": {
+    "cash_usd_assumption": 1.0,
+    "decision_latency_ms": 250.0,
+    "max_pair_cost_usd": 50.0,
+    "max_unhedged_hold_ms": 2000.0,
+    "max_unhedged_world_cost_usd": 12.0,
+    "max_unit_cost": 1.0,
+    "min_nominal_edge_usd": 0.0,
+    "pm_evidence_ttl_ms": 1000.0,
+    "quote_ttl_ms": 1000.0,
+    "second_leg_latency_ms": 250.0,
+    "world_cash_size": 10.0,
+    "world_fee_bps_assumption": null
+  },
+  "summary": {
+    "candidateCount": 0,
+    "liveCandidatePathObserved": false,
+    "liveTwoLegPathObserved": false,
+    "noTradeDecisionCount": 0,
+    "openRiskAtEnd": false,
+    "paperTradeDecisionCount": 0,
+    "pmSourceFreshnessRejectedPollCount": 0,
+    "secondLegPositiveCompleteCount": 0,
+    "twoLegSimulationCompleteCount": 0,
+    "unknownDecisionCount": 0,
+    "windowsCompleted": 6
+  },
+  "windows": [
+    {
+      "candidates": [],
+      "endTs": 1790512500,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790512200,
+      "windowIndex": 1,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "candidates": [],
+      "endTs": 1790512800,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790512500,
+      "windowIndex": 2,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "candidates": [],
+      "endTs": 1790513100,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790512800,
+      "windowIndex": 3,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "candidates": [],
+      "endTs": 1790513400,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790513100,
+      "windowIndex": 4,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "candidates": [],
+      "endTs": 1790513700,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790513400,
+      "windowIndex": 5,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "candidates": [],
+      "endTs": 1790514000,
+      "radarEpisodeCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarFreshnessRejectPollCount": {
+        "WORLD_NO+PM_UP": 0,
+        "WORLD_YES+PM_DOWN": 0
+      },
+      "radarPollCount": 0,
+      "startTs": 1790513700,
+      "windowIndex": 6,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    }
+  ],
+  "worldFeeSemanticsAuthority": "docs/decisions/2026-09-22-world-pm-dflow-quote-fee-semantics-r1.md",
+  "worldFeeStatus": "INCLUDED_IN_DFLOW_QUOTE_OUTPUT_AFTER_ALL_FEES",
+  "worldFeeTreatment": "NO_SEPARATE_CASH_ADDON_OUTPUT_SHARES_ALREADY_AFTER_ALL_FEES"
+}

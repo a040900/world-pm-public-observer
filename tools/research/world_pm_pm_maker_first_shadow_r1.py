@@ -17,6 +17,8 @@ submission, order placement, or capital.
 """
 from __future__ import annotations
 
+from tools.research import world_pm_qualification_runtime_r1 as qualification
+
 import argparse
 import asyncio
 import json
@@ -718,7 +720,12 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
     end_ts = start_ts + WINDOW_SECONDS
     if time.time() < start_ts:
         await asyncio.sleep(start_ts - time.time())
-    pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
+    try:
+        pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
+    except Exception as exc:
+        return qualification.qualify_window({"startTs": start_ts, "endTs": end_ts,
+            "executionError": f"PM_DISCOVERY:{type(exc).__name__}:{exc}",
+            "radarPollCount": 0, "shadowCandidates": [], "candidates": [], "summary": {"candidateCount": 0}})
     stop = asyncio.Event()
     feed = TradeAwareBook([pm_market.up_token, pm_market.down_token])
     feed_task = asyncio.create_task(feed.run(stop))
@@ -739,6 +746,9 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         "startTs": start_ts,
         "endTs": end_ts,
         "worldDiscoveryError": world_error,
+        "worldDiscoveryTrace": r23.wp.DISCOVERY_TRACES.get(start_ts, {}),
+        "pmMarket": {"conditionId": pm_market.condition_id, "upToken": pm_market.up_token, "downToken": pm_market.down_token},
+        "radarPollCount": 0,
         "shadowCandidates": [],
         "summary": {},
     }
@@ -747,12 +757,22 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         feed_task.cancel()
         await asyncio.gather(feed_task, return_exceptions=True)
         row["summary"] = {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}
-        return row
+        return qualification.qualify_window(row)
 
-    yes_decimals, no_decimals = await asyncio.gather(
-        asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
-        asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
-    )
+    try:
+        yes_decimals, no_decimals = await asyncio.gather(
+            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
+            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
+        )
+    except Exception as exc:
+        row["executionError"] = f"TOKEN_DECIMALS:{type(exc).__name__}:{exc}"
+        stop.set()
+        feed_task.cancel()
+        await asyncio.gather(feed_task, return_exceptions=True)
+        return qualification.qualify_window(row)
+
+    row["worldMarket"] = {"market": world_market.market, "yesMint": world_market.yes_mint, "noMint": world_market.no_mint,
+                          "yesDecimals": yes_decimals, "noDecimals": no_decimals}
     dflow = r2s.GapRadar(world_market.yes_mint, world_market.no_mint)
     dflow_task = asyncio.create_task(dflow.run(stop))
     world_session = requests.Session()
@@ -790,7 +810,10 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
     try:
         while time.time() < end_ts:
             now = time.time()
+            row["radarPollCount"] += 1
             world_snapshot = dflow.snapshot(now)
+            qualification.observe_health(row, world_snapshot,
+                [feed.snapshot(pm_market.up_token), feed.snapshot(pm_market.down_token)], now)
             for pair, side, world_mint, world_decimals, pm_token, complement_token in pairs:
                 current = active[pair]
                 if current is not None:
@@ -1034,6 +1057,9 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     "status": "RESTING_SHADOW",
                 }
             await asyncio.sleep(POLL_SECONDS)
+        row["measurementLoopCompleted"] = True
+    except Exception as exc:
+        row["executionError"] = f"{type(exc).__name__}:{exc}"
     finally:
         for pair, current in active.items():
             if current is not None:
@@ -1115,7 +1141,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         "survivingProtectedEdgeCount": len(definite_survived),
         "noTrade": True,
     }
-    return row
+    return qualification.qualify_window(row)
 
 
 async def run(args: argparse.Namespace) -> dict[str, Any]:
@@ -1181,6 +1207,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "noTrade": True,
         },
     }
+    result["qualification"] = qualification.qualify_batch(windows, args.windows)
+    result["summary"].update(result["qualification"])
     return result
 
 
