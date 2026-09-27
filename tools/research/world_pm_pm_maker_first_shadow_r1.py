@@ -29,6 +29,7 @@ import requests
 from tools.research import world_polymarket_btc5m_executable_sync_r23 as r23
 from tools.research import world_polymarket_btc5m_executable_sync_r24 as r24
 from tools.research import world_pm_world_session_randomized_r2 as r2s
+from tools.research import a7_public_trade_size_mapping_r1 as a7
 
 SCHEMA_VERSION = "WORLD_PM_PM_MAKER_FIRST_SHADOW_R1"
 WINDOW_SECONDS = 300
@@ -419,6 +420,56 @@ def validate_maker_entry_snapshot(
     }
 
 
+def _hydrate_trade_execution_evidence(trade: dict[str, Any]) -> None:
+    """Attach public-chain OrderFilled evidence; failures remain fail-closed."""
+    if trade.get("executionEvidence") is not None:
+        return
+    tx_hash = trade.get("transactionHash") or trade.get("transaction_hash")
+    token = trade.get("assetId") or trade.get("asset_id")
+    if not tx_hash or not token:
+        trade["executionEvidence"] = {"status": "UNAVAILABLE", "reason": "MISSING_TX_OR_TOKEN"}
+        return
+    event = {
+        "transaction_hash": tx_hash,
+        "asset_id": str(token),
+        "price": trade.get("price"),
+        "size": trade.get("size"),
+        "side": trade.get("side"),
+        "timestamp": trade.get("sourceTimestampMs") or trade.get("timestamp"),
+    }
+    try:
+        trade["executionEvidence"] = a7._analyze_event(event)
+    except Exception as exc:
+        trade["executionEvidence"] = {
+            "status": "UNAVAILABLE",
+            "reason": f"{type(exc).__name__}:{exc}",
+        }
+
+
+def _onchain_sell_volumes(trade: Mapping[str, Any], maker_bid: float) -> tuple[float, float] | None:
+    """Return (same-price shares, strictly-below-bid shares) from OrderFilled maker logs."""
+    evidence = trade.get("executionEvidence")
+    if not isinstance(evidence, Mapping) or not str(evidence.get("status") or "").startswith("QUALIFIED"):
+        return None
+    maker_logs = evidence.get("makerLogs")
+    if not isinstance(maker_logs, list):
+        return None
+    same = 0.0
+    below = 0.0
+    for fill in maker_logs:
+        if not isinstance(fill, Mapping):
+            continue
+        price = _finite(fill.get("price"))
+        shares = _finite(fill.get("shares"))
+        if price is None or shares is None or shares <= 0:
+            continue
+        if price < maker_bid - 1e-12:
+            below += shares
+        elif abs(price - maker_bid) <= 1e-12:
+            same += shares
+    return same, below
+
+
 def queue_shadow_fill(
     *,
     maker_bid: float,
@@ -426,51 +477,72 @@ def queue_shadow_fill(
     maker_size: float,
     trades: list[Mapping[str, Any]],
 ) -> dict[str, Any]:
-    """Conservative public-trade queue shadow for a hypothetical resting BUY."""
+    """Fail-closed queue shadow using on-chain maker-level matched quantities.
+
+    Public last_trade_price.size is aggregate taker size and MUST NOT be used as
+    price-level execution volume (A7_PUBLIC_TRADE_SIZE_MAPPING_R1).
+    """
     same_price_sell = 0.0
-    seen: set[tuple[Any, ...]] = set()
+    below_bid_sell = 0.0
+    seen: set[str] = set()
+    unavailable = 0
+    trigger: dict[str, Any] | None = None
     for trade in trades:
         side = str(trade.get("side") or "").upper()
         price = _finite(trade.get("price"))
-        size = _finite(trade.get("size"))
-        if side != "SELL" or price is None or size is None or size <= 0:
+        tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "").lower()
+        if side != "SELL" or price is None or price > maker_bid + 1e-12:
             continue
-        fingerprint = (
-            trade.get("transactionHash") or trade.get("transaction_hash"),
-            trade.get("sourceTimestampMs") or trade.get("timestamp"),
-            round(price, 12),
-            round(size, 12),
-        )
-        if fingerprint in seen:
+        if not tx_hash or tx_hash in seen:
             continue
-        seen.add(fingerprint)
-        if price < maker_bid - 1e-12:
-            fill = min(maker_size, size)
+        seen.add(tx_hash)
+        volumes = _onchain_sell_volumes(trade, maker_bid)
+        if volumes is None:
+            unavailable += 1
+            continue
+        same, below = volumes
+        same_price_sell += same
+        below_bid_sell += below
+        if trigger is None and below > 0:
+            trigger = dict(trade)
+
+        # A factual execution strictly below our hypothetical resting bid proves
+        # that this much taker SELL flow actually continued below that price.
+        # Under the frozen counterfactual (our order added, never cancelled),
+        # that below-bid factual volume is a conservative lower bound on flow
+        # available to our order; aggregate taker size is deliberately ignored.
+        if below_bid_sell > 0:
+            fill = min(maker_size, below_bid_sell)
             return {
                 "status": "FULL_SHADOW_FILL" if fill >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL",
                 "fillShares": fill,
                 "samePriceSellVolume": same_price_sell,
-                "trigger": dict(trade),
-                "rule": "SELL_PRINT_BELOW_STILL_RESTING_BID_VOLUME_CAPS_HYPOTHETICAL_FILL",
+                "belowBidSellVolume": below_bid_sell,
+                "trigger": trigger or dict(trade),
+                "rule": "ONCHAIN_MAKER_MATCHED_VOLUME_STRICTLY_BELOW_STILL_RESTING_BID",
+                "executionEvidenceUnavailableCount": unavailable,
             }
-        if abs(price - maker_bid) <= 1e-12:
-            same_price_sell += size
-            executable = max(0.0, same_price_sell - max(0.0, queue_ahead))
-            if executable > 0:
-                fill = min(maker_size, executable)
-                return {
-                    "status": "FULL_SHADOW_FILL" if fill >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL",
-                    "fillShares": fill,
-                    "samePriceSellVolume": same_price_sell,
-                    "trigger": dict(trade),
-                    "rule": "EXACT_BID_SELL_VOLUME_EXCEEDED_QUEUE_AHEAD",
-                }
+
+        executable = max(0.0, same_price_sell - max(0.0, queue_ahead))
+        if executable > 0:
+            fill = min(maker_size, executable)
+            return {
+                "status": "FULL_SHADOW_FILL" if fill >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL",
+                "fillShares": fill,
+                "samePriceSellVolume": same_price_sell,
+                "belowBidSellVolume": below_bid_sell,
+                "trigger": dict(trade),
+                "rule": "ONCHAIN_EXACT_BID_MATCHED_VOLUME_EXCEEDED_QUEUE_AHEAD",
+                "executionEvidenceUnavailableCount": unavailable,
+            }
     return {
         "status": "NO_SHADOW_FILL",
         "fillShares": 0.0,
         "samePriceSellVolume": same_price_sell,
+        "belowBidSellVolume": below_bid_sell,
         "trigger": None,
-        "rule": "QUEUE_NOT_CLEARED_BY_PUBLIC_SELL_TRADES",
+        "rule": "QUEUE_NOT_CLEARED_BY_ONCHAIN_MAKER_MATCHED_VOLUME",
+        "executionEvidenceUnavailableCount": unavailable,
     }
 
 
@@ -503,7 +575,9 @@ class TradeAwareBook(r24.PolymarketTimelineBook):
                 "side": side,
                 "feeRateBps": message.get("fee_rate_bps") or message.get("feeRateBps"),
                 "transactionHash": message.get("transaction_hash") or message.get("transactionHash"),
+                "assetId": token,
                 "connectionGeneration": self.connection_generation,
+                "executionEvidence": None,
             }
         )
 
@@ -654,6 +728,9 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                             }
                         )
                     trades = feed.trades_since(pm_token, int(current["tradeIndex"]))
+                    for trade in trades:
+                        if trade.get("executionEvidence") is None:
+                            await asyncio.to_thread(_hydrate_trade_execution_evidence, trade)
                     classification = queue_shadow_classification(
                         maker_bid=float(current["makerBid"]),
                         queue_ahead=float(current["queueAheadShares"]),
