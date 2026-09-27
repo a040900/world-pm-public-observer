@@ -514,34 +514,74 @@ def queue_shadow_fill(
 
 
 
+def _refresh_candidate_economics(current: dict[str, Any]) -> None:
+    """Aggregate all confirmed fill/hedge legs; never promote a marginal quote to whole-candidate PnL."""
+    maker_size = float(current["makerSizeShares"])
+    lower = float(current.get("confirmedFillLowerBoundShares") or current.get("cumulativeFillShares") or 0.0)
+    covered = float(current.get("hypotheticalHedgeCoveredShares") or 0.0)
+    world_cash = 0.0
+    all_covered_cost_known = True
+    for event in current.get("fillEvents") or []:
+        econ = event.get("protectedEconomics") or {}
+        quote = event.get("worldQuote") or {}
+        if econ.get("survived") is None:
+            all_covered_cost_known = False
+            continue
+        cash = _finite(quote.get("requestSizeCash"))
+        if cash is None:
+            all_covered_cost_known = False
+            continue
+        world_cash += cash
+    exact_inventory = lower >= maker_size - 1e-12
+    fully_hedged = exact_inventory and covered >= maker_size - 1e-12 and all_covered_cost_known
+    current["fullyHedged"] = fully_hedged
+    current["cumulativeWorldHedgeCash"] = world_cash if covered > 0 else 0.0
+    if fully_hedged:
+        unit = (float(current["makerBid"]) * maker_size + world_cash) / maker_size
+        current["cumulativeProtectedUnitCost"] = unit
+        current["protectedEdgeSurvived"] = unit < 1.0
+        current["candidateEconomicsStatus"] = "SURVIVED" if unit < 1.0 else "FAILED"
+    else:
+        current["cumulativeProtectedUnitCost"] = None
+        current["protectedEdgeSurvived"] = None
+        current["candidateEconomicsStatus"] = "INCOMPLETE_HEDGE_OR_INVENTORY_UNKNOWN"
+
+
 def apply_shadow_fill_lifecycle(
     current: dict[str, Any],
     *,
     cumulative_fill: float,
     incremental_hedge_covered: float = 0.0,
 ) -> bool:
-    """Update persistent hypothetical order inventory. Return True only when fully filled."""
-    previous_fill = float(current.get("cumulativeFillShares") or 0.0)
+    """Persist monotone confirmed fill lower bound plus conservative inventory/exposure bounds."""
+    maker_size = float(current["makerSizeShares"])
+    previous_fill = float(current.get("confirmedFillLowerBoundShares") or current.get("cumulativeFillShares") or 0.0)
     if cumulative_fill < previous_fill - 1e-12:
         current["inventoryState"] = "INVENTORY_UNKNOWN"
-        current["inventoryUnknownReason"] = "CUMULATIVE_FILL_REGRESSED"
+        current["inventoryUnknownReason"] = "CONFIRMED_FILL_LOWER_BOUND_REGRESSED"
         return False
-    current["cumulativeFillShares"] = cumulative_fill
-    current["hypotheticalHedgeCoveredShares"] = float(
-        current.get("hypotheticalHedgeCoveredShares") or 0.0
-    ) + max(0.0, incremental_hedge_covered)
-    current["residualInventoryShares"] = max(
-        0.0,
-        cumulative_fill - float(current["hypotheticalHedgeCoveredShares"]),
+    lower = min(maker_size, cumulative_fill)
+    upper = maker_size
+    current["confirmedFillLowerBoundShares"] = lower
+    current["confirmedFillUpperBoundShares"] = upper
+    current["cumulativeFillShares"] = lower  # compatibility alias: lower bound, not exact inventory
+    current["hypotheticalHedgeCoveredShares"] = min(
+        lower,
+        float(current.get("hypotheticalHedgeCoveredShares") or 0.0)
+        + max(0.0, incremental_hedge_covered),
     )
-    current["remainingOrderShares"] = max(
-        0.0,
-        float(current["makerSizeShares"]) - cumulative_fill,
+    covered = float(current["hypotheticalHedgeCoveredShares"])
+    current["residualInventoryLowerBoundShares"] = max(0.0, lower - covered)
+    current["residualInventoryUpperBoundShares"] = max(0.0, upper - covered)
+    current["residualInventoryShares"] = current["residualInventoryLowerBoundShares"]
+    current["remainingOrderLowerBoundShares"] = 0.0 if lower < maker_size - 1e-12 else 0.0
+    current["remainingOrderUpperBoundShares"] = max(0.0, maker_size - lower)
+    current["remainingOrderShares"] = current["remainingOrderUpperBoundShares"]
+    full = lower >= maker_size - 1e-12
+    current["inventoryState"] = "FULLY_FILLED_CONFIRMED" if full else (
+        "PARTIAL_FILL_LOWER_BOUND_INVENTORY_UNKNOWN" if lower > 0 else "RESTING"
     )
-    full = cumulative_fill >= float(current["makerSizeShares"]) - 1e-12
-    current["inventoryState"] = "FULLY_FILLED" if full else (
-        "PARTIALLY_FILLED_RESTING" if cumulative_fill > 0 else "RESTING"
-    )
+    _refresh_candidate_economics(current)
     return full
 
 
@@ -706,14 +746,29 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
     dflow_task = asyncio.create_task(dflow.run(stop))
     world_session = requests.Session()
     receipt_tasks: dict[str, asyncio.Task[Any]] = {}
+    tx_evidence_cache: dict[str, dict[str, Any]] = {}
+    tx_attempts: dict[str, int] = {}
 
     async def hydrate_tx_nonblocking(tx_hash: str, representative: dict[str, Any]) -> None:
-        await asyncio.to_thread(_hydrate_tx_execution_evidence, representative)
-        evidence = representative.get("executionEvidence")
+        cached = tx_evidence_cache.get(tx_hash)
+        if isinstance(cached, Mapping) and cached.get("status") == "QUALIFIED":
+            evidence = dict(cached)
+        else:
+            representative["receiptLookupAttempts"] = tx_attempts.get(tx_hash, 0)
+            await asyncio.to_thread(_hydrate_tx_execution_evidence, representative)
+            evidence = representative.get("executionEvidence")
+            tx_attempts[tx_hash] = int(representative.get("receiptLookupAttempts") or tx_attempts.get(tx_hash, 0))
+            if isinstance(evidence, Mapping):
+                old = tx_evidence_cache.get(tx_hash)
+                # Evidence is monotone: transient failure/replay can never downgrade QUALIFIED.
+                if not (isinstance(old, Mapping) and old.get("status") == "QUALIFIED" and evidence.get("status") != "QUALIFIED"):
+                    tx_evidence_cache[tx_hash] = dict(evidence)
+                evidence = tx_evidence_cache.get(tx_hash, dict(evidence))
         for rows in feed.trades.values():
             for row_trade in rows:
                 if str(row_trade.get("transactionHash") or "").lower() == tx_hash:
                     row_trade["executionEvidence"] = evidence
+                    row_trade["receiptLookupAttempts"] = tx_attempts.get(tx_hash, 0)
 
     active: dict[str, dict[str, Any] | None] = {"WORLD_YES+PM_DOWN": None, "WORLD_NO+PM_UP": None}
     sampled = {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0}
@@ -763,6 +818,10 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                         for trade in pending:
                             tx_hash = str(trade.get("transactionHash") or "").lower()
                             if not tx_hash:
+                                continue
+                            cached = tx_evidence_cache.get(tx_hash)
+                            if isinstance(cached, Mapping) and cached.get("status") == "QUALIFIED":
+                                trade["executionEvidence"] = cached
                                 continue
                             existing_task = receipt_tasks.get(tx_hash)
                             if existing_task is not None and not existing_task.done():
@@ -858,7 +917,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                             current["postFillWorldQuote"] = quote
                             current["postFillProtectedEconomics"] = verdict
                             current["postFillProtectedUnitCost"] = verdict["unitCost"]
-                            current["protectedEdgeSurvived"] = verdict["survived"]
+                            _refresh_candidate_economics(current)
                         if cumulative_fill >= float(current["makerSizeShares"]) - 1e-12:
                             current["status"] = "FULL_SHADOW_FILL"
                             current["completedAt"] = time.time()
@@ -939,11 +998,19 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     "connectionGeneration": int(entry["connectionGeneration"]),
                     "queueAheadKnown": False,
                     "queueAheadUncertaintyReason": "SNAPSHOT_PRECEDES_HYPOTHETICAL_ADMISSION_NO_POST_ADMISSION_UPPER_BOUND",
+                    "confirmedFillLowerBoundShares": 0.0,
+                    "confirmedFillUpperBoundShares": MAKER_SIZE_SHARES,
                     "cumulativeFillShares": 0.0,
                     "hypotheticalHedgeCoveredShares": 0.0,
+                    "residualInventoryLowerBoundShares": 0.0,
+                    "residualInventoryUpperBoundShares": MAKER_SIZE_SHARES,
                     "residualInventoryShares": 0.0,
                     "inventoryState": "RESTING",
+                    "remainingOrderLowerBoundShares": 0.0,
+                    "remainingOrderUpperBoundShares": MAKER_SIZE_SHARES,
                     "remainingOrderShares": MAKER_SIZE_SHARES,
+                    "candidateEconomicsStatus": "INCOMPLETE_HEDGE_OR_INVENTORY_UNKNOWN",
+                    "fullyHedged": False,
                     "fillEvents": [],
                     "preFillWorldQuote": quote,
                     "preFillProtectedUnitCost": pre_unit,
@@ -971,26 +1038,34 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     placed_at=float(current["placedAt"]),
                 )
                 current["queueShadow"] = final_shadow
-                final_class = current.get("highestQueueClassification") or final_shadow["classification"]
-                if final_class == "PLAUSIBLE_FILL":
-                    current["status"] = "PLAUSIBLE_ONLY_EXPIRED"
-                elif final_class == "NEAR_FILL":
-                    current["status"] = "NEAR_FILL_ONLY_EXPIRED"
-                elif final_shadow["classification"] == "UNKNOWN_TRADE_TIME":
-                    current["status"] = "UNKNOWN_TRADE_SOURCE_TIME"
+                final_lower = float(final_shadow["definite"].get("fillShares") or 0.0)
+                prior_lower = float(current.get("confirmedFillLowerBoundShares") or current.get("cumulativeFillShares") or 0.0)
+                if final_lower > prior_lower + 1e-12:
+                    # Reconcile inventory only. Never invent a historical World hedge at expiry.
+                    apply_shadow_fill_lifecycle(current, cumulative_fill=final_lower, incremental_hedge_covered=0.0)
+                    current["expiryReconciledAdditionalFillLowerBoundShares"] = final_lower - prior_lower
+                unavailable = int(final_shadow["definite"].get("executionEvidenceUnavailableCount") or 0)
+                ambiguous = int(final_shadow["definite"].get("executionEvidenceAmbiguousCount") or 0)
+                lower = float(current.get("confirmedFillLowerBoundShares") or 0.0)
+                if unavailable > 0 or ambiguous > 0 or final_shadow["classification"] == "UNKNOWN_TRADE_TIME":
+                    current["executionEvidenceComplete"] = False
+                    current["status"] = "UNKNOWN_EXECUTION_EVIDENCE_AT_EXPIRY"
+                elif lower >= float(current["makerSizeShares"]) - 1e-12:
+                    current["executionEvidenceComplete"] = True
+                    current["status"] = "FULL_SHADOW_FILL"
+                elif lower > 0:
+                    current["executionEvidenceComplete"] = True
+                    current["status"] = "PARTIAL_FILL_EXPIRED_WITH_RESIDUAL_ORDER"
                 else:
-                    if float(current.get("cumulativeFillShares") or 0.0) > 0:
-                        current["status"] = "PARTIAL_FILL_EXPIRED_WITH_RESIDUAL_ORDER"
+                    current["executionEvidenceComplete"] = True
+                    final_class = current.get("highestQueueClassification") or final_shadow["classification"]
+                    if final_class == "PLAUSIBLE_FILL":
+                        current["status"] = "PLAUSIBLE_ONLY_EXPIRED"
+                    elif final_class == "NEAR_FILL":
+                        current["status"] = "NEAR_FILL_ONLY_EXPIRED"
                     else:
                         current["status"] = "EXPIRED_UNFILLED_AT_WINDOW_END"
-                current["remainingOrderShares"] = max(
-                    0.0,
-                    float(current["makerSizeShares"]) - float(current.get("cumulativeFillShares") or 0.0),
-                )
-                current["residualInventoryShares"] = max(
-                    0.0,
-                    float(current.get("cumulativeFillShares") or 0.0) - float(current.get("hypotheticalHedgeCoveredShares") or 0.0),
-                )
+                _refresh_candidate_economics(current)
                 current["completedAt"] = time.time()
                 row["shadowCandidates"].append(current)
         stop.set()
@@ -1003,11 +1078,11 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         world_session.close()
 
     candidates = row["shadowCandidates"]
-    definite = [c for c in candidates if c.get("status") in {"PARTIAL_FILL_EXPIRED_WITH_RESIDUAL_ORDER", "FULL_SHADOW_FILL"}]
+    definite = [c for c in candidates if float(c.get("confirmedFillLowerBoundShares") or c.get("cumulativeFillShares") or 0.0) > 0]
     plausible = [c for c in candidates if c.get("highestQueueClassification") in {"PLAUSIBLE_FILL", "DEFINITE_FILL"}]
     near = [c for c in candidates if c.get("highestQueueClassification") in {"NEAR_FILL", "PLAUSIBLE_FILL", "DEFINITE_FILL"}]
-    definite_survived = [c for c in definite if c.get("protectedEdgeSurvived") is True]
-    definite_unknown = [c for c in definite if c.get("protectedEdgeSurvived") is None]
+    definite_survived = [c for c in definite if c.get("fullyHedged") is True and c.get("protectedEdgeSurvived") is True]
+    definite_unknown = [c for c in definite if c.get("fullyHedged") is not True or c.get("protectedEdgeSurvived") is None]
     plausible_survived = [
         c for c in candidates
         if isinstance(c.get("plausibleFillProtectedEconomics"), Mapping)
@@ -1046,11 +1121,11 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         windows.append(window)
         print(json.dumps({"completedWindow": index + 1, "summary": window["summary"]}, sort_keys=True), flush=True)
     candidates = [c for w in windows for c in w.get("shadowCandidates", [])]
-    fills = [c for c in candidates if c.get("status") in {"PARTIAL_SHADOW_FILL", "FULL_SHADOW_FILL"}]
+    fills = [c for c in candidates if float(c.get("confirmedFillLowerBoundShares") or c.get("cumulativeFillShares") or 0.0) > 0]
     plausible = [c for c in candidates if c.get("highestQueueClassification") in {"PLAUSIBLE_FILL", "DEFINITE_FILL"}]
     near = [c for c in candidates if c.get("highestQueueClassification") in {"NEAR_FILL", "PLAUSIBLE_FILL", "DEFINITE_FILL"}]
-    survived = [c for c in fills if c.get("protectedEdgeSurvived") is True]
-    definite_unknown = [c for c in fills if c.get("protectedEdgeSurvived") is None]
+    survived = [c for c in fills if c.get("fullyHedged") is True and c.get("protectedEdgeSurvived") is True]
+    definite_unknown = [c for c in fills if c.get("fullyHedged") is not True or c.get("protectedEdgeSurvived") is None]
     plausible_survived = [
         c for c in candidates
         if isinstance(c.get("plausibleFillProtectedEconomics"), Mapping)
