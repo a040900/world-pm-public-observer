@@ -94,6 +94,8 @@ class T(unittest.TestCase):
  def test_runner_lifecycle_keeps_residual_order_after_partial(self):
   current={
    "makerSizeShares":5.0,
+   "makerBid":0.8,
+   "fillEvents":[],
    "cumulativeFillShares":0.0,
    "hypotheticalHedgeCoveredShares":0.0,
    "remainingOrderShares":5.0,
