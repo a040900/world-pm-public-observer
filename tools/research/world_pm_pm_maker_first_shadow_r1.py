@@ -30,6 +30,7 @@ from tools.research import world_polymarket_btc5m_executable_sync_r23 as r23
 from tools.research import world_polymarket_btc5m_executable_sync_r24 as r24
 from tools.research import world_pm_world_session_randomized_r2 as r2s
 from tools.research import a7_public_trade_size_mapping_r1 as a7
+from tools.research import world_pm_condition_execution_tape_r1 as condition_tape
 
 SCHEMA_VERSION = "WORLD_PM_PM_MAKER_FIRST_SHADOW_R1"
 WINDOW_SECONDS = 300
@@ -269,32 +270,6 @@ def _world_quote_for_target_minout(
     return best
 
 
-def _unique_sell_volume(trades: list[Mapping[str, Any]], maker_bid: float) -> tuple[float, bool]:
-    same_price_sell = 0.0
-    below_bid_sell = False
-    seen: set[tuple[Any, ...]] = set()
-    for trade in trades:
-        side = str(trade.get("side") or "").upper()
-        price = _finite(trade.get("price"))
-        size = _finite(trade.get("size"))
-        if side != "SELL" or price is None or size is None or size <= 0:
-            continue
-        fingerprint = (
-            trade.get("transactionHash") or trade.get("transaction_hash"),
-            trade.get("sourceTimestampMs") or trade.get("timestamp"),
-            round(price, 12),
-            round(size, 12),
-        )
-        if fingerprint in seen:
-            continue
-        seen.add(fingerprint)
-        if price < maker_bid - 1e-12:
-            below_bid_sell = True
-        elif abs(price - maker_bid) <= 1e-12:
-            same_price_sell += size
-    return same_price_sell, below_bid_sell
-
-
 def queue_shadow_classification(
     *,
     maker_bid: float,
@@ -303,22 +278,26 @@ def queue_shadow_classification(
     trades: list[Mapping[str, Any]],
     queue_timeline: list[Mapping[str, Any]],
     placed_at: float | None = None,
+    target_token: str | None = None,
+    complement_token: str | None = None,
+    queue_ahead_known: bool = False,
 ) -> dict[str, Any]:
-    """Classify definite, plausible and near-fill evidence without conflating them."""
-    valid_trades = []
+    """Classify only receipt-backed condition-level evidence.
+
+    A7 proved public WS size is aggregate taker size. Therefore plausible/near
+    classifications may use displayed-queue diagnostics, but never WS size.
+    """
+    valid_trades: list[Mapping[str, Any]] = []
     unknown_trade_time_count = 0
     pre_placement_trade_count = 0
     for trade in trades:
         source_ms = _finite(trade.get("sourceTimestampMs") or trade.get("timestamp"))
-        side = str(trade.get("side") or "").upper()
-        price = _finite(trade.get("price"))
-        if side == "SELL" and price is not None and price <= maker_bid + 1e-12:
-            if source_ms is None:
-                unknown_trade_time_count += 1
-                continue
-            if placed_at is not None and source_ms < placed_at * 1000.0:
-                pre_placement_trade_count += 1
-                continue
+        if source_ms is None:
+            unknown_trade_time_count += 1
+            continue
+        if placed_at is not None and source_ms < placed_at * 1000.0:
+            pre_placement_trade_count += 1
+            continue
         valid_trades.append(trade)
 
     definite = queue_shadow_fill(
@@ -326,8 +305,10 @@ def queue_shadow_classification(
         queue_ahead=queue_ahead,
         maker_size=maker_size,
         trades=valid_trades,
+        target_token=target_token,
+        complement_token=complement_token,
+        queue_ahead_known=queue_ahead_known,
     )
-    same_price_sell, below_bid_sell = _unique_sell_volume(valid_trades, maker_bid)
     observed_sizes: list[float] = []
     for point in sorted(queue_timeline, key=lambda row: float(row.get("observedAt") or 0.0)):
         size = _finite(point.get("bidSize"))
@@ -336,23 +317,14 @@ def queue_shadow_classification(
 
     initial_queue = max(0.0, queue_ahead)
     min_displayed_queue = min(observed_sizes, default=initial_queue)
-
-    # Two independent upper bounds on how much queue can still be ahead of us:
-    # 1) confirmed same-price SELL flow can consume queue ahead;
-    # 2) the smallest displayed size seen at our price bounds how much pre-existing
-    #    visible queue could still remain. We take the tighter bound rather than
-    #    adding queue decreases, so oscillations such as 100->20->100->20 are not
-    #    double-counted.
-    remaining_from_sell_flow = max(0.0, initial_queue - same_price_sell)
-    plausible_remaining = min(initial_queue, min_displayed_queue, remaining_from_sell_flow)
-    plausible_advancement = max(0.0, initial_queue - plausible_remaining)
+    plausible_advancement = max(0.0, initial_queue - min_displayed_queue)
     near_threshold = max(maker_size, initial_queue * NEAR_FILL_QUEUE_FRACTION)
 
     if definite["status"] != "NO_SHADOW_FILL":
         classification = "DEFINITE_FILL"
-    elif same_price_sell > 0 and plausible_remaining <= 1e-12:
+    elif min_displayed_queue <= 1e-12 and initial_queue > 0:
         classification = "PLAUSIBLE_FILL"
-    elif (same_price_sell > 0 or min_displayed_queue < initial_queue) and plausible_remaining <= near_threshold:
+    elif min_displayed_queue < initial_queue and min_displayed_queue <= near_threshold:
         classification = "NEAR_FILL"
     elif unknown_trade_time_count > 0:
         classification = "UNKNOWN_TRADE_TIME"
@@ -362,18 +334,18 @@ def queue_shadow_classification(
     return {
         "classification": classification,
         "definite": definite,
-        "samePriceSellVolume": same_price_sell,
-        "belowBidSellObserved": below_bid_sell,
+        "samePriceSellVolume": None,
+        "belowBidSellObserved": definite.get("strictlyWorseShares", 0.0) > 0,
         "minimumDisplayedQueueShares": min_displayed_queue,
-        "remainingFromConfirmedSamePriceSellFlowShares": remaining_from_sell_flow,
+        "remainingFromConfirmedSamePriceSellFlowShares": None,
         "plausibleQueueAdvancementShares": plausible_advancement,
-        "plausibleQueueRemainingShares": plausible_remaining,
+        "plausibleQueueRemainingShares": min_displayed_queue,
         "nearFillThresholdShares": near_threshold,
         "queueTimelinePointCount": len(observed_sizes),
         "unknownRelevantTradeSourceTimeCount": unknown_trade_time_count,
         "prePlacementRelevantTradeCount": pre_placement_trade_count,
         "plausibleInterpretation": (
-            "UPPER_BOUND_USES_MINIMUM_DISPLAYED_QUEUE_AND_CONFIRMED_SELL_FLOW_WITHOUT_ADDITIVE_DOUBLE_COUNTING;"
+            "DISPLAYED_QUEUE_DIAGNOSTIC_ONLY;PUBLIC_WS_SIZE_NEVER_COUNTS_AS_PRICE_LEVEL_VOLUME;"
             "CANCELLATION_ALONE_NEVER_COUNTS_AS_FILL"
         ),
     }
@@ -420,54 +392,41 @@ def validate_maker_entry_snapshot(
     }
 
 
-def _hydrate_trade_execution_evidence(trade: dict[str, Any]) -> None:
-    """Attach public-chain OrderFilled evidence; failures remain fail-closed."""
-    if trade.get("executionEvidence") is not None:
+def _hydrate_tx_execution_evidence(trade: dict[str, Any]) -> None:
+    """Attach one bounded condition-level receipt decode to a public trade."""
+    existing = trade.get("executionEvidence")
+    if isinstance(existing, Mapping) and existing.get("status") not in {"PENDING"}:
         return
-    tx_hash = trade.get("transactionHash") or trade.get("transaction_hash")
-    token = trade.get("assetId") or trade.get("asset_id")
-    if not tx_hash or not token:
-        trade["executionEvidence"] = {"status": "UNAVAILABLE", "reason": "MISSING_TX_OR_TOKEN"}
-        return
-    event = {
-        "transaction_hash": tx_hash,
-        "asset_id": str(token),
-        "price": trade.get("price"),
-        "size": trade.get("size"),
-        "side": trade.get("side"),
-        "timestamp": trade.get("sourceTimestampMs") or trade.get("timestamp"),
-    }
-    try:
-        trade["executionEvidence"] = a7._analyze_event(event)
-    except Exception as exc:
+    attempts = int(trade.get("receiptLookupAttempts") or 0)
+    if attempts >= 3:
         trade["executionEvidence"] = {
             "status": "UNAVAILABLE",
-            "reason": f"{type(exc).__name__}:{exc}",
+            "reason": "RECEIPT_RETRY_EXHAUSTED",
+            "receiptLookupAttempts": attempts,
         }
-
-
-def _onchain_sell_volumes(trade: Mapping[str, Any], maker_bid: float) -> tuple[float, float] | None:
-    """Return (same-price shares, strictly-below-bid shares) from OrderFilled maker logs."""
-    evidence = trade.get("executionEvidence")
-    if not isinstance(evidence, Mapping) or not str(evidence.get("status") or "").startswith("QUALIFIED"):
-        return None
-    maker_logs = evidence.get("makerLogs")
-    if not isinstance(maker_logs, list):
-        return None
-    same = 0.0
-    below = 0.0
-    for fill in maker_logs:
-        if not isinstance(fill, Mapping):
-            continue
-        price = _finite(fill.get("price"))
-        shares = _finite(fill.get("shares"))
-        if price is None or shares is None or shares <= 0:
-            continue
-        if price < maker_bid - 1e-12:
-            below += shares
-        elif abs(price - maker_bid) <= 1e-12:
-            same += shares
-    return same, below
+        return
+    trade["receiptLookupAttempts"] = attempts + 1
+    tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "")
+    if not tx_hash:
+        trade["executionEvidence"] = {"status": "UNAVAILABLE", "reason": "MISSING_TX_HASH"}
+        return
+    lookup_started_at = time.time()
+    receipt = condition_tape.fetch_receipt_once(tx_hash)
+    lookup_completed_at = time.time()
+    if receipt is None:
+        trade["executionEvidence"] = {
+            "status": "PENDING",
+            "reason": "RECEIPT_NOT_YET_AVAILABLE",
+            "receiptLookupStartedAt": lookup_started_at,
+            "receiptLookupCompletedAt": lookup_completed_at,
+            "receiptLookupAttempts": attempts + 1,
+        }
+        return
+    evidence = condition_tape.decode_match_groups(receipt)
+    evidence["receiptLookupStartedAt"] = lookup_started_at
+    evidence["receiptLookupCompletedAt"] = lookup_completed_at
+    evidence["receiptLookupAttempts"] = attempts + 1
+    trade["executionEvidence"] = evidence
 
 
 def queue_shadow_fill(
@@ -476,74 +435,114 @@ def queue_shadow_fill(
     queue_ahead: float,
     maker_size: float,
     trades: list[Mapping[str, Any]],
+    target_token: str | None = None,
+    complement_token: str | None = None,
+    queue_ahead_known: bool = True,
 ) -> dict[str, Any]:
-    """Fail-closed queue shadow using on-chain maker-level matched quantities.
+    """Cumulative lower-bound fill using condition-level execution evidence.
 
-    Public last_trade_price.size is aggregate taker size and MUST NOT be used as
-    price-level execution volume (A7_PUBLIC_TRADE_SIZE_MAPPING_R1).
+    Public WS price/size is never used as execution quantity or as a pre-filter.
+    Partial fills accumulate across transactions. Exact-bid direct volume is
+    only usable when queue_ahead is a defensible upper bound.
     """
-    same_price_sell = 0.0
-    below_bid_sell = 0.0
+    target_token = str(target_token or "")
+    complement_token = str(complement_token or "")
+    strict_worse = 0.0
+    same_direct = 0.0
+    same_synthetic = 0.0
     seen: set[str] = set()
     unavailable = 0
-    trigger: dict[str, Any] | None = None
+    ambiguous = 0
+    triggers: list[dict[str, Any]] = []
     for trade in trades:
-        side = str(trade.get("side") or "").upper()
-        price = _finite(trade.get("price"))
         tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "").lower()
-        if side != "SELL" or price is None or price > maker_bid + 1e-12:
-            continue
         if not tx_hash or tx_hash in seen:
             continue
         seen.add(tx_hash)
-        volumes = _onchain_sell_volumes(trade, maker_bid)
-        if volumes is None:
+        evidence = trade.get("executionEvidence")
+        if not isinstance(evidence, Mapping):
             unavailable += 1
             continue
-        same, below = volumes
-        same_price_sell += same
-        below_bid_sell += below
-        if trigger is None and below > 0:
-            trigger = dict(trade)
+        if evidence.get("status") == "PENDING" or evidence.get("status") == "UNAVAILABLE":
+            unavailable += 1
+            continue
+        inferred = condition_tape.infer_hypothetical_buy_lower_bound(
+            evidence,
+            target_token=target_token,
+            complement_token=complement_token,
+            maker_bid=maker_bid,
+        )
+        if inferred.get("status") != "QUALIFIED":
+            ambiguous += 1
+            continue
+        tx_strict = float(inferred.get("strictlyWorseShares") or 0.0)
+        tx_same = float(inferred.get("sameDirectTargetBidShares") or 0.0)
+        tx_synth = float(inferred.get("sameSyntheticShares") or 0.0)
+        strict_worse += tx_strict
+        same_direct += tx_same
+        same_synthetic += tx_synth
+        if tx_strict > 0 or tx_same > 0 or tx_synth > 0:
+            triggers.append({
+                "transactionHash": trade.get("transactionHash") or trade.get("transaction_hash"),
+                "sourceTimestampMs": trade.get("sourceTimestampMs"),
+                "receivedAt": trade.get("receivedAt"),
+                "inference": inferred,
+            })
 
-        # A factual execution strictly below our hypothetical resting bid proves
-        # that this much taker SELL flow actually continued below that price.
-        # Under the frozen counterfactual (our order added, never cancelled),
-        # that below-bid factual volume is a conservative lower bound on flow
-        # available to our order; aggregate taker size is deliberately ignored.
-        if below_bid_sell > 0:
-            fill = min(maker_size, below_bid_sell)
-            return {
-                "status": "FULL_SHADOW_FILL" if fill >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL",
-                "fillShares": fill,
-                "samePriceSellVolume": same_price_sell,
-                "belowBidSellVolume": below_bid_sell,
-                "trigger": trigger or dict(trade),
-                "rule": "ONCHAIN_MAKER_MATCHED_VOLUME_STRICTLY_BELOW_STILL_RESTING_BID",
-                "executionEvidenceUnavailableCount": unavailable,
-            }
-
-        executable = max(0.0, same_price_sell - max(0.0, queue_ahead))
-        if executable > 0:
-            fill = min(maker_size, executable)
-            return {
-                "status": "FULL_SHADOW_FILL" if fill >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL",
-                "fillShares": fill,
-                "samePriceSellVolume": same_price_sell,
-                "belowBidSellVolume": below_bid_sell,
-                "trigger": dict(trade),
-                "rule": "ONCHAIN_EXACT_BID_MATCHED_VOLUME_EXCEEDED_QUEUE_AHEAD",
-                "executionEvidenceUnavailableCount": unavailable,
-            }
+    exact_executable = max(0.0, same_direct - max(0.0, queue_ahead)) if queue_ahead_known else 0.0
+    lower_bound = min(maker_size, strict_worse + exact_executable)
+    if lower_bound > 0:
+        status = "FULL_SHADOW_FILL" if lower_bound >= maker_size - 1e-12 else "PARTIAL_SHADOW_FILL"
+        rule = "CONDITION_LEVEL_STRICTLY_WORSE_PLUS_EXACT_DIRECT_QUEUE"
+    else:
+        status = "NO_SHADOW_FILL"
+        rule = "NO_QUALIFIED_CONDITION_LEVEL_FILL_LOWER_BOUND"
     return {
-        "status": "NO_SHADOW_FILL",
-        "fillShares": 0.0,
-        "samePriceSellVolume": same_price_sell,
-        "belowBidSellVolume": below_bid_sell,
-        "trigger": None,
-        "rule": "QUEUE_NOT_CLEARED_BY_ONCHAIN_MAKER_MATCHED_VOLUME",
+        "status": status,
+        "fillShares": lower_bound,
+        "strictlyWorseShares": strict_worse,
+        "sameDirectTargetBidShares": same_direct,
+        "sameSyntheticShares": same_synthetic,
+        "exactBidExecutableShares": exact_executable,
+        "queueAheadKnown": queue_ahead_known,
+        "trigger": triggers[-1] if triggers else None,
+        "triggers": triggers,
+        "rule": rule,
         "executionEvidenceUnavailableCount": unavailable,
+        "executionEvidenceAmbiguousCount": ambiguous,
     }
+
+
+
+def apply_shadow_fill_lifecycle(
+    current: dict[str, Any],
+    *,
+    cumulative_fill: float,
+    incremental_hedge_covered: float = 0.0,
+) -> bool:
+    """Update persistent hypothetical order inventory. Return True only when fully filled."""
+    previous_fill = float(current.get("cumulativeFillShares") or 0.0)
+    if cumulative_fill < previous_fill - 1e-12:
+        current["inventoryState"] = "INVENTORY_UNKNOWN"
+        current["inventoryUnknownReason"] = "CUMULATIVE_FILL_REGRESSED"
+        return False
+    current["cumulativeFillShares"] = cumulative_fill
+    current["hypotheticalHedgeCoveredShares"] = float(
+        current.get("hypotheticalHedgeCoveredShares") or 0.0
+    ) + max(0.0, incremental_hedge_covered)
+    current["residualInventoryShares"] = max(
+        0.0,
+        cumulative_fill - float(current["hypotheticalHedgeCoveredShares"]),
+    )
+    current["remainingOrderShares"] = max(
+        0.0,
+        float(current["makerSizeShares"]) - cumulative_fill,
+    )
+    full = cumulative_fill >= float(current["makerSizeShares"]) - 1e-12
+    current["inventoryState"] = "FULLY_FILLED" if full else (
+        "PARTIALLY_FILLED_RESTING" if cumulative_fill > 0 else "RESTING"
+    )
+    return full
 
 
 class TradeAwareBook(r24.PolymarketTimelineBook):
@@ -556,6 +555,19 @@ class TradeAwareBook(r24.PolymarketTimelineBook):
 
     def trades_since(self, token: str, index: int) -> list[dict[str, Any]]:
         return list((self.trades.get(token) or [])[index:])
+
+    def condition_trade_counts(self) -> dict[str, int]:
+        return {token: len(rows) for token, rows in self.trades.items()}
+
+    def condition_trades_since(self, indices: Mapping[str, int]) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for token, trades in self.trades.items():
+            rows.extend(trades[int(indices.get(token, 0)):])
+        rows.sort(key=lambda row: (
+            int(row.get("sourceTimestampMs") or 0),
+            float(row.get("receivedAt") or 0.0),
+        ))
+        return rows
 
     def _apply_last_trade(self, message: Mapping[str, Any], received_at: float) -> None:
         token = str(message.get("asset_id") or message.get("tokenId") or "")
@@ -693,17 +705,27 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
     dflow = r2s.GapRadar(world_market.yes_mint, world_market.no_mint)
     dflow_task = asyncio.create_task(dflow.run(stop))
     world_session = requests.Session()
+    receipt_tasks: dict[str, asyncio.Task[Any]] = {}
+
+    async def hydrate_tx_nonblocking(tx_hash: str, representative: dict[str, Any]) -> None:
+        await asyncio.to_thread(_hydrate_tx_execution_evidence, representative)
+        evidence = representative.get("executionEvidence")
+        for rows in feed.trades.values():
+            for row_trade in rows:
+                if str(row_trade.get("transactionHash") or "").lower() == tx_hash:
+                    row_trade["executionEvidence"] = evidence
+
     active: dict[str, dict[str, Any] | None] = {"WORLD_YES+PM_DOWN": None, "WORLD_NO+PM_UP": None}
     sampled = {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0}
     pairs = (
-        ("WORLD_YES+PM_DOWN", "yes", world_market.yes_mint, yes_decimals, pm_market.down_token),
-        ("WORLD_NO+PM_UP", "no", world_market.no_mint, no_decimals, pm_market.up_token),
+        ("WORLD_YES+PM_DOWN", "yes", world_market.yes_mint, yes_decimals, pm_market.down_token, pm_market.up_token),
+        ("WORLD_NO+PM_UP", "no", world_market.no_mint, no_decimals, pm_market.up_token, pm_market.down_token),
     )
     try:
         while time.time() < end_ts:
             now = time.time()
             world_snapshot = dflow.snapshot(now)
-            for pair, side, world_mint, world_decimals, pm_token in pairs:
+            for pair, side, world_mint, world_decimals, pm_token, complement_token in pairs:
                 current = active[pair]
                 if current is not None:
                     snapshot = feed.snapshot(pm_token)
@@ -727,15 +749,40 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                                 "bidSize": displayed,
                             }
                         )
-                    trades = feed.trades_since(pm_token, int(current["tradeIndex"]))
-                    for trade in trades:
-                        if trade.get("executionEvidence") is None:
-                            await asyncio.to_thread(_hydrate_trade_execution_evidence, trade)
+                    trades = feed.condition_trades_since(current["conditionTradeIndices"])
+                    pending = [
+                        trade for trade in trades
+                        if trade.get("executionEvidence") is None
+                        or (
+                            isinstance(trade.get("executionEvidence"), Mapping)
+                            and trade["executionEvidence"].get("status") == "PENDING"
+                        )
+                    ]
+                    if pending:
+                        launched = 0
+                        for trade in pending:
+                            tx_hash = str(trade.get("transactionHash") or "").lower()
+                            if not tx_hash:
+                                continue
+                            existing_task = receipt_tasks.get(tx_hash)
+                            if existing_task is not None and not existing_task.done():
+                                continue
+                            if existing_task is not None and existing_task.done():
+                                receipt_tasks.pop(tx_hash, None)
+                            receipt_tasks[tx_hash] = asyncio.create_task(
+                                hydrate_tx_nonblocking(tx_hash, trade)
+                            )
+                            launched += 1
+                            if launched >= 8:
+                                break
                     classification = queue_shadow_classification(
                         maker_bid=float(current["makerBid"]),
                         queue_ahead=float(current["queueAheadShares"]),
                         maker_size=float(current["makerSizeShares"]),
                         trades=trades,
+                        target_token=str(current["pmToken"]),
+                        complement_token=str(current["complementPmToken"]),
+                        queue_ahead_known=bool(current.get("queueAheadKnown")),
                         queue_timeline=timeline,
                         placed_at=float(current["placedAt"]),
                     )
@@ -772,31 +819,53 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                         current[f"{economics_field}ObservedAt"] = verdict_at
 
                     if stage == "DEFINITE_FILL":
-                        fill_shares = float(classification["definite"]["fillShares"])
-                        quote = await asyncio.to_thread(
-                            _world_quote_for_target_minout,
-                            world_session,
-                            output_mint=world_mint,
-                            cash_decimals=cash_decimals,
-                            outcome_decimals=world_decimals,
-                            target_shares=fill_shares,
-                            timeout_seconds=args.http_timeout_seconds,
-                        )
-                        verdict_at = time.time()
-                        verdict = protected_edge_verdict(
-                            float(current["makerBid"]),
-                            quote,
-                            maker_fill_shares=fill_shares,
-                            observed_at=verdict_at,
-                        )
-                        current["postFillWorldQuote"] = quote
-                        current["postFillProtectedEconomics"] = verdict
-                        current["postFillProtectedUnitCost"] = verdict["unitCost"]
-                        current["protectedEdgeSurvived"] = verdict["survived"]
-                        current["status"] = classification["definite"]["status"]
-                        current["completedAt"] = time.time()
-                        row["shadowCandidates"].append(current)
-                        active[pair] = None
+                        cumulative_fill = float(classification["definite"]["fillShares"])
+                        previous_fill = float(current.get("cumulativeFillShares") or 0.0)
+                        incremental_fill = max(0.0, cumulative_fill - previous_fill)
+                        if incremental_fill > 1e-12:
+                            fill_observed_at = time.time()
+                            quote = await asyncio.to_thread(
+                                _world_quote_for_target_minout,
+                                world_session,
+                                output_mint=world_mint,
+                                cash_decimals=cash_decimals,
+                                outcome_decimals=world_decimals,
+                                target_shares=incremental_fill,
+                                timeout_seconds=args.http_timeout_seconds,
+                            )
+                            verdict_at = time.time()
+                            verdict = protected_edge_verdict(
+                                float(current["makerBid"]),
+                                quote,
+                                maker_fill_shares=incremental_fill,
+                                observed_at=verdict_at,
+                            )
+                            current["fillEvents"].append({
+                                "observedAt": fill_observed_at,
+                                "cumulativeFillShares": cumulative_fill,
+                                "incrementalFillShares": incremental_fill,
+                                "worldQuote": quote,
+                                "protectedEconomics": verdict,
+                                "quoteCompletedAt": verdict_at,
+                                "trigger": classification["definite"].get("trigger"),
+                            })
+                            hedge_covered = incremental_fill if verdict.get("survived") is not None else 0.0
+                            full_fill = apply_shadow_fill_lifecycle(
+                                current,
+                                cumulative_fill=cumulative_fill,
+                                incremental_hedge_covered=hedge_covered,
+                            )
+                            current["postFillWorldQuote"] = quote
+                            current["postFillProtectedEconomics"] = verdict
+                            current["postFillProtectedUnitCost"] = verdict["unitCost"]
+                            current["protectedEdgeSurvived"] = verdict["survived"]
+                        if cumulative_fill >= float(current["makerSizeShares"]) - 1e-12:
+                            current["status"] = "FULL_SHADOW_FILL"
+                            current["completedAt"] = time.time()
+                            row["shadowCandidates"].append(current)
+                            active[pair] = None
+                        else:
+                            current["status"] = "PARTIALLY_FILLED_RESTING_SHADOW"
                     continue
 
                 if sampled[pair] >= MAX_SHADOWS_PER_PAIR_PER_WINDOW:
@@ -865,8 +934,17 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     }],
                     "queueObservationUnknownCount": 0,
                     "highestQueueClassification": "NO_FILL_EVIDENCE",
-                    "tradeIndex": feed.trade_count(pm_token),
+                    "conditionTradeIndices": feed.condition_trade_counts(),
+                    "complementPmToken": complement_token,
                     "connectionGeneration": int(entry["connectionGeneration"]),
+                    "queueAheadKnown": False,
+                    "queueAheadUncertaintyReason": "SNAPSHOT_PRECEDES_HYPOTHETICAL_ADMISSION_NO_POST_ADMISSION_UPPER_BOUND",
+                    "cumulativeFillShares": 0.0,
+                    "hypotheticalHedgeCoveredShares": 0.0,
+                    "residualInventoryShares": 0.0,
+                    "inventoryState": "RESTING",
+                    "remainingOrderShares": MAKER_SIZE_SHARES,
+                    "fillEvents": [],
                     "preFillWorldQuote": quote,
                     "preFillProtectedUnitCost": pre_unit,
                     "preFillConditionalEdgeFraction": 1.0 - pre_unit,
@@ -885,7 +963,10 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     maker_bid=float(current["makerBid"]),
                     queue_ahead=float(current["queueAheadShares"]),
                     maker_size=float(current["makerSizeShares"]),
-                    trades=feed.trades_since(str(current["pmToken"]), int(current["tradeIndex"])),
+                    trades=feed.condition_trades_since(current["conditionTradeIndices"]),
+                    target_token=str(current["pmToken"]),
+                    complement_token=str(current["complementPmToken"]),
+                    queue_ahead_known=bool(current.get("queueAheadKnown")),
                     queue_timeline=list(current["queueTimeline"]),
                     placed_at=float(current["placedAt"]),
                 )
@@ -898,17 +979,31 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                 elif final_shadow["classification"] == "UNKNOWN_TRADE_TIME":
                     current["status"] = "UNKNOWN_TRADE_SOURCE_TIME"
                 else:
-                    current["status"] = "EXPIRED_UNFILLED_AT_WINDOW_END"
+                    if float(current.get("cumulativeFillShares") or 0.0) > 0:
+                        current["status"] = "PARTIAL_FILL_EXPIRED_WITH_RESIDUAL_ORDER"
+                    else:
+                        current["status"] = "EXPIRED_UNFILLED_AT_WINDOW_END"
+                current["remainingOrderShares"] = max(
+                    0.0,
+                    float(current["makerSizeShares"]) - float(current.get("cumulativeFillShares") or 0.0),
+                )
+                current["residualInventoryShares"] = max(
+                    0.0,
+                    float(current.get("cumulativeFillShares") or 0.0) - float(current.get("hypotheticalHedgeCoveredShares") or 0.0),
+                )
                 current["completedAt"] = time.time()
                 row["shadowCandidates"].append(current)
         stop.set()
         dflow_task.cancel()
         feed_task.cancel()
-        await asyncio.gather(dflow_task, feed_task, return_exceptions=True)
+        for task in receipt_tasks.values():
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(dflow_task, feed_task, *receipt_tasks.values(), return_exceptions=True)
         world_session.close()
 
     candidates = row["shadowCandidates"]
-    definite = [c for c in candidates if c.get("status") in {"PARTIAL_SHADOW_FILL", "FULL_SHADOW_FILL"}]
+    definite = [c for c in candidates if c.get("status") in {"PARTIAL_FILL_EXPIRED_WITH_RESIDUAL_ORDER", "FULL_SHADOW_FILL"}]
     plausible = [c for c in candidates if c.get("highestQueueClassification") in {"PLAUSIBLE_FILL", "DEFINITE_FILL"}]
     near = [c for c in candidates if c.get("highestQueueClassification") in {"NEAR_FILL", "PLAUSIBLE_FILL", "DEFINITE_FILL"}]
     definite_survived = [c for c in definite if c.get("protectedEdgeSurvived") is True]
@@ -980,7 +1075,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "side": "POLYMARKET_BUY_MAKER_FIRST",
             "placement": "JOIN_EXISTING_BEST_BID",
             "makerSizeShares": MAKER_SIZE_SHARES,
-            "queueRule": "DEFINITE_PUBLIC_SELL_FLOW_LOWER_BOUND_PLUS_SEPARATE_PLAUSIBLE_QUEUE_ADVANCEMENT_RANGE",
+            "queueRule": "CONDITION_LEVEL_ORDERFILLED_LOWER_BOUND_DIRECT_MINT_MERGE_FAIL_CLOSED",
             "plausibleRule": "DISPLAYED_QUEUE_DECREASE_CAN_ADVANCE_POSITION_BUT_CANCELLATION_ALONE_NEVER_COUNTS_AS_FILL",
             "nearFillQueueFraction": NEAR_FILL_QUEUE_FRACTION,
             "makerRebateModeled": False,
