@@ -1,10 +1,12 @@
 {
   "schemaVersion": "WORLD_PM_MAKER_TAKER_SAME_WINDOW_REQUEST_R1",
-  "firstWindowStartTs": 1790501100,
-  "windows": 8,
+  "firstWindowStartTs": 1790501400,
+  "windows": 6,
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
   "privateAuthorityResearchSha": "3ab1d113149511c44080e13db1d9a9eb4f12730b",
   "mode": "NO_TRADE_PUBLIC_READ_ONLY_SPLIT_RUNNER_AB",
-  "requestId": "fresh-prospective-maker-qualification-r1-batch1-20260927",
-  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063"
+  "requestId": "fresh-prospective-maker-qualification-r1-batch1-retry-20260927",
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "priorFailedRun": 36309301112,
+  "priorFailureReason": "REQUESTED_WINDOW_COUNT_8_OUTSIDE_FROZEN_RUNNER_RANGE_1_TO_6"
 }
