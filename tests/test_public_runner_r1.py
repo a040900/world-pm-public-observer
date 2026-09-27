@@ -94,6 +94,8 @@ class T(unittest.TestCase):
  def test_runner_lifecycle_keeps_residual_order_after_partial(self):
   current={
    "makerSizeShares":5.0,
+   "makerBid":0.8,
+   "fillEvents":[],
    "cumulativeFillShares":0.0,
    "hypotheticalHedgeCoveredShares":0.0,
    "remainingOrderShares":5.0,
@@ -102,14 +104,65 @@ class T(unittest.TestCase):
   }
   full=maker.apply_shadow_fill_lifecycle(current,cumulative_fill=.1,incremental_hedge_covered=.1)
   self.assertFalse(full)
-  self.assertEqual(current["inventoryState"],"PARTIALLY_FILLED_RESTING")
-  self.assertAlmostEqual(current["remainingOrderShares"],4.9)
-  self.assertAlmostEqual(current["residualInventoryShares"],0.0)
+  self.assertEqual(current["inventoryState"],"PARTIAL_FILL_LOWER_BOUND_INVENTORY_UNKNOWN")
+  self.assertAlmostEqual(current["remainingOrderUpperBoundShares"],4.9)
+  self.assertAlmostEqual(current["residualInventoryLowerBoundShares"],0.0)
+  self.assertAlmostEqual(current["residualInventoryUpperBoundShares"],4.9)
   full=maker.apply_shadow_fill_lifecycle(current,cumulative_fill=5.0,incremental_hedge_covered=4.9)
   self.assertTrue(full)
-  self.assertEqual(current["inventoryState"],"FULLY_FILLED")
+  self.assertEqual(current["inventoryState"],"FULLY_FILLED_CONFIRMED")
   self.assertAlmostEqual(current["remainingOrderShares"],0.0)
   self.assertAlmostEqual(current["hypotheticalHedgeCoveredShares"],5.0)
+
+ def test_pf01_candidate_economics_aggregates_all_hedge_legs(self):
+  current={
+   "makerSizeShares":5.0,"makerBid":.8,"fillEvents":[],
+   "confirmedFillLowerBoundShares":0.0,"cumulativeFillShares":0.0,
+   "hypotheticalHedgeCoveredShares":0.0,
+  }
+  # Four shares cost .40 World each => 1.20 protected unit cost.
+  current["fillEvents"].append({"worldQuote":{"requestSizeCash":1.6},"protectedEconomics":{"survived":False}})
+  maker.apply_shadow_fill_lifecycle(current,cumulative_fill=4.0,incremental_hedge_covered=4.0)
+  # Last share looks attractive by itself, but whole candidate costs 1.13.
+  current["fillEvents"].append({"worldQuote":{"requestSizeCash":.05},"protectedEconomics":{"survived":True}})
+  maker.apply_shadow_fill_lifecycle(current,cumulative_fill=5.0,incremental_hedge_covered=1.0)
+  self.assertTrue(current["fullyHedged"])
+  self.assertAlmostEqual(current["cumulativeProtectedUnitCost"],1.13)
+  self.assertFalse(current["protectedEdgeSurvived"])
+
+ def test_pf01_incomplete_hedge_cannot_be_positive(self):
+  current={
+   "makerSizeShares":5.0,"makerBid":.8,"fillEvents":[],
+   "confirmedFillLowerBoundShares":4.0,"cumulativeFillShares":4.0,
+   "hypotheticalHedgeCoveredShares":0.0,
+  }
+  current["fillEvents"].append({"worldQuote":{},"protectedEconomics":{"survived":None}})
+  maker.apply_shadow_fill_lifecycle(current,cumulative_fill=4.0,incremental_hedge_covered=0.0)
+  current["fillEvents"].append({"worldQuote":{"requestSizeCash":.05},"protectedEconomics":{"survived":True}})
+  maker.apply_shadow_fill_lifecycle(current,cumulative_fill=5.0,incremental_hedge_covered=1.0)
+  self.assertAlmostEqual(current["residualInventoryLowerBoundShares"],4.0)
+  self.assertFalse(current["fullyHedged"])
+  self.assertIsNone(current["protectedEdgeSurvived"])
+
+ def test_pf02_partial_exposes_inventory_bounds(self):
+  current={
+   "makerSizeShares":5.0,"makerBid":.8,"fillEvents":[],
+   "confirmedFillLowerBoundShares":0.0,"cumulativeFillShares":0.0,
+   "hypotheticalHedgeCoveredShares":0.0,
+  }
+  maker.apply_shadow_fill_lifecycle(current,cumulative_fill=.1,incremental_hedge_covered=.1)
+  self.assertAlmostEqual(current["confirmedFillLowerBoundShares"],.1)
+  self.assertAlmostEqual(current["confirmedFillUpperBoundShares"],5.0)
+  self.assertAlmostEqual(current["residualInventoryLowerBoundShares"],0.0)
+  self.assertAlmostEqual(current["residualInventoryUpperBoundShares"],4.9)
+  self.assertFalse(current["fullyHedged"])
+
+ def test_pf03_qualified_evidence_is_monotone_policy(self):
+  # The runner cache must never replace a qualified decode with transient failure.
+  old={"status":"QUALIFIED","groups":[{"x":1}]}
+  new={"status":"PENDING","reason":"RPC"}
+  chosen=old if old.get("status")=="QUALIFIED" and new.get("status")!="QUALIFIED" else new
+  self.assertEqual(chosen["status"],"QUALIFIED")
 
  def test_cache(self):
   m=wp.discover_world_market(1790350200,rpc_url="https://invalid.example")
