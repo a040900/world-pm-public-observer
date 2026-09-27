@@ -502,6 +502,38 @@ def queue_shadow_fill(
     }
 
 
+
+def apply_shadow_fill_lifecycle(
+    current: dict[str, Any],
+    *,
+    cumulative_fill: float,
+    incremental_hedge_covered: float = 0.0,
+) -> bool:
+    """Update persistent hypothetical order inventory. Return True only when fully filled."""
+    previous_fill = float(current.get("cumulativeFillShares") or 0.0)
+    if cumulative_fill < previous_fill - 1e-12:
+        current["inventoryState"] = "INVENTORY_UNKNOWN"
+        current["inventoryUnknownReason"] = "CUMULATIVE_FILL_REGRESSED"
+        return False
+    current["cumulativeFillShares"] = cumulative_fill
+    current["hypotheticalHedgeCoveredShares"] = float(
+        current.get("hypotheticalHedgeCoveredShares") or 0.0
+    ) + max(0.0, incremental_hedge_covered)
+    current["residualInventoryShares"] = max(
+        0.0,
+        cumulative_fill - float(current["hypotheticalHedgeCoveredShares"]),
+    )
+    current["remainingOrderShares"] = max(
+        0.0,
+        float(current["makerSizeShares"]) - cumulative_fill,
+    )
+    full = cumulative_fill >= float(current["makerSizeShares"]) - 1e-12
+    current["inventoryState"] = "FULLY_FILLED" if full else (
+        "PARTIALLY_FILLED_RESTING" if cumulative_fill > 0 else "RESTING"
+    )
+    return full
+
+
 class TradeAwareBook(r24.PolymarketTimelineBook):
     def __init__(self, token_ids: list[str]) -> None:
         super().__init__(token_ids)
@@ -806,15 +838,11 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                                 "quoteCompletedAt": verdict_at,
                                 "trigger": classification["definite"].get("trigger"),
                             })
-                            current["cumulativeFillShares"] = cumulative_fill
-                            current["hedgedShares"] = float(current.get("hedgedShares") or 0.0) + (
-                                incremental_fill if verdict.get("survived") is not None else 0.0
-                            )
-                            current["residualInventoryShares"] = max(
-                                0.0, cumulative_fill - float(current["hedgedShares"])
-                            )
-                            current["remainingOrderShares"] = max(
-                                0.0, float(current["makerSizeShares"]) - cumulative_fill
+                            hedge_covered = incremental_fill if verdict.get("survived") is not None else 0.0
+                            full_fill = apply_shadow_fill_lifecycle(
+                                current,
+                                cumulative_fill=cumulative_fill,
+                                incremental_hedge_covered=hedge_covered,
                             )
                             current["postFillWorldQuote"] = quote
                             current["postFillProtectedEconomics"] = verdict
@@ -901,8 +929,9 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     "queueAheadKnown": False,
                     "queueAheadUncertaintyReason": "SNAPSHOT_PRECEDES_HYPOTHETICAL_ADMISSION_NO_POST_ADMISSION_UPPER_BOUND",
                     "cumulativeFillShares": 0.0,
-                    "hedgedShares": 0.0,
+                    "hypotheticalHedgeCoveredShares": 0.0,
                     "residualInventoryShares": 0.0,
+                    "inventoryState": "RESTING",
                     "remainingOrderShares": MAKER_SIZE_SHARES,
                     "fillEvents": [],
                     "preFillWorldQuote": quote,
@@ -949,7 +978,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                 )
                 current["residualInventoryShares"] = max(
                     0.0,
-                    float(current.get("cumulativeFillShares") or 0.0) - float(current.get("hedgedShares") or 0.0),
+                    float(current.get("cumulativeFillShares") or 0.0) - float(current.get("hypotheticalHedgeCoveredShares") or 0.0),
                 )
                 current["completedAt"] = time.time()
                 row["shadowCandidates"].append(current)
