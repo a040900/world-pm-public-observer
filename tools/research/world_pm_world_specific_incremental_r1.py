@@ -112,11 +112,14 @@ def _pm_proxy_from_states(rows: list[Mapping[str, Any]], *, cutoff: float) -> di
         ask = min((_finite(level.get("price")) for level in asks if isinstance(level, Mapping)), default=None)
         if bid is None or ask is None or bid <= 0 or ask <= 0 or bid > ask:
             return {"valid": False, "reason": "PM_BBO_INVALID"}
-        age_ms = cutoff * 1000.0 - source
-        if age_ms < -PM_SOURCE_FUTURE_TOLERANCE_MS or age_ms > PM_SOURCE_MAX_AGE_MS:
-            return {"valid": False, "reason": "PM_SOURCE_STALE_OR_FUTURE", "sourceAgeMs": age_ms}
+        local_age_ms = (cutoff - effective_at) * 1000.0
+        if local_age_ms < 0 or local_age_ms > PM_SOURCE_MAX_AGE_MS:
+            return {"valid": False, "reason": "PM_LOCAL_STATE_STALE_OR_FUTURE", "localStateAgeMs": local_age_ms}
         mids.append((bid + ask) / 2.0)
         effective_ats.append(effective_at)
+    generations = [int(row.get("connectionGeneration") or -1) for row in rows]
+    if generations[0] < 0 or generations[0] != generations[1]:
+        return {"valid": False, "reason": "PM_CONNECTION_GENERATION_MISMATCH", "generations": generations}
     proxy = _normalized_two_side(mids[0], mids[1])
     return {
         "valid": proxy is not None,
@@ -128,6 +131,7 @@ def _pm_proxy_from_states(rows: list[Mapping[str, Any]], *, cutoff: float) -> di
         "downEffectiveAt": effective_ats[1],
         "upSourceTimestampMs": rows[0].get("sourceTimestampMs"),
         "downSourceTimestampMs": rows[1].get("sourceTimestampMs"),
+        "connectionGeneration": generations[0],
     }
 
 
