@@ -1,0 +1,52 @@
+name: BINANCE_MARKET_DATA_TRANSPORT_SMOKE
+on:
+  push:
+    branches: [main]
+    paths: ['.github/run-requests/binance-market-data-transport-smoke.json']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install websockets==14.2
+      - name: Compare Binance public market-data transports
+        run: |
+          python - <<'PY'
+          import asyncio, json, time
+          import websockets
+
+          endpoints = {
+              "standard": "wss://stream.binance.com:9443/ws/btcusdt@aggTrade",
+              "market_data_only": "wss://data-stream.binance.vision/ws/btcusdt@aggTrade",
+          }
+
+          async def probe(name, url):
+              out={"name":name,"url":url,"messages":0,"first":None,"error":None}
+              try:
+                  async with websockets.connect(url, open_timeout=10, close_timeout=3, ping_interval=20, ping_timeout=20) as ws:
+                      deadline=time.time()+15
+                      while time.time()<deadline and out["messages"]<5:
+                          raw=await asyncio.wait_for(ws.recv(), timeout=5)
+                          msg=json.loads(raw)
+                          out["messages"]+=1
+                          if out["first"] is None:
+                              out["first"]={k:msg.get(k) for k in ("e","E","s","a","p","q","f","l","T","m")}
+              except Exception as exc:
+                  out["error"]=f"{type(exc).__name__}:{exc}"
+              print(json.dumps(out,sort_keys=True),flush=True)
+              return out
+
+          async def main():
+              rows=[]
+              for name,url in endpoints.items():
+                  rows.append(await probe(name,url))
+              assert rows[1]["messages"]>0, rows
+              assert rows[1]["first"]["s"]=="BTCUSDT", rows[1]
+              assert rows[1]["first"]["e"]=="aggTrade", rows[1]
+          asyncio.run(main())
+          PY
