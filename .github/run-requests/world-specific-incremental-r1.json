@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "WORLD_PM_WORLD_SPECIFIC_INCREMENTAL_R1_REQUEST",
+  "requestId": "world-specific-incremental-r1-20260928",
+  "privateAuthorityRepo": "a040900/prediction-market-relative-value",
+  "privateAuthorityProtocolPath": "docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md",
+  "privateAuthorityProtocolCommit": "86cfc3ae780ebbd551773fdba0fee26a75130b23",
+  "windows": 6,
+  "mode": "PUBLIC_READ_ONLY_NO_TRADE",
+  "selectionRule": "SERVER_TIME_PLUS_120_SECONDS_CEIL_TO_300_NO_REPLACEMENT",
+  "interpretation": "MECHANISM_DIAGNOSTIC_NOT_TRADING_EDGE"
+}
