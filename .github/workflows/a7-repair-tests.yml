@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "a7-aggregate-size-repair-r1"
+      - "main"
   pull_request:
     paths:
       - "tools/research/world_pm_pm_maker_first_shadow_r1.py"
