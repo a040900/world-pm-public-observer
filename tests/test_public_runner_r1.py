@@ -91,6 +91,26 @@ class T(unittest.TestCase):
   r=self._classify([self._trade("0x8",[],ws_size=100)])
   self.assertEqual(r["definite"]["status"],"NO_SHADOW_FILL")
 
+ def test_runner_lifecycle_keeps_residual_order_after_partial(self):
+  current={
+   "makerSizeShares":5.0,
+   "cumulativeFillShares":0.0,
+   "hypotheticalHedgeCoveredShares":0.0,
+   "remainingOrderShares":5.0,
+   "residualInventoryShares":0.0,
+   "inventoryState":"RESTING",
+  }
+  full=maker.apply_shadow_fill_lifecycle(current,cumulative_fill=.1,incremental_hedge_covered=.1)
+  self.assertFalse(full)
+  self.assertEqual(current["inventoryState"],"PARTIALLY_FILLED_RESTING")
+  self.assertAlmostEqual(current["remainingOrderShares"],4.9)
+  self.assertAlmostEqual(current["residualInventoryShares"],0.0)
+  full=maker.apply_shadow_fill_lifecycle(current,cumulative_fill=5.0,incremental_hedge_covered=4.9)
+  self.assertTrue(full)
+  self.assertEqual(current["inventoryState"],"FULLY_FILLED")
+  self.assertAlmostEqual(current["remainingOrderShares"],0.0)
+  self.assertAlmostEqual(current["hypotheticalHedgeCoveredShares"],5.0)
+
  def test_cache(self):
   m=wp.discover_world_market(1790350200,rpc_url="https://invalid.example")
   self.assertEqual(m.market,"52dBfCPUPeggatbZvw4Cf4oQ88mGR9HPq1a4Jsi9DAn5")
