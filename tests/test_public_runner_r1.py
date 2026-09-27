@@ -164,6 +164,29 @@ class T(unittest.TestCase):
   chosen=old if old.get("status")=="QUALIFIED" and new.get("status")!="QUALIFIED" else new
   self.assertEqual(chosen["status"],"QUALIFIED")
 
+ def test_pf04_missing_hash_is_unresolved_execution_evidence(self):
+  trades=[{"side":"SELL","price":.79,"size":5,"sourceTimestampMs":2000,"receivedAt":2.0,"transactionHash":""}]
+  out=maker.queue_shadow_classification(maker_bid=.8,queue_ahead=100,maker_size=5,trades=trades,queue_timeline=[],placed_at=1,target_token="101",complement_token="202",queue_ahead_known=False)
+  self.assertEqual(out["definite"]["fillShares"],0)
+  self.assertEqual(out["definite"]["executionEvidenceUnavailableCount"],1)
+  self.assertTrue(maker._execution_evidence_incomplete_at_expiry(out))
+
+ def test_pf04_unknown_time_not_masked_by_confirmed_fill(self):
+  trades=[
+   {"side":"SELL","price":.79,"size":1,"sourceTimestampMs":2000,"receivedAt":2.0,"transactionHash":"0x1","executionEvidence":{"status":"QUALIFIED","groups":[{"taker":{"side":"SELL","tokenId":"101","shares":1},"makers":[{"side":"BUY","tokenId":"101","price":.79,"shares":1}]}]}},
+   {"side":"SELL","price":.79,"size":5,"sourceTimestampMs":None,"receivedAt":2.1,"transactionHash":"0x2"},
+  ]
+  out=maker.queue_shadow_classification(maker_bid=.8,queue_ahead=100,maker_size=5,trades=trades,queue_timeline=[],placed_at=1,target_token="101",complement_token="202",queue_ahead_known=False)
+  self.assertEqual(out["classification"],"DEFINITE_FILL")
+  self.assertEqual(out["unknownRelevantTradeSourceTimeCount"],1)
+  self.assertTrue(maker._execution_evidence_incomplete_at_expiry(out))
+
+ def test_pf04_unknown_time_not_masked_by_plausible(self):
+  trades=[{"side":"SELL","price":.79,"size":5,"sourceTimestampMs":None,"receivedAt":2.1,"transactionHash":"0x2"}]
+  out=maker.queue_shadow_classification(maker_bid=.8,queue_ahead=100,maker_size=5,trades=trades,queue_timeline=[{"observedAt":2,"bidSize":0}],placed_at=1,target_token="101",complement_token="202",queue_ahead_known=False)
+  self.assertGreater(out["unknownRelevantTradeSourceTimeCount"],0)
+  self.assertTrue(maker._execution_evidence_incomplete_at_expiry(out))
+
  def test_cache(self):
   m=wp.discover_world_market(1790350200,rpc_url="https://invalid.example")
   self.assertEqual(m.market,"52dBfCPUPeggatbZvw4Cf4oQ88mGR9HPq1a4Jsi9DAn5")
