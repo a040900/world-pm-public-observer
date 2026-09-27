@@ -401,11 +401,21 @@ def _hydrate_tx_execution_evidence(trade: dict[str, Any]) -> None:
     if not tx_hash:
         trade["executionEvidence"] = {"status": "UNAVAILABLE", "reason": "MISSING_TX_HASH"}
         return
+    lookup_started_at = time.time()
     receipt = condition_tape.fetch_receipt_once(tx_hash)
+    lookup_completed_at = time.time()
     if receipt is None:
-        trade["executionEvidence"] = {"status": "PENDING", "reason": "RECEIPT_NOT_YET_AVAILABLE"}
+        trade["executionEvidence"] = {
+            "status": "PENDING",
+            "reason": "RECEIPT_NOT_YET_AVAILABLE",
+            "receiptLookupStartedAt": lookup_started_at,
+            "receiptLookupCompletedAt": lookup_completed_at,
+        }
         return
-    trade["executionEvidence"] = condition_tape.decode_match_groups(receipt)
+    evidence = condition_tape.decode_match_groups(receipt)
+    evidence["receiptLookupStartedAt"] = lookup_started_at
+    evidence["receiptLookupCompletedAt"] = lookup_completed_at
+    trade["executionEvidence"] = evidence
 
 
 def queue_shadow_fill(
