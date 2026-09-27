@@ -652,6 +652,16 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
     dflow = r2s.GapRadar(world_market.yes_mint, world_market.no_mint)
     dflow_task = asyncio.create_task(dflow.run(stop))
     world_session = requests.Session()
+    receipt_tasks: dict[str, asyncio.Task[Any]] = {}
+
+    async def hydrate_tx_nonblocking(tx_hash: str, representative: dict[str, Any]) -> None:
+        await asyncio.to_thread(_hydrate_tx_execution_evidence, representative)
+        evidence = representative.get("executionEvidence")
+        for rows in feed.trades.values():
+            for row_trade in rows:
+                if str(row_trade.get("transactionHash") or "").lower() == tx_hash:
+                    row_trade["executionEvidence"] = evidence
+
     active: dict[str, dict[str, Any] | None] = {"WORLD_YES+PM_DOWN": None, "WORLD_NO+PM_UP": None}
     sampled = {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0}
     pairs = (
@@ -696,10 +706,22 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                         )
                     ]
                     if pending:
-                        await asyncio.gather(*[
-                            asyncio.to_thread(_hydrate_tx_execution_evidence, trade)
-                            for trade in pending[:8]
-                        ])
+                        launched = 0
+                        for trade in pending:
+                            tx_hash = str(trade.get("transactionHash") or "").lower()
+                            if not tx_hash:
+                                continue
+                            existing_task = receipt_tasks.get(tx_hash)
+                            if existing_task is not None and not existing_task.done():
+                                continue
+                            if existing_task is not None and existing_task.done():
+                                receipt_tasks.pop(tx_hash, None)
+                            receipt_tasks[tx_hash] = asyncio.create_task(
+                                hydrate_tx_nonblocking(tx_hash, trade)
+                            )
+                            launched += 1
+                            if launched >= 8:
+                                break
                     classification = queue_shadow_classification(
                         maker_bid=float(current["makerBid"]),
                         queue_ahead=float(current["queueAheadShares"]),
@@ -924,7 +946,10 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         stop.set()
         dflow_task.cancel()
         feed_task.cancel()
-        await asyncio.gather(dflow_task, feed_task, return_exceptions=True)
+        for task in receipt_tasks.values():
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(dflow_task, feed_task, *receipt_tasks.values(), return_exceptions=True)
         world_session.close()
 
     candidates = row["shadowCandidates"]
