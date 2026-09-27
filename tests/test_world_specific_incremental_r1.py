@@ -64,6 +64,82 @@ class IncrementalLeadR1Tests(unittest.TestCase):
         )
         self.assertIsNone(event)
 
+    def test_pm_cutoff_rejects_future_receipt_even_if_source_timestamp_is_old(self):
+        rows = [
+            {
+                "bids": [{"price": 0.49}],
+                "asks": [{"price": 0.51}],
+                "sourceTimestampMs": 999900.0,
+                "effectiveAt": 1000.100,
+                "connectionGeneration": 1,
+            },
+            {
+                "bids": [{"price": 0.49}],
+                "asks": [{"price": 0.51}],
+                "sourceTimestampMs": 999900.0,
+                "effectiveAt": 999.990,
+                "connectionGeneration": 1,
+            },
+        ]
+        out = r._pm_proxy_from_states(rows, cutoff=1000.000)
+        self.assertFalse(out["valid"])
+        self.assertEqual(out["reason"], "PM_STATE_INVALID_OR_FUTURE_RECEIPT")
+
+    def test_pm_cutoff_accepts_only_states_observer_available_by_cutoff(self):
+        rows = [
+            {
+                "bids": [{"price": 0.59}],
+                "asks": [{"price": 0.61}],
+                "sourceTimestampMs": 999900.0,
+                "effectiveAt": 999.990,
+                "connectionGeneration": 1,
+            },
+            {
+                "bids": [{"price": 0.39}],
+                "asks": [{"price": 0.41}],
+                "sourceTimestampMs": 999900.0,
+                "effectiveAt": 999.995,
+                "connectionGeneration": 1,
+            },
+        ]
+        out = r._pm_proxy_from_states(rows, cutoff=1000.000)
+        self.assertTrue(out["valid"])
+        self.assertAlmostEqual(out["proxy"], 0.6)
+        self.assertLessEqual(out["upEffectiveAt"], out["cutoffAt"])
+        self.assertLessEqual(out["downEffectiveAt"], out["cutoffAt"])
+
+    def test_cex_at_or_before_never_uses_future_receipt(self):
+        from collections import deque
+        points = deque([
+            {"receivedAt": 999.9, "price": 100.0},
+            {"receivedAt": 1000.1, "price": 101.0},
+        ])
+        point = r._at_or_before(points, 1000.0)
+        self.assertEqual(point["price"], 100.0)
+
+    def test_pm_cutoff_rejects_cross_generation_pair(self):
+        rows = [
+            {"bids": [{"price": .59}], "asks": [{"price": .61}], "sourceTimestampMs": 1.0,
+             "effectiveAt": 1000.0, "connectionGeneration": 1},
+            {"bids": [{"price": .39}], "asks": [{"price": .41}], "sourceTimestampMs": 1.0,
+             "effectiveAt": 1000.0, "connectionGeneration": 2},
+        ]
+        out = r._pm_proxy_from_states(rows, cutoff=1000.0)
+        self.assertFalse(out["valid"])
+        self.assertEqual(out["reason"], "PM_CONNECTION_GENERATION_MISMATCH")
+
+    def test_causal_timeline_does_not_move_duplicate_state_availability_forward(self):
+        book = object.__new__(r.CausalTimelineBook)
+        book.history = {"x": []}
+        book._state_point = lambda token, at: {
+            "bids": [{"price": .49}], "asks": [{"price": .51}],
+            "sourceTimestampMs": at * 1000, "effectiveAt": at,
+            "connectionGeneration": 1, "localDigest": "same",
+        }
+        book._record("x", 1000.0)
+        book._record("x", 1000.2)
+        self.assertEqual(book.state_at("x", 1000.1)["effectiveAt"], 1000.0)
+
 
 if __name__ == "__main__":
     unittest.main()

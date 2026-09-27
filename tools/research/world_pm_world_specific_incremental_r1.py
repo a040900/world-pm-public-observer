@@ -90,47 +90,63 @@ def _world_proxy(snapshot: Mapping[str, Any]) -> float | None:
     return _normalized_two_side(legs[0], legs[1])
 
 
-def _pm_proxy(
-    pm_feed: r2.RollingTimelineBook,
-    up_token: str,
-    down_token: str,
-    *,
-    clock_offset_seconds: float | None,
-) -> dict[str, Any]:
-    now = time.time()
-    rows = [
-        pm_feed.snapshot(up_token, clock_offset_seconds=clock_offset_seconds),
-        pm_feed.snapshot(down_token, clock_offset_seconds=clock_offset_seconds),
-    ]
+def _pm_proxy_from_states(rows: list[Mapping[str, Any]], *, cutoff: float) -> dict[str, Any]:
     mids = []
+    effective_ats = []
     for row in rows:
-        bid = _finite(row.get("bestBid"))
-        ask = _finite(row.get("bestAsk"))
+        bids = row.get("bids")
+        asks = row.get("asks")
         source = _finite(row.get("sourceTimestampMs"))
+        effective_at = _finite(row.get("effectiveAt"))
         if (
-            row.get("healthy") is not True
-            or bid is None
-            or ask is None
-            or bid <= 0
-            or ask <= 0
-            or bid > ask
+            not isinstance(bids, list)
+            or not bids
+            or not isinstance(asks, list)
+            or not asks
             or source is None
+            or effective_at is None
+            or effective_at > cutoff
         ):
-            return {"valid": False, "reason": "PM_BBO_OR_HEALTH_INVALID"}
-        age_ms = now * 1000.0 - source
-        if age_ms < -PM_SOURCE_FUTURE_TOLERANCE_MS or age_ms > PM_SOURCE_MAX_AGE_MS:
-            return {"valid": False, "reason": "PM_SOURCE_STALE_OR_FUTURE", "sourceAgeMs": age_ms}
+            return {"valid": False, "reason": "PM_STATE_INVALID_OR_FUTURE_RECEIPT"}
+        bid = max((_finite(level.get("price")) for level in bids if isinstance(level, Mapping)), default=None)
+        ask = min((_finite(level.get("price")) for level in asks if isinstance(level, Mapping)), default=None)
+        if bid is None or ask is None or bid <= 0 or ask <= 0 or bid > ask:
+            return {"valid": False, "reason": "PM_BBO_INVALID"}
+        local_age_ms = (cutoff - effective_at) * 1000.0
+        if local_age_ms < 0 or local_age_ms > PM_SOURCE_MAX_AGE_MS:
+            return {"valid": False, "reason": "PM_LOCAL_STATE_STALE_OR_FUTURE", "localStateAgeMs": local_age_ms}
         mids.append((bid + ask) / 2.0)
+        effective_ats.append(effective_at)
+    generations = [int(row.get("connectionGeneration") or -1) for row in rows]
+    if generations[0] < 0 or generations[0] != generations[1]:
+        return {"valid": False, "reason": "PM_CONNECTION_GENERATION_MISMATCH", "generations": generations}
     proxy = _normalized_two_side(mids[0], mids[1])
     return {
         "valid": proxy is not None,
         "proxy": proxy,
-        "observedAt": now,
+        "cutoffAt": cutoff,
         "upMid": mids[0],
         "downMid": mids[1],
+        "upEffectiveAt": effective_ats[0],
+        "downEffectiveAt": effective_ats[1],
         "upSourceTimestampMs": rows[0].get("sourceTimestampMs"),
         "downSourceTimestampMs": rows[1].get("sourceTimestampMs"),
+        "connectionGeneration": generations[0],
     }
+
+
+def _pm_proxy_at(
+    pm_feed: CausalTimelineBook,
+    up_token: str,
+    down_token: str,
+    *,
+    cutoff: float,
+) -> dict[str, Any]:
+    up = pm_feed.state_at(up_token, cutoff)
+    down = pm_feed.state_at(down_token, cutoff)
+    if up is None or down is None:
+        return {"valid": False, "reason": "PM_STATE_MISSING_AT_CUTOFF", "cutoffAt": cutoff}
+    return _pm_proxy_from_states([up, down], cutoff=cutoff)
 
 
 def _at_or_before(points: deque[dict[str, Any]], target: float) -> dict[str, Any] | None:
@@ -140,6 +156,20 @@ def _at_or_before(points: deque[dict[str, Any]], target: float) -> dict[str, Any
             break
         candidate = point
     return candidate
+
+
+class CausalTimelineBook(r2.RollingTimelineBook):
+    """Preserve every observer-time state transition without moving first availability."""
+
+    def _record(self, token: str, at: float) -> None:
+        point = self._state_point(token, at)
+        if point is None:
+            return
+        rows = self.history[token]
+        rows.append(point)
+        cutoff = at - r2.HISTORY_SECONDS
+        while len(rows) > 1 and float(rows[1].get("effectiveAt") or 0.0) < cutoff:
+            rows.pop(0)
 
 
 class CexTape:
@@ -317,7 +347,7 @@ def _point_near(points: deque[dict[str, Any]], target: float) -> dict[str, Any] 
 async def _finish_episode(
     event: dict[str, Any],
     *,
-    pm_feed: r2.RollingTimelineBook,
+    pm_feed: CausalTimelineBook,
     up_token: str,
     down_token: str,
     clock_offset_seconds: float | None,
@@ -332,7 +362,7 @@ async def _finish_episode(
         wait = target - time.time()
         if wait > 0:
             await asyncio.sleep(wait)
-        row = _pm_proxy(pm_feed, up_token, down_token, clock_offset_seconds=clock_offset_seconds)
+        row = _pm_proxy_at(pm_feed, up_token, down_token, cutoff=target)
         if row.get("valid") is not True:
             event["future"][str(int(horizon))] = {"score": "UNSCORABLE", "pm": row}
             continue
@@ -523,7 +553,7 @@ async def _run_window(
         return row
 
     stop = asyncio.Event()
-    pm_feed = r2.RollingTimelineBook([pm_market.up_token, pm_market.down_token])
+    pm_feed = CausalTimelineBook([pm_market.up_token, pm_market.down_token])
     pm_task = asyncio.create_task(pm_feed.run(stop))
 
     try:
@@ -560,20 +590,21 @@ async def _run_window(
 
     try:
         while time.time() < end_ts:
-            loop_at = time.time()
-            world_snapshot = dflow.snapshot(loop_at)
+            poll_started_at = time.time()
+            world_snapshot = dflow.snapshot(poll_started_at)
             world_value = _world_proxy(world_snapshot)
-            pm_value = _pm_proxy(
+            anchor_at = time.time()
+            pm_value = _pm_proxy_at(
                 pm_feed,
                 pm_market.up_token,
                 pm_market.down_token,
-                clock_offset_seconds=clock_offset_seconds,
+                cutoff=anchor_at,
             )
-            cex_state = cex.consensus(loop_at)
+            cex_state = cex.consensus(anchor_at)
             if world_value is not None:
-                world_points.append({"observedAt": loop_at, "receivedAt": loop_at, "proxy": world_value})
+                world_points.append({"observedAt": anchor_at, "receivedAt": anchor_at, "proxy": world_value})
 
-            prior = _point_near(world_points, loop_at - LOOKBACK_SECONDS)
+            prior = _point_near(world_points, anchor_at - LOOKBACK_SECONDS)
             healthy = (
                 world_value is not None
                 and prior is not None
@@ -589,12 +620,12 @@ async def _run_window(
                     if (
                         is_above
                         and not above[threshold]
-                        and loop_at - last_trigger[threshold] >= EPISODE_COOLDOWN_SECONDS
+                        and anchor_at - last_trigger[threshold] >= EPISODE_COOLDOWN_SECONDS
                     ):
                         sequence[threshold] += 1
                         event = _classify_episode(
                             threshold=threshold,
-                            at=loop_at,
+                            at=anchor_at,
                             world_current=world_value,
                             world_prior=world_prior,
                             cex=cex_state,
@@ -616,13 +647,13 @@ async def _run_window(
                                     )
                                 )
                             )
-                            last_trigger[threshold] = loop_at
+                            last_trigger[threshold] = anchor_at
                     above[threshold] = is_above
             else:
                 for threshold in WORLD_THRESHOLDS:
                     above[threshold] = False
 
-            await asyncio.sleep(max(0.0, POLL_SECONDS - (time.time() - loop_at)))
+            await asyncio.sleep(max(0.0, POLL_SECONDS - (time.time() - poll_started_at)))
 
         row["measurementLoopCompleted"] = True
     finally:
@@ -677,6 +708,12 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         "mode": "PUBLIC_READ_ONLY_NO_TRADE",
         "protocolAuthority": args.protocol_authority,
         "sourceCommitRecordedByWorkflow": args.source_commit,
+        "observerTimeSemantics": {
+            "crossSourceAvailabilityAuthority": "LOCAL_RECEIPT_TIME_ONLY",
+            "sourceTimestamps": "METADATA_AND_STALENESS_ONLY",
+            "futurePmRule": "LATEST_PM_STATE_WITH_EFFECTIVE_AT_LE_CUTOFF",
+            "futureReceiptLeakageAllowed": False,
+        },
         "clockCalibration": clock,
         "schedule": schedule,
         "thresholds": list(WORLD_THRESHOLDS),
