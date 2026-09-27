@@ -10,5 +10,9 @@
   "interpretation": "MECHANISM_DIAGNOSTIC_NOT_TRADING_EDGE",
   "supersedesInvalidRun": 36336976825,
   "invalidRunReason": "FUTURE_RECEIPT_LEAKAGE_RISK_AND_PREVIOUS_AUTHORITY_NOT_ON_MAIN",
-  "observerTimeRule": "LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA"
+  "observerTimeRule": "LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA",
+  "activation": "FRESH_R1_AFTER_CAUSAL_CUTOFF_VALIDATION_PASS",
+  "validationRun": 36340468986,
+  "validationCommit": "63b85c19c83711a6f8c61d49cb83dbacda2838bb",
+  "priorRunEvidenceAdmissible": false
 }
