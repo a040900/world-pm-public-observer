@@ -11,6 +11,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 CLOB_TIME_URL = "https://clob.polymarket.com/time"
@@ -58,6 +59,32 @@ def _json_request(url: str, *, method: str = "GET", payload: Any = None, timeout
     request = Request(url, data=data, headers=headers, method=method)
     with urlopen(request, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
+
+
+def _json_request_transient_retry(
+    url: str,
+    *,
+    method: str = "GET",
+    payload: Any = None,
+    timeout: float = 10.0,
+    attempts: int = 4,
+) -> Any:
+    """Bounded retry for transport failures only; response semantics remain unchanged."""
+    last: Exception | None = None
+    for index in range(max(1, attempts)):
+        try:
+            return _json_request(url, method=method, payload=payload, timeout=timeout)
+        except HTTPError as exc:
+            if exc.code != 429 and not 500 <= exc.code <= 599:
+                raise
+            last = exc
+        except (URLError, TimeoutError, ConnectionResetError, OSError) as exc:
+            last = exc
+        if index + 1 < attempts:
+            time.sleep(0.5 * (2**index))
+    if last is not None:
+        raise last
+    raise RuntimeError("TRANSIENT_HTTP_RETRY_EXHAUSTED")
 
 
 def _rpc(url: str, method: str, params: list[Any]) -> Any:
@@ -110,7 +137,7 @@ def _server_time() -> int:
 
 def fetch_polymarket_market(start_ts: int) -> PolymarketMarket:
     slug = f"btc-updown-5m-{start_ts}"
-    rows = _json_request(f"{GAMMA_EVENTS_URL}?slug={slug}")
+    rows = _json_request_transient_retry(f"{GAMMA_EVENTS_URL}?slug={slug}", timeout=10.0, attempts=4)
     if not isinstance(rows, list) or len(rows) != 1 or not isinstance(rows[0], Mapping):
         raise RuntimeError(f"PM_EVENT_NOT_UNIQUE:{slug}")
     event = rows[0]

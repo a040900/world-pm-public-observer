@@ -6,6 +6,7 @@ on:
       - "maker-lifecycle-condition-tape-r1"
       - "maker-postfix-accounting-r2"
       - "pf04-unknown-propagation-r1"
+      - "execution-retry-buffer-r1"
       - "main"
   pull_request:
     paths:

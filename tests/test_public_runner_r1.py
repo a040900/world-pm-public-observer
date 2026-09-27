@@ -187,6 +187,37 @@ class T(unittest.TestCase):
   self.assertGreater(out["unknownRelevantTradeSourceTimeCount"],0)
   self.assertTrue(maker._execution_evidence_incomplete_at_expiry(out))
 
+ def test_pm_market_discovery_retries_transient_transport(self):
+  original=wp._json_request
+  calls={"n":0}
+  valid=[{"description":"x","markets":[{"clobTokenIds":"[\"1\",\"2\"]","outcomes":"[\"Up\",\"Down\"]","active":True,"closed":False,"acceptingOrders":True,"feeSchedule":{"rate":0,"exponent":1},"cryptoMarketConfig":dict(wp.EXPECTED_PM_CRYPTO_CONFIG),"conditionId":"c"}]}]
+  def fake(url,**kwargs):
+   calls["n"]+=1
+   if calls["n"]<3:
+    raise ConnectionResetError("transient")
+   return valid
+  wp._json_request=fake
+  try:
+   market=wp.fetch_polymarket_market(123)
+  finally:
+   wp._json_request=original
+  self.assertEqual(calls["n"],3)
+  self.assertEqual(market.condition_id,"c")
+
+ def test_pm_market_discovery_does_not_retry_semantic_invalidity(self):
+  original=wp._json_request
+  calls={"n":0}
+  def fake(url,**kwargs):
+   calls["n"]+=1
+   return []
+  wp._json_request=fake
+  try:
+   with self.assertRaisesRegex(RuntimeError,"PM_EVENT_NOT_UNIQUE"):
+    wp.fetch_polymarket_market(123)
+  finally:
+   wp._json_request=original
+  self.assertEqual(calls["n"],1)
+
  def test_cache(self):
   m=wp.discover_world_market(1790350200,rpc_url="https://invalid.example")
   self.assertEqual(m.market,"52dBfCPUPeggatbZvw4Cf4oQ88mGR9HPq1a4Jsi9DAn5")
