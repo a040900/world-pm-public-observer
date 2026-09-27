@@ -136,7 +136,7 @@ def _pm_proxy_from_states(rows: list[Mapping[str, Any]], *, cutoff: float) -> di
 
 
 def _pm_proxy_at(
-    pm_feed: r2.RollingTimelineBook,
+    pm_feed: CausalTimelineBook,
     up_token: str,
     down_token: str,
     *,
@@ -156,6 +156,20 @@ def _at_or_before(points: deque[dict[str, Any]], target: float) -> dict[str, Any
             break
         candidate = point
     return candidate
+
+
+class CausalTimelineBook(r2.RollingTimelineBook):
+    """Preserve every observer-time state transition without moving first availability."""
+
+    def _record(self, token: str, at: float) -> None:
+        point = self._state_point(token, at)
+        if point is None:
+            return
+        rows = self.history[token]
+        rows.append(point)
+        cutoff = at - r2.HISTORY_SECONDS
+        while len(rows) > 1 and float(rows[1].get("effectiveAt") or 0.0) < cutoff:
+            rows.pop(0)
 
 
 class CexTape:
@@ -333,7 +347,7 @@ def _point_near(points: deque[dict[str, Any]], target: float) -> dict[str, Any] 
 async def _finish_episode(
     event: dict[str, Any],
     *,
-    pm_feed: r2.RollingTimelineBook,
+    pm_feed: CausalTimelineBook,
     up_token: str,
     down_token: str,
     clock_offset_seconds: float | None,
@@ -539,7 +553,7 @@ async def _run_window(
         return row
 
     stop = asyncio.Event()
-    pm_feed = r2.RollingTimelineBook([pm_market.up_token, pm_market.down_token])
+    pm_feed = CausalTimelineBook([pm_market.up_token, pm_market.down_token])
     pm_task = asyncio.create_task(pm_feed.run(stop))
 
     try:
