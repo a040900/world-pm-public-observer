@@ -1,9 +1,10 @@
 {
   "schemaVersion": "WORLD_PM_MAKER_TAKER_SAME_WINDOW_REQUEST_R1",
-  "firstWindowStartTs": 1790486700,
-  "windows": 1,
+  "firstWindowStartTs": 1790501100,
+  "windows": 8,
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
-  "privateAuthorityResearchSha": "959a003d1ae117b6c7bf7c7ec9565fab57c63765",
+  "privateAuthorityResearchSha": "3ab1d113149511c44080e13db1d9a9eb4f12730b",
   "mode": "NO_TRADE_PUBLIC_READ_ONLY_SPLIT_RUNNER_AB",
-  "requestId": "maker-lifecycle-repair-runtime-smoke-20260927"
+  "requestId": "fresh-prospective-maker-qualification-r1-batch1-20260927",
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063"
 }
