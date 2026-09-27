@@ -7,6 +7,7 @@ on:
       - "maker-postfix-accounting-r2"
       - "pf04-unknown-propagation-r1"
       - "execution-retry-buffer-r1"
+      - "codex/qualification-runtime-repair"
       - "main"
   pull_request:
     paths:
