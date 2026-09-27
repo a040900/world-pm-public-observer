@@ -1,6 +1,9 @@
 name: A7 repair deterministic tests
 
 on:
+  push:
+    branches:
+      - "a7-aggregate-size-repair-r1"
   pull_request:
     paths:
       - "tools/research/world_pm_pm_maker_first_shadow_r1.py"
