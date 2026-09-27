@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "maker-lifecycle-condition-tape-r1"
+      - "maker-postfix-accounting-r2"
       - "main"
   pull_request:
     paths:
