@@ -1,7 +1,7 @@
 name: WORLD_SPECIFIC_R1_FIX_CHECK
 on:
   push:
-    branches: [fix/world-specific-r1-causal-cutoff-20260928]
+    branches: [main]
 permissions:
   contents: read
 jobs:
