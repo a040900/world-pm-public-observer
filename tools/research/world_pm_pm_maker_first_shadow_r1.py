@@ -456,7 +456,10 @@ def queue_shadow_fill(
     triggers: list[dict[str, Any]] = []
     for trade in trades:
         tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "").lower()
-        if not tx_hash or tx_hash in seen:
+        if not tx_hash:
+            unavailable += 1
+            continue
+        if tx_hash in seen:
             continue
         seen.add(tx_hash)
         evidence = trade.get("executionEvidence")
@@ -512,6 +515,14 @@ def queue_shadow_fill(
         "executionEvidenceAmbiguousCount": ambiguous,
     }
 
+
+
+def _execution_evidence_incomplete_at_expiry(final_shadow: Mapping[str, Any]) -> bool:
+    definite = final_shadow.get("definite") or {}
+    unavailable = int(definite.get("executionEvidenceUnavailableCount") or 0)
+    ambiguous = int(definite.get("executionEvidenceAmbiguousCount") or 0)
+    unknown_time = int(final_shadow.get("unknownRelevantTradeSourceTimeCount") or 0)
+    return unavailable > 0 or ambiguous > 0 or unknown_time > 0
 
 
 def _refresh_candidate_economics(current: dict[str, Any]) -> None:
@@ -1044,10 +1055,8 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     # Reconcile inventory only. Never invent a historical World hedge at expiry.
                     apply_shadow_fill_lifecycle(current, cumulative_fill=final_lower, incremental_hedge_covered=0.0)
                     current["expiryReconciledAdditionalFillLowerBoundShares"] = final_lower - prior_lower
-                unavailable = int(final_shadow["definite"].get("executionEvidenceUnavailableCount") or 0)
-                ambiguous = int(final_shadow["definite"].get("executionEvidenceAmbiguousCount") or 0)
                 lower = float(current.get("confirmedFillLowerBoundShares") or 0.0)
-                if unavailable > 0 or ambiguous > 0 or final_shadow["classification"] == "UNKNOWN_TRADE_TIME":
+                if _execution_evidence_incomplete_at_expiry(final_shadow):
                     current["executionEvidenceComplete"] = False
                     current["status"] = "UNKNOWN_EXECUTION_EVIDENCE_AT_EXPIRY"
                 elif lower >= float(current["makerSizeShares"]) - 1e-12:
