@@ -1,8 +1,5 @@
 name: WORLD_PM_WORLD_SPECIFIC_INCREMENTAL_R1
 on:
-  push:
-    branches: [main]
-    paths: ['.github/run-requests/world-specific-incremental-r1.json']
   workflow_dispatch:
 permissions:
   contents: read
