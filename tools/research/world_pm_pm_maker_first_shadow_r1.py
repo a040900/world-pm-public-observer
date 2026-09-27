@@ -397,6 +397,15 @@ def _hydrate_tx_execution_evidence(trade: dict[str, Any]) -> None:
     existing = trade.get("executionEvidence")
     if isinstance(existing, Mapping) and existing.get("status") not in {"PENDING"}:
         return
+    attempts = int(trade.get("receiptLookupAttempts") or 0)
+    if attempts >= 3:
+        trade["executionEvidence"] = {
+            "status": "UNAVAILABLE",
+            "reason": "RECEIPT_RETRY_EXHAUSTED",
+            "receiptLookupAttempts": attempts,
+        }
+        return
+    trade["receiptLookupAttempts"] = attempts + 1
     tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "")
     if not tx_hash:
         trade["executionEvidence"] = {"status": "UNAVAILABLE", "reason": "MISSING_TX_HASH"}
@@ -410,11 +419,13 @@ def _hydrate_tx_execution_evidence(trade: dict[str, Any]) -> None:
             "reason": "RECEIPT_NOT_YET_AVAILABLE",
             "receiptLookupStartedAt": lookup_started_at,
             "receiptLookupCompletedAt": lookup_completed_at,
+            "receiptLookupAttempts": attempts + 1,
         }
         return
     evidence = condition_tape.decode_match_groups(receipt)
     evidence["receiptLookupStartedAt"] = lookup_started_at
     evidence["receiptLookupCompletedAt"] = lookup_completed_at
+    evidence["receiptLookupAttempts"] = attempts + 1
     trade["executionEvidence"] = evidence
 
 
