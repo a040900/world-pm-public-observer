@@ -270,32 +270,6 @@ def _world_quote_for_target_minout(
     return best
 
 
-def _unique_sell_volume(trades: list[Mapping[str, Any]], maker_bid: float) -> tuple[float, bool]:
-    same_price_sell = 0.0
-    below_bid_sell = False
-    seen: set[tuple[Any, ...]] = set()
-    for trade in trades:
-        side = str(trade.get("side") or "").upper()
-        price = _finite(trade.get("price"))
-        size = _finite(trade.get("size"))
-        if side != "SELL" or price is None or size is None or size <= 0:
-            continue
-        fingerprint = (
-            trade.get("transactionHash") or trade.get("transaction_hash"),
-            trade.get("sourceTimestampMs") or trade.get("timestamp"),
-            round(price, 12),
-            round(size, 12),
-        )
-        if fingerprint in seen:
-            continue
-        seen.add(fingerprint)
-        if price < maker_bid - 1e-12:
-            below_bid_sell = True
-        elif abs(price - maker_bid) <= 1e-12:
-            same_price_sell += size
-    return same_price_sell, below_bid_sell
-
-
 def queue_shadow_classification(
     *,
     maker_bid: float,
@@ -304,22 +278,26 @@ def queue_shadow_classification(
     trades: list[Mapping[str, Any]],
     queue_timeline: list[Mapping[str, Any]],
     placed_at: float | None = None,
+    target_token: str | None = None,
+    complement_token: str | None = None,
+    queue_ahead_known: bool = False,
 ) -> dict[str, Any]:
-    """Classify definite, plausible and near-fill evidence without conflating them."""
-    valid_trades = []
+    """Classify only receipt-backed condition-level evidence.
+
+    A7 proved public WS size is aggregate taker size. Therefore plausible/near
+    classifications may use displayed-queue diagnostics, but never WS size.
+    """
+    valid_trades: list[Mapping[str, Any]] = []
     unknown_trade_time_count = 0
     pre_placement_trade_count = 0
     for trade in trades:
         source_ms = _finite(trade.get("sourceTimestampMs") or trade.get("timestamp"))
-        side = str(trade.get("side") or "").upper()
-        price = _finite(trade.get("price"))
-        if side == "SELL" and price is not None and price <= maker_bid + 1e-12:
-            if source_ms is None:
-                unknown_trade_time_count += 1
-                continue
-            if placed_at is not None and source_ms < placed_at * 1000.0:
-                pre_placement_trade_count += 1
-                continue
+        if source_ms is None:
+            unknown_trade_time_count += 1
+            continue
+        if placed_at is not None and source_ms < placed_at * 1000.0:
+            pre_placement_trade_count += 1
+            continue
         valid_trades.append(trade)
 
     definite = queue_shadow_fill(
@@ -327,8 +305,10 @@ def queue_shadow_classification(
         queue_ahead=queue_ahead,
         maker_size=maker_size,
         trades=valid_trades,
+        target_token=target_token,
+        complement_token=complement_token,
+        queue_ahead_known=queue_ahead_known,
     )
-    same_price_sell, below_bid_sell = _unique_sell_volume(valid_trades, maker_bid)
     observed_sizes: list[float] = []
     for point in sorted(queue_timeline, key=lambda row: float(row.get("observedAt") or 0.0)):
         size = _finite(point.get("bidSize"))
@@ -337,23 +317,14 @@ def queue_shadow_classification(
 
     initial_queue = max(0.0, queue_ahead)
     min_displayed_queue = min(observed_sizes, default=initial_queue)
-
-    # Two independent upper bounds on how much queue can still be ahead of us:
-    # 1) confirmed same-price SELL flow can consume queue ahead;
-    # 2) the smallest displayed size seen at our price bounds how much pre-existing
-    #    visible queue could still remain. We take the tighter bound rather than
-    #    adding queue decreases, so oscillations such as 100->20->100->20 are not
-    #    double-counted.
-    remaining_from_sell_flow = max(0.0, initial_queue - same_price_sell)
-    plausible_remaining = min(initial_queue, min_displayed_queue, remaining_from_sell_flow)
-    plausible_advancement = max(0.0, initial_queue - plausible_remaining)
+    plausible_advancement = max(0.0, initial_queue - min_displayed_queue)
     near_threshold = max(maker_size, initial_queue * NEAR_FILL_QUEUE_FRACTION)
 
     if definite["status"] != "NO_SHADOW_FILL":
         classification = "DEFINITE_FILL"
-    elif same_price_sell > 0 and plausible_remaining <= 1e-12:
+    elif min_displayed_queue <= 1e-12 and initial_queue > 0:
         classification = "PLAUSIBLE_FILL"
-    elif (same_price_sell > 0 or min_displayed_queue < initial_queue) and plausible_remaining <= near_threshold:
+    elif min_displayed_queue < initial_queue and min_displayed_queue <= near_threshold:
         classification = "NEAR_FILL"
     elif unknown_trade_time_count > 0:
         classification = "UNKNOWN_TRADE_TIME"
@@ -363,18 +334,18 @@ def queue_shadow_classification(
     return {
         "classification": classification,
         "definite": definite,
-        "samePriceSellVolume": same_price_sell,
-        "belowBidSellObserved": below_bid_sell,
+        "samePriceSellVolume": None,
+        "belowBidSellObserved": definite.get("strictlyWorseShares", 0.0) > 0,
         "minimumDisplayedQueueShares": min_displayed_queue,
-        "remainingFromConfirmedSamePriceSellFlowShares": remaining_from_sell_flow,
+        "remainingFromConfirmedSamePriceSellFlowShares": None,
         "plausibleQueueAdvancementShares": plausible_advancement,
-        "plausibleQueueRemainingShares": plausible_remaining,
+        "plausibleQueueRemainingShares": min_displayed_queue,
         "nearFillThresholdShares": near_threshold,
         "queueTimelinePointCount": len(observed_sizes),
         "unknownRelevantTradeSourceTimeCount": unknown_trade_time_count,
         "prePlacementRelevantTradeCount": pre_placement_trade_count,
         "plausibleInterpretation": (
-            "UPPER_BOUND_USES_MINIMUM_DISPLAYED_QUEUE_AND_CONFIRMED_SELL_FLOW_WITHOUT_ADDITIVE_DOUBLE_COUNTING;"
+            "DISPLAYED_QUEUE_DIAGNOSTIC_ONLY;PUBLIC_WS_SIZE_NEVER_COUNTS_AS_PRICE_LEVEL_VOLUME;"
             "CANCELLATION_ALONE_NEVER_COUNTS_AS_FILL"
         ),
     }
@@ -423,7 +394,8 @@ def validate_maker_entry_snapshot(
 
 def _hydrate_tx_execution_evidence(trade: dict[str, Any]) -> None:
     """Attach one bounded condition-level receipt decode to a public trade."""
-    if trade.get("executionEvidence") is not None:
+    existing = trade.get("executionEvidence")
+    if isinstance(existing, Mapping) and existing.get("status") not in {"PENDING"}:
         return
     tx_hash = str(trade.get("transactionHash") or trade.get("transaction_hash") or "")
     if not tx_hash:
@@ -715,7 +687,14 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                             }
                         )
                     trades = feed.condition_trades_since(current["conditionTradeIndices"])
-                    pending = [trade for trade in trades if trade.get("executionEvidence") in (None, {"status": "PENDING", "reason": "RECEIPT_NOT_YET_AVAILABLE"})]
+                    pending = [
+                        trade for trade in trades
+                        if trade.get("executionEvidence") is None
+                        or (
+                            isinstance(trade.get("executionEvidence"), Mapping)
+                            and trade["executionEvidence"].get("status") == "PENDING"
+                        )
+                    ]
                     if pending:
                         await asyncio.gather(*[
                             asyncio.to_thread(_hydrate_tx_execution_evidence, trade)
@@ -729,6 +708,8 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                         target_token=str(current["pmToken"]),
                         complement_token=str(current["complementPmToken"]),
                         queue_ahead_known=bool(current.get("queueAheadKnown")),
+                        queue_timeline=timeline,
+                        placed_at=float(current["placedAt"]),
                     )
                     current["queueShadow"] = classification
                     rank = {"NO_FILL_EVIDENCE": 0, "UNKNOWN_TRADE_TIME": 0, "NEAR_FILL": 1, "PLAUSIBLE_FILL": 2, "DEFINITE_FILL": 3}
@@ -914,6 +895,8 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     target_token=str(current["pmToken"]),
                     complement_token=str(current["complementPmToken"]),
                     queue_ahead_known=bool(current.get("queueAheadKnown")),
+                    queue_timeline=list(current["queueTimeline"]),
+                    placed_at=float(current["placedAt"]),
                 )
                 current["queueShadow"] = final_shadow
                 final_class = current.get("highestQueueClassification") or final_shadow["classification"]
