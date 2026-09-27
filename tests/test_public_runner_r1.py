@@ -1,40 +1,94 @@
 import unittest
+
 from tools.research import world_pm_pm_maker_first_shadow_r1 as maker
+from tools.research import world_pm_condition_execution_tape_r1 as tape
 from tools.research import world_polymarket_btc5m_leadlag_probe_r1 as wp
 
+TARGET = "101"
+COMP = "202"
+
 class T(unittest.TestCase):
- def _trade(self, *, ws_price, ws_size, fills):
+ def _trade(self, tx, groups, *, ws_side="BUY", ws_price=.99, ws_size=999):
+  # Deliberately absurd WS fields: receipt evidence, not public size/price, must drive fill.
   return {
-   "side":"SELL","price":ws_price,"size":ws_size,"sourceTimestampMs":2000,
-   "transactionHash":"0xabc",
-   "executionEvidence":{
-    "status":"QUALIFIED_MULTI_PRICE" if len({x[0] for x in fills}) > 1 else "QUALIFIED_MULTI_MAKER_SAME_PRICE",
-    "makerLogs":[{"price":p,"shares":q} for p,q in fills],
-   },
+   "side":ws_side,"price":ws_price,"size":ws_size,"sourceTimestampMs":2000,
+   "transactionHash":tx,
+   "executionEvidence":{"status":"QUALIFIED","groups":groups,"errors":[]},
   }
 
- def test_a7_aggregate_ws_size_does_not_create_false_full_fill(self):
-  # Public WS says size=5, but only 0.1 share actually traded below our .92 bid.
-  r=maker.queue_shadow_classification(
-   maker_bid=.92,queue_ahead=100,maker_size=5,
-   trades=[self._trade(ws_price=.84,ws_size=5,fills=[(.93,4.9),(.84,.1)])],
-   queue_timeline=[],placed_at=1)
+ def _group(self, *, taker_side, taker_token, makers):
+  return {
+   "taker":{"side":taker_side,"tokenId":taker_token,"orderHash":"0xt","shares":sum(x["shares"] for x in makers)},
+   "makers":makers,"firstLogIndex":1,"lastLogIndex":len(makers)+1,
+  }
+
+ def _maker(self, *, side, token, price, shares):
+  return {"side":side,"tokenId":token,"price":price,"shares":shares,"logIndex":1,"orderHash":"0xm"}
+
+ def _classify(self, trades, *, bid=.92, queue=100, known=False):
+  return maker.queue_shadow_classification(
+   maker_bid=bid,queue_ahead=queue,maker_size=5,trades=trades,
+   queue_timeline=[],placed_at=1,target_token=TARGET,complement_token=COMP,
+   queue_ahead_known=known)
+
+ def test_a7_aggregate_ws_size_cannot_create_fill(self):
+  g=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="BUY",token=TARGET,price=.93,shares=4.9),
+   self._maker(side="BUY",token=TARGET,price=.84,shares=.1)])
+  r=self._classify([self._trade("0x1",[g],ws_price=.44,ws_size=500)])
   self.assertEqual(r["definite"]["status"],"PARTIAL_SHADOW_FILL")
   self.assertAlmostEqual(r["definite"]["fillShares"],.1)
 
- def test_exact_bid_uses_matched_volume_not_aggregate_ws_size(self):
-  r=maker.queue_shadow_classification(
-   maker_bid=.92,queue_ahead=1,maker_size=5,
-   trades=[self._trade(ws_price=.92,ws_size=10,fills=[(.93,9.5),(.92,.5)])],
-   queue_timeline=[],placed_at=1)
+ def test_ws_price_does_not_filter_receipt_levels(self):
+  g=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="BUY",token=TARGET,price=.43,shares=6)])
+  r=self._classify([self._trade("0x2",[g],ws_price=.44,ws_size=26)],bid=.43)
   self.assertEqual(r["definite"]["status"],"NO_SHADOW_FILL")
-  self.assertAlmostEqual(r["definite"]["samePriceSellVolume"],.5)
+  # Same price needs queue authority; with a defensible queue=1 it clears 5.
+  r=self._classify([self._trade("0x2",[g],ws_price=.44,ws_size=26)],bid=.43,queue=1,known=True)
+  self.assertEqual(r["definite"]["status"],"FULL_SHADOW_FILL")
+  self.assertAlmostEqual(r["definite"]["fillShares"],5)
 
- def test_unavailable_onchain_evidence_fails_closed(self):
-  r=maker.queue_shadow_classification(
-   maker_bid=.48,queue_ahead=1000,maker_size=5,
-   trades=[{"side":"SELL","price":.47,"size":5,"sourceTimestampMs":2000,"transactionHash":"0xabc"}],
-   queue_timeline=[],placed_at=1)
+ def test_partial_fills_accumulate_across_transactions(self):
+  g1=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="BUY",token=TARGET,price=.80,shares=.1)])
+  g2=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="BUY",token=TARGET,price=.79,shares=4.9)])
+  first=self._classify([self._trade("0x3",[g1])],bid=.81)
+  both=self._classify([self._trade("0x3",[g1]),self._trade("0x4",[g2])],bid=.81)
+  self.assertEqual(first["definite"]["status"],"PARTIAL_SHADOW_FILL")
+  self.assertAlmostEqual(first["definite"]["fillShares"],.1)
+  self.assertEqual(both["definite"]["status"],"FULL_SHADOW_FILL")
+  self.assertAlmostEqual(both["definite"]["fillShares"],5)
+
+ def test_mint_complement_buy_flow_counts(self):
+  # Incoming BUY complement @ .38 reaches maker BUY target @ .62.
+  # A hypothetical target BUY @ .63 is a better MINT counterpart and gets a lower bound.
+  g=self._group(taker_side="BUY",taker_token=COMP,makers=[
+   self._maker(side="BUY",token=TARGET,price=.62,shares=5)])
+  r=self._classify([self._trade("0x5",[g])],bid=.63)
+  self.assertEqual(r["definite"]["status"],"FULL_SHADOW_FILL")
+  self.assertAlmostEqual(r["definite"]["fillShares"],5)
+
+ def test_merge_path_normalizes_to_synthetic_target_bid(self):
+  # Incoming SELL target matched with SELL complement @ .10 => synthetic target bid .90.
+  # A hypothetical target BUY @ .91 has better effective price.
+  g=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="SELL",token=COMP,price=.10,shares=3)])
+  r=self._classify([self._trade("0x6",[g])],bid=.91)
+  self.assertEqual(r["definite"]["status"],"PARTIAL_SHADOW_FILL")
+  self.assertAlmostEqual(r["definite"]["fillShares"],3)
+
+ def test_exact_bid_fails_closed_without_admission_queue_bound(self):
+  g=self._group(taker_side="SELL",taker_token=TARGET,makers=[
+   self._maker(side="BUY",token=TARGET,price=.92,shares=10)])
+  unknown=self._classify([self._trade("0x7",[g])],queue=1,known=False)
+  known=self._classify([self._trade("0x7",[g])],queue=1,known=True)
+  self.assertEqual(unknown["definite"]["status"],"NO_SHADOW_FILL")
+  self.assertEqual(known["definite"]["status"],"FULL_SHADOW_FILL")
+
+ def test_ambiguous_match_group_fails_closed(self):
+  r=self._classify([self._trade("0x8",[],ws_size=100)])
   self.assertEqual(r["definite"]["status"],"NO_SHADOW_FILL")
 
  def test_cache(self):
