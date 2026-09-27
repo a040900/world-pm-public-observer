@@ -190,7 +190,7 @@ class T(unittest.TestCase):
  def test_pm_market_discovery_retries_transient_transport(self):
   original=wp._json_request
   calls={"n":0}
-  valid=[{"description":"x","markets":[{"clobTokenIds":"[\\"1\\",\\"2\\"]","outcomes":"[\\"Up\\",\\"Down\\"]","active":True,"closed":False,"acceptingOrders":True,"feeSchedule":{"rate":0,"exponent":1},"cryptoMarketConfig":dict(wp.EXPECTED_PM_CRYPTO_CONFIG),"conditionId":"c"}]}]
+  valid=[{"description":"x","markets":[{"clobTokenIds":"[\"1\",\"2\"]","outcomes":"[\"Up\",\"Down\"]","active":True,"closed":False,"acceptingOrders":True,"feeSchedule":{"rate":0,"exponent":1},"cryptoMarketConfig":dict(wp.EXPECTED_PM_CRYPTO_CONFIG),"conditionId":"c"}]}]
   def fake(url,**kwargs):
    calls["n"]+=1
    if calls["n"]<3:
