@@ -1,0 +1,109 @@
+{
+  "makerModel": {
+    "liquidityRewardsModeled": false,
+    "makerRebateModeled": false,
+    "makerSizeShares": 5.0,
+    "nearFillQueueFraction": 0.25,
+    "placement": "JOIN_EXISTING_BEST_BID",
+    "plausibleRule": "DISPLAYED_QUEUE_DECREASE_CAN_ADVANCE_POSITION_BUT_CANCELLATION_ALONE_NEVER_COUNTS_AS_FILL",
+    "queueRule": "CONDITION_LEVEL_ORDERFILLED_LOWER_BOUND_DIRECT_MINT_MERGE_FAIL_CLOSED",
+    "side": "POLYMARKET_BUY_MAKER_FIRST"
+  },
+  "noTradeBoundary": {
+    "capital": false,
+    "credentials": false,
+    "orderPlacement": false,
+    "privateKeys": false,
+    "signing": false,
+    "transactionSubmission": false
+  },
+  "schemaVersion": "WORLD_PM_PM_MAKER_FIRST_SHADOW_R1",
+  "summary": {
+    "candidateCount": 0,
+    "definiteFillCount": 0,
+    "definiteProtectedEdgeUnknownCount": 0,
+    "definiteSurvivingProtectedEdgeCount": 0,
+    "nearOrBetterCount": 0,
+    "nearStageSurvivingProtectedEdgeCount": 0,
+    "noTrade": true,
+    "plausibleOrDefiniteFillCount": 0,
+    "plausibleStageSurvivingProtectedEdgeCount": 0,
+    "shadowFillCount": 0,
+    "survivingProtectedEdgeCount": 0,
+    "windowsCompleted": 6
+  },
+  "windows": [
+    {
+      "endTs": 1790512500,
+      "shadowCandidates": [],
+      "startTs": 1790512200,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 1,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "endTs": 1790512800,
+      "shadowCandidates": [],
+      "startTs": 1790512500,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 2,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "endTs": 1790513100,
+      "shadowCandidates": [],
+      "startTs": 1790512800,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 3,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "endTs": 1790513400,
+      "shadowCandidates": [],
+      "startTs": 1790513100,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 4,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "endTs": 1790513700,
+      "shadowCandidates": [],
+      "startTs": 1790513400,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 5,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    },
+    {
+      "endTs": 1790514000,
+      "shadowCandidates": [],
+      "startTs": 1790513700,
+      "summary": {
+        "candidateCount": 0,
+        "shadowFillCount": 0,
+        "survivingProtectedEdgeCount": 0
+      },
+      "windowIndex": 6,
+      "worldDiscoveryError": "RuntimeError:WORLD_DISCOVERY_TIMEOUT:HTTPError:HTTP Error 429: Too Many Requests"
+    }
+  ]
+}

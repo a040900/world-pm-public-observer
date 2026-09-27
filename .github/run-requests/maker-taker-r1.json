@@ -1,13 +1,17 @@
 {
   "schemaVersion": "WORLD_PM_MAKER_TAKER_SAME_WINDOW_REQUEST_R1",
-  "firstWindowStartTs": 1790512200,
+  "firstWindowStartTs": null,
   "windows": 6,
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
   "privateAuthorityResearchSha": "3ab1d113149511c44080e13db1d9a9eb4f12730b",
-  "mode": "NO_TRADE_PUBLIC_READ_ONLY_SPLIT_RUNNER_AB",
-  "requestId": "fresh-prospective-maker-qualification-r1-batch1-runtime-hardened-20260927",
+  "mode": "NO_TRADE_PUBLIC_READ_ONLY_SEPARATE_PROCESSES_SHARED_IDENTITY_CACHE",
+  "requestId": "fresh-prospective-maker-qualification-r1-batch1-runtime-r2-20260927",
   "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
-  "executionRuntimeSha": "3e50c17ad29502e4e5888e7a9622bcc61f9e66b6",
-  "supersedesIncompleteRun": 36309585620,
-  "supersededRunReason": "INCOMPLETE_BATCH_PM_DISCOVERY_CONNECTION_RESET_AND_TAKER_START_BUFFER_REJECTED"
+  "executionRuntimeSha": "GITHUB_SHA_RECORDED_IN_BATCH_ARTIFACT",
+  "schedulingRule": "RUNNER_SERVER_TIME_PLUS_120_SECONDS_CEIL_TO_300",
+  "excludedExecutionHistory": [
+    36309301112,
+    36309585620,
+    36318577787
+  ]
 }

@@ -1,0 +1,62 @@
+{
+  "entries": [
+    {
+      "startTs": 1790523900,
+      "endTs": 1790524200,
+      "marketLedger": "FfskMC7ZhJBHFyGVvau9ydw3w3Ptb7mgWtcWFkYJ7p9B",
+      "yesMint": "EKEQmbuFDqVWKSZspRwRqo7cNm8dgJVgZCUchzmp2JZ",
+      "noMint": "6ZqVjhDdMVgavER2tyTTeukyQTe3NwWahUiwFe6D8MGs",
+      "description": "BTC/USD closes at or above its open between 2026-09-27 15:45:00 UTC and 2026-09-27 15:50:00 UTC.",
+      "discoveredAt": 1790524193.352582,
+      "source": "SOLANA_SPLIT_AND_EXACT_WORLD_METADATA",
+      "evidence": {
+        "startTs": 1790523900,
+        "requests": [
+          {
+            "endpoint": "https://api.mainnet-beta.solana.com",
+            "method": "getSignaturesForAddress",
+            "attempt": 1,
+            "at": 1790524189.9810565,
+            "status": "SUCCESS"
+          },
+          {
+            "endpoint": "https://api.mainnet-beta.solana.com",
+            "method": "getTransaction",
+            "attempt": 1,
+            "at": 1790524190.213315,
+            "status": "SUCCESS"
+          },
+          {
+            "endpoint": "https://api.mainnet-beta.solana.com",
+            "method": "getTransaction",
+            "attempt": 1,
+            "at": 1790524190.7322247,
+            "status": "SUCCESS"
+          },
+          {
+            "endpoint": "https://m.world.xyz/8VdK9fNPsih6bA8jwKginasWTGreVF7bNq1y49Mtdaap",
+            "method": "GET",
+            "at": 1790524191.5089316
+          },
+          {
+            "endpoint": "https://api.mainnet-beta.solana.com",
+            "method": "getTransaction",
+            "attempt": 1,
+            "at": 1790524192.0185742,
+            "status": "SUCCESS"
+          },
+          {
+            "endpoint": "https://m.world.xyz/EKEQmbuFDqVWKSZspRwRqo7cNm8dgJVgZCUchzmp2JZ",
+            "method": "GET",
+            "at": 1790524192.8285735
+          }
+        ],
+        "cacheHit": false,
+        "workingEndpoint": "https://api.mainnet-beta.solana.com",
+        "signature": "4SK7WuJQzk3NHYL2eXAePvNerpaTyGfHHrRHGF9Gu1vJ4dhn5QCQmopoKFserAr9gJSoWR3q3hM97GFViQzU8G2F",
+        "metadataSha256": "6fd102e87f459376782840185043225fabd998329f5039037361c9448a7106a0"
+      }
+    }
+  ],
+  "schemaVersion": "WORLD_BTC5M_IDENTITY_CACHE_R2"
+}

@@ -9,6 +9,8 @@ It cannot sign, submit transactions, place real orders, or use capital.
 """
 from __future__ import annotations
 
+from tools.research import world_pm_qualification_runtime_r1 as qualification
+
 import argparse
 import asyncio
 from dataclasses import asdict
@@ -825,7 +827,12 @@ async def _run_window(
     end_ts = start_ts + r23.WINDOW_SECONDS
     if time.time() < start_ts:
         await asyncio.sleep(start_ts - time.time())
-    pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
+    try:
+        pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
+    except Exception as exc:
+        return qualification.qualify_window({"startTs": start_ts, "endTs": end_ts,
+            "executionError": f"PM_DISCOVERY:{type(exc).__name__}:{exc}",
+            "radarPollCount": 0, "shadowCandidates": [], "candidates": [], "summary": {"candidateCount": 0}})
     stop = asyncio.Event()
     pm_feed = r2s.r2.RollingTimelineBook([pm_market.up_token, pm_market.down_token])
     pm_task = asyncio.create_task(pm_feed.run(stop))
@@ -847,8 +854,10 @@ async def _run_window(
         "startTs": start_ts,
         "endTs": end_ts,
         "worldDiscoveryError": world_error,
-        "candidates": [],
+        "worldDiscoveryTrace": r23.wp.DISCOVERY_TRACES.get(start_ts, {}),
+        "pmMarket": {"conditionId": pm_market.condition_id, "upToken": pm_market.up_token, "downToken": pm_market.down_token},
         "radarPollCount": 0,
+        "candidates": [],
         "radarEpisodeCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
         "radarFreshnessRejectPollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
     }
@@ -858,12 +867,20 @@ async def _run_window(
         stop.set()
         pm_task.cancel()
         await asyncio.gather(pm_task, return_exceptions=True)
-        return row
+        return qualification.qualify_window(row)
 
-    yes_decimals, no_decimals = await asyncio.gather(
-        asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
-        asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
-    )
+    try:
+        yes_decimals, no_decimals = await asyncio.gather(
+            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
+            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
+        )
+    except Exception as exc:
+        row["executionError"] = f"TOKEN_DECIMALS:{type(exc).__name__}:{exc}"
+        stop.set()
+        pm_task.cancel()
+        await asyncio.gather(pm_task, return_exceptions=True)
+        return qualification.qualify_window(row)
+
     row["worldMarket"] = {
         "market": world_market.market,
         "yesMint": world_market.yes_mint,
@@ -892,6 +909,8 @@ async def _run_window(
             loop_at = time.time()
             row["radarPollCount"] += 1
             world_snapshot = dflow.snapshot(loop_at)
+            qualification.observe_health(row, world_snapshot,
+                [pm_feed.snapshot(pm_market.up_token), pm_feed.snapshot(pm_market.down_token)], loop_at)
             for pair, side, mint, decimals, token in pairs:
                 pm_snapshot = pm_feed.snapshot(token)
                 leg = world_snapshot.get(side) or {}
@@ -957,6 +976,9 @@ async def _run_window(
                 elif not below:
                     active[pair] = False
             await asyncio.sleep(max(0.0, RADAR_POLL_SECONDS - (time.time() - loop_at)))
+        row["measurementLoopCompleted"] = True
+    except Exception as exc:
+        row["executionError"] = f"{type(exc).__name__}:{exc}"
     finally:
         stop.set()
         dflow_task.cancel()
@@ -967,7 +989,7 @@ async def _run_window(
             "reconnectCount": pm_feed.reconnect_count,
             "errorHistory": pm_feed.error_history,
         }
-    return row
+    return qualification.qualify_window(row)
 
 
 def _summary(report: Mapping[str, Any]) -> dict[str, Any]:
@@ -1106,7 +1128,9 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         report["ledgerState"] = ledger.state
         report["invariants"] = core.invariant_report(ledger.state)
         report["summary"] = _summary(report)
-        report["researchBudget"]["consumedAfterRun"] = GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE + len(report["windows"])
+        report["qualification"] = qualification.qualify_batch(report["windows"], args.windows)
+        report["summary"].update(report["qualification"])
+        report["researchBudget"]["consumedAfterRun"] = GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE + report["qualification"]["phaseAEligibleWindowCount"]
         report["completedAt"] = time.time()
         _write_json(args.out, report)
     return report

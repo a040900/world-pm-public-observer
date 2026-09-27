@@ -1,0 +1,108 @@
+{
+  "baseSha": "2ff6a19a7b73442d26d96514d1d2a6cb10472f4d",
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "noTrade": true,
+  "excludedPhaseARuns": [
+    36309301112,
+    36309585620,
+    36318577787
+  ],
+  "verifiedInvalid36318577787": {
+    "makerWindows": 6,
+    "takerWindows": 6,
+    "validQualificationWindowCount": 0,
+    "candidateCount": 0,
+    "takerRadarPollCount": 0,
+    "makerRadarPollCount": "NOT_RECORDED_BUT_UNREACHABLE_AFTER_DISCOVERY_FAILURE"
+  },
+  "rootCause": [
+    "Solana RPC helper did not use previous HTTP transient retry",
+    "Repeated global scan restarted after one-second delay; seed cache contained only earlier dates and discovery never persisted identities",
+    "Successful current Split transactions omit Instruction: Split debug log; legacy filter discarded them"
+  ],
+  "historicalRequestCount": "NOT_RECORDED; per scan 1 getSignaturesForAddress plus up to 80 getTransaction; each role restarted scan approximately once per second if immediately rate limited",
+  "realDiagnostic": {
+    "beforeFix": {
+      "deadlineSeconds": 45,
+      "getSignaturesForAddress": 1,
+      "getTransaction": 40,
+      "result": "429_RETRY_EXHAUSTED_NO_IDENTITY"
+    },
+    "afterFix": {
+      "elapsedSeconds": 3.3825275897979736,
+      "getSignaturesForAddress": 1,
+      "getTransaction": 3,
+      "metadataGet": 2,
+      "identityMatchesOfficialWorldConnector": true,
+      "secondLookupNetworkRequests": 0,
+      "notProspectiveSample": true
+    }
+  },
+  "measurementScopeProof": {
+    "world_pm_pm_maker_first_shadow_r1.py": {
+      "changedSymbols": [
+        "_run_window",
+        "run"
+      ],
+      "unchangedSymbols": [
+        "_finite",
+        "_snapshot_source_age_ms",
+        "_snapshot_fresh",
+        "_bid_size",
+        "protected_world_unit_cost",
+        "combined_protected_unit_cost",
+        "size_matched_protected_unit_cost",
+        "_world_quote_fresh",
+        "protected_edge_verdict",
+        "_world_anonymous_quote_for_cash",
+        "_world_quote_for_target_minout",
+        "queue_shadow_classification",
+        "validate_maker_entry_snapshot",
+        "_hydrate_tx_execution_evidence",
+        "queue_shadow_fill",
+        "_execution_evidence_incomplete_at_expiry",
+        "_refresh_candidate_economics",
+        "apply_shadow_fill_lifecycle",
+        "TradeAwareBook",
+        "parser",
+        "main"
+      ]
+    },
+    "world_pm_two_leg_paper_bot_r1.py": {
+      "changedSymbols": [
+        "_run_window",
+        "run"
+      ],
+      "unchangedSymbols": [
+        "_finite",
+        "_pm_source_age_ms",
+        "_pm_source_fresh",
+        "_base58_decode",
+        "_decode_world_settlement_instruction",
+        "_solana_rpc_http",
+        "_solana_get_transactions_batch",
+        "_fetch_world_settlement",
+        "_fetch_pm_settlement",
+        "_paired_settlement",
+        "_collect_settlement_observations",
+        "_write_json",
+        "_runtime",
+        "_source_hashes",
+        "_route_schema_ok",
+        "admission_decision",
+        "_fresh_pm_second_leg_book",
+        "_pm_fee_usd_equivalent",
+        "_evaluate_candidate",
+        "_summary",
+        "_parser",
+        "main"
+      ]
+    }
+  },
+  "tests": {
+    "passed": 34,
+    "pyCompile": "PASS"
+  },
+  "topologyChange": "Two independent Python processes share a runner and a file-locked identity cache; timestamps/freshness/queue/fill guards unchanged; operational health required for qualification",
+  "phaseAPromotion": "ONLY_COMPLETE_SIX_VALID_PAIRED_WINDOWS; OBSERVER_ARTIFACT_REQUIRES_RESEARCH_AUTHORITY_IMPORT"
+}

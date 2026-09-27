@@ -1,4 +1,4 @@
-name: WORLD_PM_MAKER_TAKER_SPLIT_RUNNER_AB_R1
+name: WORLD_PM_FRESH_PROSPECTIVE_BATCH_R1
 on:
   push:
     branches: [main]
@@ -6,67 +6,33 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: world-pm-fresh-prospective
+  cancel-in-progress: false
 jobs:
-  qa:
+  qualification:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.9'}
       - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
-      - name: Fail-closed verification
+      - name: Frozen measurement and runtime regression checks
         run: |
-          set -euo pipefail
-          python -m unittest tests.test_public_runner_r1 -v
+          python -m unittest discover -s tests -v
           python -m py_compile tools/research/*.py
-
-  maker:
-    needs: qa
-    runs-on: ubuntu-24.04
-    timeout-minutes: 55
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11.9'}
-      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
-      - name: Maker-only prospective observer
+      - name: Select future schedule and run both read-only observers
+        run: python -m tools.research.world_pm_fresh_batch_r1
+      - name: Qualification result
+        if: always()
         run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          START_TS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["firstWindowStartTs"])')"
-          WINDOWS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["windows"])')"
-          python -m tools.research.world_pm_pm_maker_first_shadow_r1 --start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/maker.json > artifacts/maker-console.txt 2>&1
-          printf 'role=maker\nrun_id=%s\nsha=%s\nstart_ts=%s\nwindows=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$START_TS" "$WINDOWS" > artifacts/environment.txt
-          find artifacts -type f ! -name artifacts.sha256 -print0 | sort -z | xargs -0 sha256sum > artifacts/artifacts.sha256
+          if [ -f artifacts/batch.json ]; then
+            python -c 'import json; b=json.load(open("artifacts/batch.json")); print("## " + b["qualificationStatus"]); print(json.dumps({k:b.get(k) for k in ("requestedWindowCount","validQualificationWindowCount","invalidExecutionWindowCount","qualificationValid","phaseAEligibleWindowCount")}, indent=2))' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: maker-ab-${{ github.run_id }}
-          path: artifacts/
-          retention-days: 90
-
-  taker:
-    needs: qa
-    runs-on: ubuntu-24.04
-    timeout-minutes: 55
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11.9'}
-      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
-      - name: Taker-only prospective observer
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          START_TS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["firstWindowStartTs"])')"
-          WINDOWS="$(python -c 'import json; print(json.load(open(".github/run-requests/maker-taker-r1.json"))["windows"])')"
-          python -m tools.research.world_pm_two_leg_paper_bot_r1 --first-window-start-ts "$START_TS" --windows "$WINDOWS" --rpc-url https://api.mainnet-beta.solana.com --out artifacts/taker.json --ledger artifacts/taker-ledger.jsonl --checkpoint artifacts/taker-checkpoint.json > artifacts/taker-console.txt 2>&1
-          printf 'role=taker\nrun_id=%s\nsha=%s\nstart_ts=%s\nwindows=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$START_TS" "$WINDOWS" > artifacts/environment.txt
-          find artifacts -type f ! -name artifacts.sha256 -print0 | sort -z | xargs -0 sha256sum > artifacts/artifacts.sha256
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: taker-ab-${{ github.run_id }}
+          name: fresh-batch-${{ github.run_id }}
           path: artifacts/
           retention-days: 90

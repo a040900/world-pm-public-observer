@@ -1,0 +1,7 @@
+usage: world_pm_pm_maker_first_shadow_r1.py [-h] [--rpc-url RPC_URL]
+                                            [--world-discovery-timeout-seconds WORLD_DISCOVERY_TIMEOUT_SECONDS]
+                                            [--http-timeout-seconds HTTP_TIMEOUT_SECONDS]
+                                            [--start-ts START_TS]
+                                            [--windows {1,2,3,4,5,6}]
+                                            [--out OUT]
+world_pm_pm_maker_first_shadow_r1.py: error: argument --windows: invalid choice: 8 (choose from 1, 2, 3, 4, 5, 6)

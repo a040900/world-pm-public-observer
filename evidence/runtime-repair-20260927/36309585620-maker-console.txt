@@ -1,0 +1,85 @@
+{"completedWindow": 1, "summary": {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}}
+{"completedWindow": 2, "summary": {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}}
+{"completedWindow": 3, "summary": {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}}
+{"completedWindow": 4, "summary": {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}}
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 1348, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 1303, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 1349, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 1058, in _send_output
+    self.send(msg)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 996, in send
+    self.connect()
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/http/client.py", line 1475, in connect
+    self.sock = self._context.wrap_socket(self.sock,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/ssl.py", line 517, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/ssl.py", line 1104, in _create
+    self.do_handshake()
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/ssl.py", line 1382, in do_handshake
+    self._sslobj.do_handshake()
+ConnectionResetError: [Errno 104] Connection reset by peer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_pm_maker_first_shadow_r1.py", line 1210, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_pm_maker_first_shadow_r1.py", line 1202, in main
+    result = asyncio.run(run(args))
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_pm_maker_first_shadow_r1.py", line 1128, in run
+    window = await _run_window(start_ts=start_ts, args=args, cash_decimals=cash_decimals)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_pm_pm_maker_first_shadow_r1.py", line 721, in _run_window
+    pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_polymarket_btc5m_leadlag_probe_r1.py", line 113, in fetch_polymarket_market
+    rows = _json_request(f"{GAMMA_EVENTS_URL}?slug={slug}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/world-pm-public-observer/world-pm-public-observer/tools/research/world_polymarket_btc5m_leadlag_probe_r1.py", line 59, in _json_request
+    with urlopen(request, timeout=timeout) as response:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 1391, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/urllib/request.py", line 1351, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 104] Connection reset by peer>
