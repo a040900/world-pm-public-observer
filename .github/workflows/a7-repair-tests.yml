@@ -5,6 +5,7 @@ on:
     branches:
       - "maker-lifecycle-condition-tape-r1"
       - "maker-postfix-accounting-r2"
+      - "pf04-unknown-propagation-r1"
       - "main"
   pull_request:
     paths:
