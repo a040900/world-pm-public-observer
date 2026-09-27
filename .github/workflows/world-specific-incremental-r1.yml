@@ -1,0 +1,58 @@
+name: WORLD_PM_WORLD_SPECIFIC_INCREMENTAL_R1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/run-requests/world-specific-incremental-r1.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: world-pm-world-specific-incremental-r1
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: Deterministic preflight and frozen request validation
+        run: |
+          python -m unittest tests.test_world_specific_incremental_r1 -v
+          python -m tools.research.world_pm_world_specific_incremental_r1 --self-test
+          python -m py_compile tools/research/world_pm_world_specific_incremental_r1.py
+          python - <<'PY'
+          import json
+          r=json.load(open('.github/run-requests/world-specific-incremental-r1.json'))
+          expected={
+            'privateAuthorityRepo':'a040900/prediction-market-relative-value',
+            'privateAuthorityProtocolPath':'docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md',
+            'privateAuthorityProtocolCommit':'86cfc3ae780ebbd551773fdba0fee26a75130b23',
+            'windows':6,
+            'mode':'PUBLIC_READ_ONLY_NO_TRADE',
+          }
+          for k,v in expected.items():
+              assert r.get(k)==v, (k,r.get(k),v)
+          print('FROZEN_REQUEST_BINDING_PASS')
+          PY
+      - name: Prospective six-window diagnostic
+        run: |
+          mkdir -p artifacts
+          python -m tools.research.world_pm_world_specific_incremental_r1 \
+            --windows 6 \
+            --protocol-authority "a040900/prediction-market-relative-value@86cfc3ae780ebbd551773fdba0fee26a75130b23:docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md" \
+            --source-commit "${GITHUB_SHA}" \
+            --out artifacts/world-specific-incremental-r1.json
+      - name: Hash evidence
+        if: always()
+        run: |
+          if [ -d artifacts ]; then sha256sum artifacts/*.json > artifacts/sha256.txt 2>/dev/null || true; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-specific-incremental-r1-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 90
