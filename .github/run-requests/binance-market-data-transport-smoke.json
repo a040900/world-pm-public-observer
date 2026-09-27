@@ -1,0 +1,6 @@
+{
+  "requestId": "binance-market-data-transport-smoke-20260928",
+  "purpose": "INFRASTRUCTURE_ONLY_NOT_RESEARCH_EVIDENCE",
+  "expectedSymbol": "BTCUSDT",
+  "expectedStream": "aggTrade"
+}
