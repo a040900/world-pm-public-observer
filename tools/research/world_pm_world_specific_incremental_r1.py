@@ -640,7 +640,7 @@ async def _run_window(
     okx_task = asyncio.create_task(cex.run_okx(stop))
 
     world_points: deque[dict[str, Any]] = deque(maxlen=MAX_WORLD_POINTS)
-    above = {threshold: False for threshold in WORLD_THRESHOLDS}
+    # None means crossing continuity is unknown after startup or any unhealthy poll.\n    above: dict[float, bool | None] = {threshold: None for threshold in WORLD_THRESHOLDS}
     last_trigger = {threshold: -float("inf") for threshold in WORLD_THRESHOLDS}
     sequence = {threshold: 0 for threshold in WORLD_THRESHOLDS}
     pending: list[asyncio.Task[dict[str, Any]]] = []
@@ -677,7 +677,7 @@ async def _run_window(
                     is_above = abs(delta) >= threshold
                     if (
                         is_above
-                        and not above[threshold]
+                        and above[threshold] is False
                         and anchor_at - last_trigger[threshold] >= EPISODE_COOLDOWN_SECONDS
                     ):
                         sequence[threshold] += 1
@@ -708,8 +708,11 @@ async def _run_window(
                             last_trigger[threshold] = anchor_at
                     above[threshold] = is_above
             else:
+                # A crossing cannot be established across a period where the four-source
+                # conditioning state was unavailable. Re-arm only after a healthy
+                # below-threshold observation is seen.
                 for threshold in WORLD_THRESHOLDS:
-                    above[threshold] = False
+                    above[threshold] = None
 
             await asyncio.sleep(max(0.0, POLL_SECONDS - (time.time() - poll_started_at)))
 
