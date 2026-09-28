@@ -7,7 +7,7 @@
   "phaseAAdmission": false,
   "phaseAContribution": 0,
   "localVerification": {
-    "allTestsPassed": 61,
+    "allTestsPassed": 62,
     "compileAll": "PASS",
     "diffCheck": "PASS",
     "makerAndTakerChangedTopLevelFunctions": [
@@ -18,7 +18,7 @@
   },
   "independentReviewer": {
     "model": "gpt-6-luna",
-    "targetedTestsAddedAndPassed": 9,
+    "targetedTestsAddedAndPassed": 10,
     "scope": "Observation exposure, known no_route versus unknown, unchanged PM heartbeat, bounds preservation, preparation cleanup, public identity availability",
     "materialOpenItems": [
       "Pre-T0 identity source not established",
@@ -44,5 +44,11 @@
     36309585620,
     36318577787
   ],
-  "nextStep": "Inspect one-window branch readiness diagnostic artifact; do not merge or launch a six-window qualification until public identity availability and denominator policy are resolved."
+  "nextStep": "Inspect one-window branch readiness diagnostic artifact; do not merge or launch a six-window qualification until public identity availability and denominator policy are resolved.",
+  "branchReadinessDiagnostic": {
+    "runId": 36406967691,
+    "runtimeSha": "123462ad45e27cd2c63ea459e73aefe42b9c7d83",
+    "status": "RUNNING_NO_PHASE_A_CONTRIBUTION",
+    "furtherLiveDiagnostics": "MANUAL_DISPATCH_ONLY"
+  }
 }

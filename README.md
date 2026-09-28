@@ -72,4 +72,4 @@ Coverage output preserves requested seconds, observed seconds, unknown intervals
 
 Diagnostic requests always contribute zero Phase A windows in both role reports and batch aggregation. Existing candidate, fill, inventory and hedge evidence is preserved. Frozen maker/taker calculation functions, condition tape, admission thresholds, fees and quote semantics remain unchanged.
 
-PHASE_A_READINESS_BOUNDED_CHECK runs deterministic checks and one fixed future-window readiness diagnostic. It requests no exact hedge quote and submits no transaction. Its artifact always has phaseAEligibleWindowCount=0; a failed identity lookup is a diagnostic NO_RESULT, not zero-candidate edge evidence.
+PHASE_A_READINESS_BOUNDED_CHECK runs deterministic checks on branch pushes. Explicit workflow_dispatch additionally runs one fixed future-window readiness diagnostic. The first draft commit triggered the initial diagnostic once; subsequent test/documentation pushes do not repeat it. It requests no exact hedge quote and submits no transaction. Its artifact always has phaseAEligibleWindowCount=0; a failed identity lookup is a diagnostic NO_RESULT, not zero-candidate edge evidence.

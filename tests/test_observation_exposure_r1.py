@@ -116,6 +116,15 @@ class ObservationExposureTests(unittest.TestCase):
             self.assertAlmostEqual(result["pairs"][side]["unknownSeconds"], 298.0)
             self.assertFalse(result["complete"])
 
+    def test_backward_wall_clock_observation_fails_closed(self):
+        coverage = q.ObservationCoverage(0.0, 300.0)
+        coverage.observe(10.0, world(10.0), {"yes": pm(10.0), "no": pm(10.0)})
+        with self.assertRaisesRegex(ValueError, "OBSERVATION_CLOCK_MOVED_BACKWARDS"):
+            coverage.observe(9.0, world(9.0), {"yes": pm(9.0), "no": pm(9.0)})
+        result = coverage.finish(300.0)
+        self.assertFalse(result["complete"])
+        self.assertLess(result["pairs"]["yes"]["observedSeconds"], 300.0)
+
     def test_unchanged_pm_book_with_live_heartbeat_remains_known(self):
         now = 100.0
         observed, expiry = q.observation_state(
