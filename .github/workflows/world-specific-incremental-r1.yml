@@ -29,7 +29,7 @@ jobs:
           expected={
             'privateAuthorityRepo':'a040900/prediction-market-relative-value',
             'privateAuthorityProtocolPath':'docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md',
-            'privateAuthorityProtocolCommit':'3ea107285b6c004bea53b20e63724f8f84261684',
+            'privateAuthorityProtocolCommit':'271106f60b1b7455117436a4a2fb16795b7649db',
             'windows':6,
             'mode':'PUBLIC_READ_ONLY_NO_TRADE',
             'supersedesInvalidRun':36336976825,
@@ -44,7 +44,7 @@ jobs:
           mkdir -p artifacts
           python -m tools.research.world_pm_world_specific_incremental_r1 \
             --windows 6 \
-            --protocol-authority "a040900/prediction-market-relative-value@3ea107285b6c004bea53b20e63724f8f84261684:docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md" \
+            --protocol-authority "a040900/prediction-market-relative-value@271106f60b1b7455117436a4a2fb16795b7649db:docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md" \
             --source-commit "${GITHUB_SHA}" \
             --out artifacts/world-specific-incremental-r1.json
       - name: Hash evidence

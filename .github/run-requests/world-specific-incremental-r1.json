@@ -3,16 +3,18 @@
   "requestId": "world-specific-incremental-r1-20260928",
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
   "privateAuthorityProtocolPath": "docs/decisions/2026-09-28-world-pm-world-specific-incremental-lead-r1.md",
-  "privateAuthorityProtocolCommit": "3ea107285b6c004bea53b20e63724f8f84261684",
+  "privateAuthorityProtocolCommit": "271106f60b1b7455117436a4a2fb16795b7649db",
   "windows": 6,
   "mode": "PUBLIC_READ_ONLY_NO_TRADE",
   "selectionRule": "SERVER_TIME_PLUS_120_SECONDS_CEIL_TO_300_NO_REPLACEMENT",
   "interpretation": "MECHANISM_DIAGNOSTIC_NOT_TRADING_EDGE",
-  "supersedesInvalidRun": 36336976825,
-  "invalidRunReason": "FUTURE_RECEIPT_LEAKAGE_RISK_AND_PREVIOUS_AUTHORITY_NOT_ON_MAIN",
+  "supersedesInvalidRun": 36340519054,
+  "invalidRunReason": "BINANCE_STANDARD_TRANSPORT_HTTP_451_ZERO_VALID_WINDOWS",
   "observerTimeRule": "LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA",
   "activation": "FRESH_R1_AFTER_CAUSAL_CUTOFF_VALIDATION_PASS",
   "validationRun": 36340468986,
   "validationCommit": "63b85c19c83711a6f8c61d49cb83dbacda2838bb",
-  "priorRunEvidenceAdmissible": false
+  "priorRunEvidenceAdmissible": false,
+  "transportValidationRun": 36343180817,
+  "binanceTransport": "wss://data-stream.binance.vision/ws/btcusdt@aggTrade"
 }

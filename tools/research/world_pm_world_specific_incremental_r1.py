@@ -39,8 +39,8 @@ WORLD_POINT_MAX_OFFSET_SECONDS = 0.25
 CEX_CURRENT_MAX_AGE_SECONDS = 0.5
 CEX_LOOKBACK_MAX_OFFSET_SECONDS = 0.5
 PM_SOURCE_FUTURE_TOLERANCE_MS = 250.0
-PM_SOURCE_MAX_AGE_MS = 1000.0
-BINANCE_WS = "wss://stream.binance.com:9443/ws/btcusdt@aggTrade"
+PM_HEALTH_MAX_OFFSET_SECONDS = 0.25
+BINANCE_WS = "wss://data-stream.binance.vision/ws/btcusdt@aggTrade"
 OKX_WS = "wss://ws.okx.com:8443/ws/v5/public"
 MAX_CEX_POINTS = 12000
 MAX_WORLD_POINTS = 6000
@@ -112,9 +112,6 @@ def _pm_proxy_from_states(rows: list[Mapping[str, Any]], *, cutoff: float) -> di
         ask = min((_finite(level.get("price")) for level in asks if isinstance(level, Mapping)), default=None)
         if bid is None or ask is None or bid <= 0 or ask <= 0 or bid > ask:
             return {"valid": False, "reason": "PM_BBO_INVALID"}
-        local_age_ms = (cutoff - effective_at) * 1000.0
-        if local_age_ms < 0 or local_age_ms > PM_SOURCE_MAX_AGE_MS:
-            return {"valid": False, "reason": "PM_LOCAL_STATE_STALE_OR_FUTURE", "localStateAgeMs": local_age_ms}
         mids.append((bid + ask) / 2.0)
         effective_ats.append(effective_at)
     generations = [int(row.get("connectionGeneration") or -1) for row in rows]
@@ -146,7 +143,28 @@ def _pm_proxy_at(
     down = pm_feed.state_at(down_token, cutoff)
     if up is None or down is None:
         return {"valid": False, "reason": "PM_STATE_MISSING_AT_CUTOFF", "cutoffAt": cutoff}
-    return _pm_proxy_from_states([up, down], cutoff=cutoff)
+    health = pm_feed.health_at(cutoff)
+    if health is None:
+        return {"valid": False, "reason": "PM_HEALTH_MISSING_AT_CUTOFF", "cutoffAt": cutoff}
+    health_offset = cutoff - float(health["receivedAt"])
+    generation = int(up.get("connectionGeneration") or -1)
+    if (
+        health_offset < 0
+        or health_offset > PM_HEALTH_MAX_OFFSET_SECONDS
+        or health.get("healthy") is not True
+        or int(health.get("connectionGeneration") or -2) != generation
+    ):
+        return {
+            "valid": False,
+            "reason": "PM_FEED_NOT_HEALTHY_AT_CUTOFF",
+            "cutoffAt": cutoff,
+            "healthOffsetSeconds": health_offset,
+            "health": health,
+        }
+    result = _pm_proxy_from_states([up, down], cutoff=cutoff)
+    result["healthAt"] = health
+    result["healthOffsetSeconds"] = health_offset
+    return result
 
 
 def _at_or_before(points: deque[dict[str, Any]], target: float) -> dict[str, Any] | None:
@@ -159,7 +177,27 @@ def _at_or_before(points: deque[dict[str, Any]], target: float) -> dict[str, Any
 
 
 class CausalTimelineBook(r2.RollingTimelineBook):
-    """Preserve every observer-time state transition without moving first availability."""
+    """Preserve exact observer-time BBO states and an independent feed-liveness timeline."""
+
+    def __init__(self, token_ids: list[str]) -> None:
+        super().__init__(token_ids)
+        self.health_history: deque[dict[str, Any]] = deque(maxlen=512)
+
+    def _state_point(self, token: str, effective_at: float) -> dict[str, Any] | None:
+        state = self.books.get(token)
+        if not isinstance(state, Mapping) or state.get("ready") is not True:
+            return None
+        bids = dict(state.get("bids") or {})
+        asks = dict(state.get("asks") or {})
+        return {
+            "effectiveAt": effective_at,
+            "connectionGeneration": self.connection_generation,
+            "eventCount": int(state.get("eventCount") or 0),
+            "sourceTimestampMs": r23._to_int(state.get("sourceTimestampMs")),
+            "localDigest": r23._book_digest(bids, asks),
+            "bids": r23._book_rows(bids, asks=False),
+            "asks": r23._book_rows(asks, asks=True),
+        }
 
     def _record(self, token: str, at: float) -> None:
         point = self._state_point(token, at)
@@ -170,6 +208,25 @@ class CausalTimelineBook(r2.RollingTimelineBook):
         cutoff = at - r2.HISTORY_SECONDS
         while len(rows) > 1 and float(rows[1].get("effectiveAt") or 0.0) < cutoff:
             rows.pop(0)
+
+    def record_health(self, at: float, token_ids: tuple[str, str]) -> None:
+        snapshots = [self.snapshot(token) for token in token_ids]
+        generations = [int(row.get("connectionGeneration") or -1) for row in snapshots]
+        self.health_history.append({
+            "receivedAt": at,
+            "healthy": all(row.get("healthy") is True for row in snapshots),
+            "connectionGeneration": generations[0] if generations[0] >= 0 and generations[0] == generations[1] else -1,
+        })
+
+    def health_at(self, cutoff: float) -> dict[str, Any] | None:
+        candidate = None
+        for point in self.health_history:
+            if float(point["receivedAt"]) > cutoff:
+                break
+            candidate = point
+        if candidate is None:
+            return None
+        return dict(candidate)
 
 
 class CexTape:
@@ -594,6 +651,7 @@ async def _run_window(
             world_snapshot = dflow.snapshot(poll_started_at)
             world_value = _world_proxy(world_snapshot)
             anchor_at = time.time()
+            pm_feed.record_health(anchor_at, (pm_market.up_token, pm_market.down_token))
             pm_value = _pm_proxy_at(
                 pm_feed,
                 pm_market.up_token,
@@ -711,10 +769,12 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         "observerTimeSemantics": {
             "crossSourceAvailabilityAuthority": "LOCAL_RECEIPT_TIME_ONLY",
             "sourceTimestamps": "METADATA_AND_STALENESS_ONLY",
-            "futurePmRule": "LATEST_PM_STATE_WITH_EFFECTIVE_AT_LE_CUTOFF",
+            "futurePmRule": "LATEST_PM_STATE_WITH_EFFECTIVE_AT_LE_CUTOFF_AND_FEED_HEALTHY_AT_CUTOFF",
+            "pmFreshnessRule": "BOOK_STATE_AGE_DOES_NOT_IMPLY_FEED_STALENESS; LIVENESS_IS_TRACKED_SEPARATELY",
             "futureReceiptLeakageAllowed": False,
         },
         "clockCalibration": clock,
+        "transports": {"binance": BINANCE_WS, "okx": OKX_WS},
         "schedule": schedule,
         "thresholds": list(WORLD_THRESHOLDS),
         "lookbackSeconds": LOOKBACK_SECONDS,
