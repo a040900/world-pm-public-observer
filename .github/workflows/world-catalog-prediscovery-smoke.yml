@@ -1,7 +1,7 @@
 name: WORLD_CATALOG_PREDISCOVERY_SMOKE_R1
 on:
   push:
-    branches: [phasea-prewarm-coverage-r1]
+    branches: ["phasea-prewarm-coverage-r1"]
 permissions:
   contents: read
 jobs:
