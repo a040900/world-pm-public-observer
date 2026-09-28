@@ -11,7 +11,7 @@
   "supersedesInvalidRun": 36340519054,
   "invalidRunReason": "BINANCE_STANDARD_TRANSPORT_HTTP_451_ZERO_VALID_WINDOWS",
   "observerTimeRule": "LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA",
-  "activation": "FRESH_R1_AFTER_PRERUN_ADVERSARIAL_REVIEW_PASS",
+  "activation": "FRESH_R1_ACTIVATED_AFTER_FINAL_PRERUN_ADVERSARIAL_PASS",
   "validationRun": 36372521863,
   "validationCommit": "18f369a54fed6f714aa135088eab4923936b7c79",
   "priorRunEvidenceAdmissible": false,
@@ -19,5 +19,8 @@
   "binanceTransport": "wss://data-stream.binance.vision/ws/btcusdt@aggTrade",
   "engineeringSmokeRun": 36372573638,
   "crossingContinuityRule": "UNKNOWN_AFTER_STARTUP_OR_UNHEALTHY_GAP_FIRST_HEALTHY_SAMPLE_INITIALIZES_ONLY",
-  "directionalGateRule": "AT_LEAST_20_NONFLAT_SCORABLE_3S_DISAGREEMENT_OUTCOMES_ACROSS_4_WINDOWS"
+  "directionalGateRule": "AT_LEAST_20_NONFLAT_SCORABLE_3S_DISAGREEMENT_OUTCOMES_ACROSS_4_WINDOWS",
+  "preRunAdversarialValidationRun": 36379260759,
+  "preRunAdversarialReviewCommit": "367266a21848cc63d546bd0b3ca1fc98312e2b87",
+  "priorEngineeringSmokeResearchScore": 0
 }
