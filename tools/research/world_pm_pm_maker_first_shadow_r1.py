@@ -749,6 +749,12 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         "worldDiscoveryTrace": r23.wp.DISCOVERY_TRACES.get(start_ts, {}),
         "pmMarket": {"conditionId": pm_market.condition_id, "upToken": pm_market.up_token, "downToken": pm_market.down_token},
         "radarPollCount": 0,
+        "measurementLoopStartupDelaySeconds": None,
+        "pairObservablePollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
+        "pairObservationFailureCount": {
+            "WORLD_YES+PM_DOWN": {"PM_NOT_FRESH": 0, "WORLD_NOT_HEALTHY": 0, "WORLD_ASK_MISSING": 0, "WORLD_TOO_OLD": 0},
+            "WORLD_NO+PM_UP": {"PM_NOT_FRESH": 0, "WORLD_NOT_HEALTHY": 0, "WORLD_ASK_MISSING": 0, "WORLD_TOO_OLD": 0},
+        },
         "shadowCandidates": [],
         "summary": {},
     }
@@ -811,10 +817,32 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         while time.time() < end_ts:
             now = time.time()
             row["radarPollCount"] += 1
+            if row["measurementLoopStartupDelaySeconds"] is None:
+                row["measurementLoopStartupDelaySeconds"] = max(0.0, now - start_ts)
             world_snapshot = dflow.snapshot(now)
             qualification.observe_health(row, world_snapshot,
                 [feed.snapshot(pm_market.up_token), feed.snapshot(pm_market.down_token)], now)
             for pair, side, world_mint, world_decimals, pm_token, complement_token in pairs:
+                pm_observation = feed.snapshot(pm_token)
+                leg_observation = world_snapshot.get(side) or {}
+                observation_failures = row["pairObservationFailureCount"][pair]
+                observable = True
+                if not _snapshot_fresh(pm_observation, now):
+                    observation_failures["PM_NOT_FRESH"] += 1
+                    observable = False
+                if world_snapshot.get("healthy") is not True:
+                    observation_failures["WORLD_NOT_HEALTHY"] += 1
+                    observable = False
+                observation_ask = _finite(leg_observation.get("ask"))
+                observation_age = _finite(leg_observation.get("quoteAgeSeconds"))
+                if observation_ask is None:
+                    observation_failures["WORLD_ASK_MISSING"] += 1
+                    observable = False
+                if observation_age is None or observation_age > r23.MAX_WORLD_RADAR_AGE_SECONDS:
+                    observation_failures["WORLD_TOO_OLD"] += 1
+                    observable = False
+                if observable:
+                    row["pairObservablePollCount"][pair] += 1
                 current = active[pair]
                 if current is not None:
                     snapshot = feed.snapshot(pm_token)
@@ -1058,6 +1086,10 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                 }
             await asyncio.sleep(POLL_SECONDS)
         row["measurementLoopCompleted"] = True
+        polls = max(1, int(row.get("radarPollCount") or 0))
+        row["pairObservableCoverageRatio"] = {
+            pair: count / polls for pair, count in row["pairObservablePollCount"].items()
+        }
     except Exception as exc:
         row["executionError"] = f"{type(exc).__name__}:{exc}"
     finally:
