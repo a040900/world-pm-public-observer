@@ -1,0 +1,29 @@
+name: WORLD_SPECIFIC_R1_PRERUN_ADVERSARIAL_CHECK
+on:
+  push:
+    branches: [fix/world-specific-r1-prerun-adversarial-20260928]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: R1 deterministic adversarial preflight
+        run: |
+          python -m unittest tests.test_world_specific_incremental_r1 -v
+          python -m tools.research.world_pm_world_specific_incremental_r1 --self-test
+          python -m py_compile tools/research/world_pm_world_specific_incremental_r1.py
+          python - <<'PY'
+          import json
+          r=json.load(open('.github/run-requests/world-specific-incremental-r1.json'))
+          assert r['privateAuthorityProtocolCommit']=='9ec4748009865b75b2948b5201adcbc90aa0fa3b'
+          assert r['supersedesInvalidRun']==36340519054
+          assert r['engineeringSmokeRun']==36372573638
+          assert r['crossingContinuityRule']=='UNKNOWN_AFTER_STARTUP_OR_UNHEALTHY_GAP_FIRST_HEALTHY_SAMPLE_INITIALIZES_ONLY'
+          print('PRERUN_BINDING_PASS')
+          PY
