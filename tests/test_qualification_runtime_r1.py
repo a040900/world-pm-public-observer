@@ -10,6 +10,7 @@ from unittest.mock import patch, AsyncMock
 from urllib.error import HTTPError
 from tools.research import world_polymarket_btc5m_leadlag_probe_r1 as wp
 from tools.research import world_pm_qualification_runtime_r1 as q
+from tools.research import world_pm_window_preparation_r1 as prep
 from tools.research import world_pm_pm_maker_first_shadow_r1 as maker
 from tools.research import world_pm_two_leg_paper_bot_r1 as taker
 
@@ -231,6 +232,33 @@ class RuntimeTests(unittest.TestCase):
             market = wp.discover_world_market(self.start, rpc_url=wp.DEFAULT_SOLANA_RPC, deadline=self.start)
         self.assertEqual(market.start_ts, self.start)
         self.assertEqual(wp.DISCOVERY_TRACES[self.start]['signatureBlockTime'], self.start-30)
+
+
+    def test_uncached_discovery_uses_final_bounded_prestart_interval(self):
+        import argparse
+        now = [self.start-120.0]
+        original_sleep = asyncio.sleep
+        async def sleep(seconds):
+            now[0] += seconds
+            await original_sleep(0)
+        class Feed:
+            def __init__(self, tokens): pass
+            async def run(self, stop): await stop.wait()
+        called = []
+        def discovery(*args, **kwargs):
+            called.append((now[0], kwargs['deadline']))
+            raise TimeoutError('not available')
+        async def check():
+            args = argparse.Namespace(rpc_url=wp.DEFAULT_SOLANA_RPC, world_discovery_timeout_seconds=60)
+            p = await prep.prepare(self.start, args, Feed, None)
+            self.assertIn('executionError', p.row)
+        pm = wp.PolymarketMarket(self.start, 'p', 'up', 'down', {}, {}, '')
+        with patch.object(prep.time, 'time', side_effect=lambda: now[0]), \
+             patch.object(prep.asyncio, 'sleep', sleep), \
+             patch.object(wp, 'fetch_polymarket_market', return_value=pm), \
+             patch.object(wp, 'discover_world_market', side_effect=discovery):
+            asyncio.run(check())
+        self.assertEqual(called, [(self.start-60, self.start)])
 
 
 if __name__ == '__main__':

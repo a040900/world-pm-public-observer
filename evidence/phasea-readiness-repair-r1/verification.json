@@ -7,7 +7,7 @@
   "phaseAAdmission": false,
   "phaseAContribution": 0,
   "localVerification": {
-    "allTestsPassed": 62,
+    "allTestsPassed": 63,
     "compileAll": "PASS",
     "diffCheck": "PASS",
     "makerAndTakerChangedTopLevelFunctions": [
@@ -24,7 +24,13 @@
       "Pre-T0 identity source not established",
       "Whole-window versus observed-time denominator policy awaiting owner clarification; draft strict complete gate is not Phase A admitted"
     ],
-    "nonBlockingLimit": "Cancelling asyncio.to_thread cannot interrupt an already running public request; existing request/deadline bounds still apply"
+    "nonBlockingLimit": "Cancelling asyncio.to_thread cannot interrupt an already running public request; existing request/deadline bounds still apply",
+    "finalTimingVerification": {
+      "result": "NO_MATERIAL_REGRESSION_FOUND",
+      "newTimingTest": "PASS",
+      "ownedExposureTestsPassed": 10,
+      "phaseAReadinessEstablished": false
+    }
   },
   "publicIdentityEvidence": {
     "priorCatalogActionsRuns": [
@@ -44,11 +50,39 @@
     36309585620,
     36318577787
   ],
-  "nextStep": "Inspect one-window branch readiness diagnostic artifact; do not merge or launch a six-window qualification until public identity availability and denominator policy are resolved.",
+  "nextStep": "Keep PR draft and Phase A contribution zero. Resolve the whole-window versus observed-time denominator policy and establish public pre-T0 readiness before admitting a six-window qualification.",
   "branchReadinessDiagnostic": {
     "runId": 36406967691,
     "runtimeSha": "123462ad45e27cd2c63ea459e73aefe42b9c7d83",
-    "status": "RUNNING_NO_PHASE_A_CONTRIBUTION",
-    "furtherLiveDiagnostics": "MANUAL_DISPATCH_ONLY"
+    "status": "NO_RESULT_PRESTART_IDENTITY_OR_FEEDS_UNAVAILABLE",
+    "furtherLiveDiagnostics": "MANUAL_DISPATCH_ONLY",
+    "error": "PREPARATION:TimeoutError:WORLD_CURRENT_BTC5M_MARKET_NOT_DISCOVERED",
+    "artifactSha256": "fa56742e680365cfcbc6d42fddffddb236b7519a97be235460460da4e78294f5",
+    "startTs": 1790589900,
+    "preparationStartedAt": 1790589780.0757754,
+    "completedAt": 1790589840.243875,
+    "phaseAEligibleWindowCount": 0,
+    "requestCounts": {
+      "getSignaturesForAddress": 8,
+      "getTransaction": 82,
+      "GET": 6
+    },
+    "requestErrors": [
+      {
+        "endpoint": "https://api.mainnet-beta.solana.com",
+        "method": "getTransaction",
+        "attempt": 1,
+        "at": 1790589785.676816,
+        "error": "HTTPError:HTTP Error 429: Too Many Requests"
+      }
+    ],
+    "interpretation": "This bounded prestart attempt did not establish the target identity. It did not observe the entire remaining period before T0 and is not proof that public prestart identity is impossible.",
+    "qualificationInterpretation": "NO_RESULT; source availability is not established; no negative edge claim",
+    "timingCorrection": {
+      "problem": "The initial 60-second uncached search began at T0-120 and ended near T0-60, so it did not test the last prestart minute.",
+      "repair": "Defer an uncached bounded search until T0 minus the configured discovery timeout; verified cache entries still prepare immediately.",
+      "deterministicVerification": "PASS: default 60-second discovery starts at T0-60 and retains deadline T0.",
+      "liveVerification": "NOT_ESTABLISHED_FOR_CORRECTED_TIMING"
+    }
   }
 }

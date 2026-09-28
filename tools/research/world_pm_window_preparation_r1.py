@@ -68,6 +68,11 @@ async def prepare(start, args, feed_factory, radar_factory):
                              "downToken": p.pm.down_token}
         p.feed = feed_factory([p.pm.up_token, p.pm.down_token])
         p.tasks.append(asyncio.create_task(p.feed.run(p.stop)))
+        # Keep the bounded discovery attempt adjacent to T0. Starting a 60s
+        # attempt at T0-120 would miss identities first published at T0-30.
+        # Already verified cache entries can warm immediately.
+        if wp._cached_world_market(start) is None:
+            await asyncio.sleep(max(0.0, start - args.world_discovery_timeout_seconds - time.time()))
         deadline = min(float(start), time.time() + args.world_discovery_timeout_seconds)
         p.world = await asyncio.to_thread(wp.discover_world_market, start, rpc_url=args.rpc_url, deadline=deadline)
         p.row["worldDiscoveryTrace"] = wp.DISCOVERY_TRACES.get(start, {})

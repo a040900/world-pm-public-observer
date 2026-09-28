@@ -1,0 +1,697 @@
+{
+  "mode": "NO_TRADE_PRESTART_READINESS_DIAGNOSTIC",
+  "noTrade": true,
+  "phaseAEligibleWindowCount": 0,
+  "schedule": {
+    "firstWindowStartTs": 1790589900,
+    "requestedFirstWindowStartTs": null,
+    "serverTimeAtSelection": 1790589624.0,
+    "safetyBufferSeconds": 120,
+    "selectionRule": "CEIL_SERVER_NOW_PLUS_FIXED_BUFFER_TO_300_SECONDS",
+    "marketStateUsed": false,
+    "rescheduledForDelay": false
+  },
+  "githubSha": "123462ad45e27cd2c63ea459e73aefe42b9c7d83",
+  "githubRunId": "36406967691",
+  "preparation": {
+    "startTs": 1790589900,
+    "endTs": 1790590200,
+    "preparationStartedAt": 1790589780.0757754,
+    "pmMarket": {
+      "conditionId": "0x76e37e8472f6a5d434d825ba03c6ba43cc9f6af3ed48c2d7c51f3b0c7bc5c540",
+      "upToken": "12826672901549376266508102322009968259842849422709595784452855944224809711272",
+      "downToken": "20404231477820629629853773098709146564987375872193776241483056095354981272748"
+    },
+    "executionError": "PREPARATION:TimeoutError:WORLD_CURRENT_BTC5M_MARKET_NOT_DISCOVERED",
+    "worldDiscoveryTrace": {
+      "startTs": 1790589900,
+      "requests": [
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589780.1565568,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589780.2848895,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589780.7229996,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/7WTP5jcjjxUQB7xk6D77W7wJj9KPRso6feCPmHjh1W9k",
+          "method": "GET",
+          "at": 1790589781.1577213
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589781.269573,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/GSZyNDfERKLYwfRRNFc9SUeWdifqZt2fzsf84QgYWaUo",
+          "method": "GET",
+          "at": 1790589781.7335346
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589781.8331306,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589782.2607095,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/7YftRvvsunGPPJzvwWRqF8oPcYjcqYcHKhgyQQMpg1xb",
+          "method": "GET",
+          "at": 1790589782.6908991
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589782.7806926,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589783.3712957,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/FPVLdXJnCbvsmytLnzb3ReKr2FydvGBGhjNkPiPuLZFg",
+          "method": "GET",
+          "at": 1790589783.851505
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589783.9780118,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589784.447147,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589785.057537,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://api.mainnet-beta.solana.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589785.676816,
+          "error": "HTTPError:HTTP Error 429: Too Many Requests"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 2,
+          "at": 1790589786.8190508,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589787.2432349,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589787.6568053,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589788.0661767,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/FCLBz2wmYrtQbRdaNQeUqLFbF6FKR3Jo1TUdH3viW8KR",
+          "method": "GET",
+          "at": 1790589788.481216
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589788.557278,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589788.9697096,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://m.world.xyz/CLGm7p2UXnT1nSYSW5MEVV7XEE9KP62PVAnVmAeeGrLv",
+          "method": "GET",
+          "at": 1790589789.379959
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589789.4935067,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589789.8981786,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589790.3113806,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589790.7121096,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589791.1191235,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589791.5422058,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589791.9452624,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589792.351871,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589792.7634068,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589793.170005,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589793.574804,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589793.9760616,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589794.3829205,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589794.7896528,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589795.1943944,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589795.6047175,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589796.014576,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589796.424959,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589796.8419592,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589797.246316,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589797.662529,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589798.0693815,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589798.47351,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589798.8768091,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589799.2808044,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589799.6842897,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589800.088099,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589800.4895852,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589800.8919432,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589801.293554,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589801.7181084,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589802.135731,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589802.5373633,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589802.9503381,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589803.3599935,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589803.7599185,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589804.164483,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589804.5782247,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589804.9831078,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589805.4030654,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589805.8250551,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589806.24295,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589806.64602,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589807.0480628,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589807.4548593,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589807.8623295,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589808.2663822,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589808.679792,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589809.0851958,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589809.488732,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589809.8934684,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589810.3054004,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589810.7104733,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589811.118952,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589811.5318675,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589811.945733,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589812.3520925,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589812.7753866,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589813.1805952,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589813.6263561,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589814.034432,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589814.4510856,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589814.8924766,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589818.2969346,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589818.3829107,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589821.796149,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589824.8791347,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589827.9361696,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589831.009037,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getTransaction",
+          "attempt": 1,
+          "at": 1790589831.0727909,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589834.4953754,
+          "status": "SUCCESS"
+        },
+        {
+          "endpoint": "https://solana-rpc.publicnode.com",
+          "method": "getSignaturesForAddress",
+          "attempt": 1,
+          "at": 1790589837.5607634,
+          "status": "SUCCESS"
+        }
+      ],
+      "cacheHit": false,
+      "earliestSignatureBlockTime": 1790589300,
+      "workingEndpoint": "https://solana-rpc.publicnode.com"
+    }
+  },
+  "status": "NO_RESULT_PRESTART_IDENTITY_OR_FEEDS_UNAVAILABLE",
+  "completedAt": 1790589840.243875
+}
