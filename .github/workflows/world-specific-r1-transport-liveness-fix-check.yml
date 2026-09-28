@@ -1,0 +1,34 @@
+name: WORLD_SPECIFIC_R1_TRANSPORT_LIVENESS_FIX_CHECK
+on:
+  push:
+    branches: [fix/world-specific-r1-transport-liveness-20260928]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: Deterministic and adversarial tests
+        run: |
+          python -m unittest tests.test_world_specific_incremental_r1 -v
+          python -m tools.research.world_pm_world_specific_incremental_r1 --self-test
+          python -m py_compile tools/research/world_pm_world_specific_incremental_r1.py
+      - name: Binance transport/schema smoke
+        run: |
+          python - <<'PY'
+          import asyncio,json,websockets
+          URL="wss://data-stream.binance.vision/ws/btcusdt@aggTrade"
+          async def main():
+              async with websockets.connect(URL,open_timeout=10,close_timeout=3) as ws:
+                  msg=json.loads(await asyncio.wait_for(ws.recv(),timeout=10))
+                  assert msg.get("e")=="aggTrade",msg
+                  assert msg.get("s")=="BTCUSDT",msg
+                  for k in ("p","q","T","E"): assert msg.get(k) is not None,(k,msg)
+                  print(json.dumps({k:msg.get(k) for k in ("e","s","p","q","T","E")},sort_keys=True))
+          asyncio.run(main())
+          PY
