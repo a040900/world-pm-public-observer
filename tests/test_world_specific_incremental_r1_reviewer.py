@@ -139,9 +139,9 @@ class ReviewerRuntimeTests(unittest.TestCase):
         self.assertFalse(any(20.0 <= x < 21.5 for x in times), times)
         # Once conditioning is healthy again, a later observed below-threshold
         # delta may re-arm the detector. The high->low crossing around t~22 and
-        # the later low->high crossing around t~24 are both admissible.
+        # the later crossing after the second World move are both admissible.
         self.assertTrue(any(21.8 <= x <= 22.4 for x in times), times)
-        self.assertTrue(any(23.8 <= x <= 24.4 for x in times), times)
+        self.assertTrue(any(24.8 <= x <= 25.4 for x in times), times)
 
 
 if __name__ == "__main__":
