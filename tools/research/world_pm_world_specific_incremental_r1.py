@@ -480,14 +480,19 @@ def _classify_episode(
 def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
     disagreement = [x for x in threshold_rows if x.get("conditioningClass") == "WORLD_CEX_DISAGREE"]
     scored = []
-    windows = set()
+    nonflat_windows = set()
     for row in disagreement:
         h = (row.get("future") or {}).get("3") or {}
         score = h.get("score")
         if score in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_FLAT", "PM_OTHER"}:
             scored.append(score)
-            windows.add(row.get("windowIndex"))
-    nonflat = [x for x in scored if x in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_OTHER"}]
+    nonflat_rows = []
+    for row in disagreement:
+        score = ((row.get("future") or {}).get("3") or {}).get("score")
+        if score in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_OTHER"}:
+            nonflat_rows.append(score)
+            nonflat_windows.add(row.get("windowIndex"))
+    nonflat = nonflat_rows
     world_n = sum(x == "PM_FOLLOWS_WORLD" for x in nonflat)
     cex_n = sum(x == "PM_FOLLOWS_CEX" for x in nonflat)
     world_rate = None if not nonflat else world_n / len(nonflat)
@@ -504,8 +509,8 @@ def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
         return sum(x == "PM_FOLLOWS_CEX" for x in labels) > len(labels) / 2
 
     passed = bool(
-        len(scored) >= 20
-        and len(windows) >= 4
+        len(nonflat) >= 20
+        and len(nonflat_windows) >= 4
         and world_rate is not None
         and cex_rate is not None
         and world_rate >= 0.60
@@ -515,7 +520,7 @@ def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "scorableDisagreementAt3s": len(scored),
-        "independentWindowCount": len(windows),
+        "independentWindowCount": len(nonflat_windows),
         "nonFlatAt3s": len(nonflat),
         "worldFollowCountAt3s": world_n,
         "cexFollowCountAt3s": cex_n,
