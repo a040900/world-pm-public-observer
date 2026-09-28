@@ -1,0 +1,21 @@
+name: WORLD_CATALOG_PREDISCOVERY_SMOKE_R1
+on:
+  push:
+    branches: [phasea-prewarm-coverage-r1]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3
+      - name: Probe next future BTC5M identity before window start
+        run: |
+          NOW=$(python -c 'import time; print(int(time.time()))')
+          START=$(( ((NOW + 599) / 300) * 300 ))
+          echo "server_now=$NOW target_start=$START seconds_before=$((START-NOW))"
+          python -m tools.research.world_catalog_prediscovery_r1 --start-ts "$START"
