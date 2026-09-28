@@ -367,6 +367,14 @@ class CexTape:
         return {"valid": True, "binance": b, "okx": o, "sign": sign}
 
 
+def _crossing_should_trigger(previous_above: bool | None, current_above: bool, elapsed_since_trigger: float) -> bool:
+    return bool(
+        current_above
+        and previous_above is False
+        and elapsed_since_trigger >= EPISODE_COOLDOWN_SECONDS
+    )
+
+
 def _conditioning_class(world_sign: int, cex_sign: int) -> str:
     if world_sign not in (-1, 1):
         return "UNSCORABLE"
@@ -472,14 +480,19 @@ def _classify_episode(
 def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
     disagreement = [x for x in threshold_rows if x.get("conditioningClass") == "WORLD_CEX_DISAGREE"]
     scored = []
-    windows = set()
+    nonflat_windows = set()
     for row in disagreement:
         h = (row.get("future") or {}).get("3") or {}
         score = h.get("score")
         if score in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_FLAT", "PM_OTHER"}:
             scored.append(score)
-            windows.add(row.get("windowIndex"))
-    nonflat = [x for x in scored if x in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_OTHER"}]
+    nonflat_rows = []
+    for row in disagreement:
+        score = ((row.get("future") or {}).get("3") or {}).get("score")
+        if score in {"PM_FOLLOWS_WORLD", "PM_FOLLOWS_CEX", "PM_OTHER"}:
+            nonflat_rows.append(score)
+            nonflat_windows.add(row.get("windowIndex"))
+    nonflat = nonflat_rows
     world_n = sum(x == "PM_FOLLOWS_WORLD" for x in nonflat)
     cex_n = sum(x == "PM_FOLLOWS_CEX" for x in nonflat)
     world_rate = None if not nonflat else world_n / len(nonflat)
@@ -496,8 +509,8 @@ def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
         return sum(x == "PM_FOLLOWS_CEX" for x in labels) > len(labels) / 2
 
     passed = bool(
-        len(scored) >= 20
-        and len(windows) >= 4
+        len(nonflat) >= 20
+        and len(nonflat_windows) >= 4
         and world_rate is not None
         and cex_rate is not None
         and world_rate >= 0.60
@@ -507,7 +520,7 @@ def _continuation_gate(threshold_rows: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "scorableDisagreementAt3s": len(scored),
-        "independentWindowCount": len(windows),
+        "independentWindowCount": len(nonflat_windows),
         "nonFlatAt3s": len(nonflat),
         "worldFollowCountAt3s": world_n,
         "cexFollowCountAt3s": cex_n,
@@ -640,7 +653,7 @@ async def _run_window(
     okx_task = asyncio.create_task(cex.run_okx(stop))
 
     world_points: deque[dict[str, Any]] = deque(maxlen=MAX_WORLD_POINTS)
-    above = {threshold: False for threshold in WORLD_THRESHOLDS}
+    # None means crossing continuity is unknown after startup or any unhealthy poll.\n    above: dict[float, bool | None] = {threshold: None for threshold in WORLD_THRESHOLDS}
     last_trigger = {threshold: -float("inf") for threshold in WORLD_THRESHOLDS}
     sequence = {threshold: 0 for threshold in WORLD_THRESHOLDS}
     pending: list[asyncio.Task[dict[str, Any]]] = []
@@ -675,10 +688,10 @@ async def _run_window(
                 delta = world_value - world_prior
                 for threshold in WORLD_THRESHOLDS:
                     is_above = abs(delta) >= threshold
-                    if (
-                        is_above
-                        and not above[threshold]
-                        and anchor_at - last_trigger[threshold] >= EPISODE_COOLDOWN_SECONDS
+                    if _crossing_should_trigger(
+                        above[threshold],
+                        is_above,
+                        anchor_at - last_trigger[threshold],
                     ):
                         sequence[threshold] += 1
                         event = _classify_episode(
@@ -708,8 +721,11 @@ async def _run_window(
                             last_trigger[threshold] = anchor_at
                     above[threshold] = is_above
             else:
+                # A crossing cannot be established across a period where the four-source
+                # conditioning state was unavailable. Re-arm only after a healthy
+                # below-threshold observation is seen.
                 for threshold in WORLD_THRESHOLDS:
-                    above[threshold] = False
+                    above[threshold] = None
 
             await asyncio.sleep(max(0.0, POLL_SECONDS - (time.time() - poll_started_at)))
 

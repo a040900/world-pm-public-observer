@@ -199,6 +199,33 @@ class IncrementalLeadR1Tests(unittest.TestCase):
         )
         self.assertFalse(wrong_gen["valid"])
 
+    def test_crossing_state_requires_observed_below_after_unhealthy_gap(self):
+        # Mirrors the runtime state machine: startup/unhealthy gaps leave crossing
+        # continuity unknown. A first healthy above-threshold sample cannot trigger.
+        self.assertFalse(r._crossing_should_trigger(None, True, 10.0))
+        self.assertFalse(r._crossing_should_trigger(False, True, 1.0))
+        self.assertTrue(r._crossing_should_trigger(False, True, 2.0))
+        self.assertFalse(r._crossing_should_trigger(True, True, 10.0))
+        self.assertFalse(r._crossing_should_trigger(False, False, 10.0))
+
+    def test_gate_cannot_pass_on_tiny_nonflat_denominator(self):
+        rows = []
+        for window in range(1, 5):
+            for i in range(5):
+                rows.append({
+                    "windowIndex": window,
+                    "conditioningClass": "WORLD_CEX_DISAGREE",
+                    "future": {
+                        "1": {"score": "PM_FOLLOWS_WORLD"},
+                        "3": {"score": "PM_FOLLOWS_WORLD" if window == 1 and i == 0 else "PM_FLAT"},
+                        "5": {"score": "PM_FOLLOWS_WORLD"},
+                    },
+                })
+        gate = r._continuation_gate(rows)
+        self.assertEqual(gate["scorableDisagreementAt3s"], 20)
+        self.assertEqual(gate["nonFlatAt3s"], 1)
+        self.assertFalse(gate["continuationGatePassed"])
+
 
 if __name__ == "__main__":
     unittest.main()
