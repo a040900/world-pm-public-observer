@@ -1,0 +1,23 @@
+name: WORLD_SPECIFIC_R1_INDEPENDENT_FIX_REVIEW
+on:
+  push:
+    branches: [review/world-specific-r1-above-nameerror-20260929]
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: Candidate regression and adversarial suite
+        run: |
+          python -m unittest tests.test_world_specific_incremental_r1 -v
+          python -m unittest tests.test_world_specific_incremental_r1_runtime -v
+          python -m unittest tests.test_world_specific_incremental_r1_reviewer -v
+          python -m tools.research.world_pm_world_specific_incremental_r1 --self-test
+          python -m py_compile tools/research/world_pm_world_specific_incremental_r1.py
