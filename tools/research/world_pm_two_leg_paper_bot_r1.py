@@ -36,8 +36,7 @@ from tools.research import world_polymarket_btc5m_executable_sync_r23 as r23
 SCHEMA_VERSION = "WORLD_PM_TWO_LEG_PAPER_BOT_R1"
 WORLD_QUOTE_FEE_CORRECTION_AUTHORITY = "docs/decisions/2026-09-22-world-pm-dflow-quote-fee-semantics-r1.md"
 WINDOW_COUNT_MAX = 6
-GLOBAL_RESEARCH_WINDOW_BUDGET = 60
-GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE = 42
+PHASE_A_TARGET_VALID_WINDOWS = 72
 MAX_CANDIDATES_PER_PAIR_PER_WINDOW = 2
 CANDIDATE_COOLDOWN_SECONDS = 2.0
 RADAR_POLL_SECONDS = 0.05
@@ -998,11 +997,11 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "sourceSha256": _source_hashes(),
         "requestedWindows": args.windows,
         "researchBudget": {
-            "authority": "EXISTING_WORLD_PM_GLOBAL_60_WINDOW_BUDGET",
-            "limit": GLOBAL_RESEARCH_WINDOW_BUDGET,
-            "consumedBeforeSmoke": GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE,
-            "plannedAfterSmoke": GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE + args.windows,
-            "fullBudgetCompletionRequiredForThisAcceptance": False,
+            "authority": "PHASE_A_72_VALID_WINDOWS_DUAL_DENOMINATOR_R1",
+            "phaseATargetValidWindows": PHASE_A_TARGET_VALID_WINDOWS,
+            "batchRequestedWindows": args.windows,
+            "legacyGlobal60WindowBudgetSuperseded": True,
+            "cumulativePhaseAProgressTrackedByAcceptedBatchArtifacts": True,
         },
         "windows": [],
         "runState": "RUNNING",
@@ -1077,7 +1076,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         report["summary"] = _summary(report)
         report["qualification"] = qualification.qualify_batch(report["windows"], args.windows)
         report["summary"].update(report["qualification"])
-        report["researchBudget"]["consumedAfterRun"] = GLOBAL_BUDGET_CONSUMED_BEFORE_SMOKE + report["qualification"]["phaseAEligibleWindowCount"]
+        report["researchBudget"]["phaseAEligibleWindowsThisBatch"] = report["qualification"]["phaseAEligibleWindowCount"]
         report["completedAt"] = time.time()
         _write_json(args.out, report)
     return report
