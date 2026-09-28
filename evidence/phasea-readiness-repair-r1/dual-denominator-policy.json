@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "WORLD_PM_DUAL_DENOMINATOR_POLICY_R1",
+  "authority": "Explicit owner instruction in PR 13 closure task",
+  "noTrade": true,
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "strategyDenominator": "Observed seconds only; UNKNOWN is never zero-candidate evidence.",
+  "operationalDenominator": "All predetermined scheduled seconds, including invalid and missing slots.",
+  "knownStates": [
+    "KNOWN_QUOTE",
+    "KNOWN_NO_ROUTE"
+  ],
+  "unknownStates": [
+    "UNKNOWN_WORLD",
+    "UNKNOWN_WORLD_RESPONSE",
+    "UNKNOWN_PM",
+    "IDENTITY_UNAVAILABLE",
+    "FEED_NOT_READY",
+    "MEASUREMENT_UNAVAILABLE"
+  ],
+  "pairScope": "Each direction has its own exposure and timestamp-matched candidate frequency. A window needs trusted positive exposure in at least one direction.",
+  "jointScope": "Window/role top-level exposure is the intersection of both directions; its strategy numerator includes only candidates triggered in that same intersection. Pair evidence remains separately available.",
+  "pairedRoleScope": "Maker and taker calendar exposure is intersected, not added. Their different strategy frequencies stay in separate role reports.",
+  "partialObservationAllowed": true,
+  "completeExposureRequired": false,
+  "preT0IdentityRequired": false,
+  "lateIdentityPolicy": "Continue a bounded public scan after T0; measure only current observations after loop entry. Never backfill unknown time.",
+  "executionInvalidPolicy": "No loop entry, crash, invalid coverage accounting, no trusted positive pair exposure or unavailable frozen authority excludes the row from strategy exposure. Candidate evidence remains unchanged.",
+  "phaseABatchEligibility": "All six predetermined paired slots must be execution-valid; partial exposure is allowed. Diagnostic requests always count zero. Authority import is separate.",
+  "coverageFailureHandling": "Sampler/finish exceptions make accounting untrustworthy and execution-invalid; no silent task failure.",
+  "frozenFunctionComparison": {
+    "world_pm_pm_maker_first_shadow_r1.py": [
+      "_run_window",
+      "run"
+    ],
+    "world_pm_two_leg_paper_bot_r1.py": [
+      "_run_window",
+      "run"
+    ]
+  },
+  "byteEquivalentFrozenModules": [
+    "world_pm_condition_execution_tape_r1.py",
+    "world_pm_paper_execution_core_r1.py",
+    "world_polymarket_btc5m_executable_sync_r23.py"
+  ],
+  "positiveEvidencePreserved": {
+    "runId": 36331335285,
+    "fullyHedged": true,
+    "shares": 5,
+    "hedgeCoveredShares": 5,
+    "cumulativeProtectedUnitCost": 0.98125,
+    "retrospectiveReadjudication": false,
+    "positiveEVEstablished": false,
+    "verifiedOriginalCandidate": {
+      "candidateId": "1790526300:WORLD_YES+PM_DOWN:1",
+      "fullyHedged": true,
+      "confirmedFillLowerBoundShares": 5.0,
+      "cumulativeFillShares": 5.0,
+      "hypotheticalHedgeCoveredShares": 5.0,
+      "cumulativeProtectedUnitCost": 0.98125
+    },
+    "sourceArtifactSha256": "a88b7c84d7ec4ecf7b20d1209efd205ab12fcb41288c00bc74dd071623de0e3a"
+  },
+  "nonBlockingRuntimeLimitations": [
+    "Public pre-T0 identity availability is not established; startup unknown seconds are reported.",
+    "Bounded public RPC failures may still produce execution-invalid slots; such slots stay in operational time only."
+  ],
+  "readinessVerdict": "READY_FOR_PHASE_A",
+  "verification": {
+    "allTestsPassed": 72,
+    "lunaOwnedTestsPassed": 12,
+    "lunaBoundedDiscoveryTest": "PASS",
+    "compileAll": "PASS",
+    "diffCheck": "PASS",
+    "materialBlockers": []
+  }
+}

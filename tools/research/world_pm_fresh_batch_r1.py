@@ -27,13 +27,16 @@ def main():
     if cache.exists():
         raise ValueError('FRESH_BATCH_OUTPUT_DIRECTORY_REQUIRED')
     shutil.copyfile('world_btc5m_identity_cache.json', cache)
-    env = dict(os.environ, WORLD_IDENTITY_CACHE=str(cache), PYTHONUNBUFFERED='1')
+    diagnostic = (request.get('coverageCalibration', {}).get('phaseAEligible') is False
+                  or 'DIAGNOSTIC' in str(request.get('mode', '')))
+    env = dict(os.environ, WORLD_IDENTITY_CACHE=str(cache), PYTHONUNBUFFERED='1',
+               WORLD_PM_PHASE_A_ELIGIBLE='0' if diagnostic else '1')
     batch = {'noTrade': True, 'request': request, 'requestedWindowCount': windows,
              'githubSha': os.environ.get('GITHUB_SHA'), 'githubRunId': os.environ.get('GITHUB_RUN_ID'),
              'qualificationValid': False, 'qualificationStatus': 'INCOMPLETE_QUALIFICATION_BATCH',
              'phaseAEligibleWindowCount': 0, 'topology': 'SEPARATE_PROCESSES_SHARED_RUNNER_AND_IDENTITY_CACHE',
              'measurementFreezeSha': 'fcd316ad0cfe0cadeb035716894103ea1ee73063'}
-    batch.update(q.qualify_batch([], windows))
+    batch.update(q.qualify_batch([], windows, phase_a_eligible=not diagnostic))
     processes = {}; handles = []
     try:
         # This is after checkout, QA and dependency installation; no market data is consulted.
@@ -62,17 +65,7 @@ def main():
         batch['processExitCodes'] = exits
         reports = {role: json.loads((root / f'{role}.json').read_text(encoding='utf-8')) for role in commands}
         expected = [int(first) + i * 300 for i in range(windows)]
-        paired = []
-        for start in expected:
-            rows = {role: [w for w in report.get('windows', []) if w.get('startTs') == start]
-                    for role, report in reports.items()}
-            valid = all(len(r) == 1 and r[0].get('qualificationValid') is True for r in rows.values())
-            paired.append({'startTs': start, 'qualificationValid': valid,
-                'invalidExecutionReasons': [f'{role}:{r[0].get("invalidExecutionReasons") if len(r) == 1 else "MISSING_OR_DUPLICATE_WINDOW"}'
-                                           for role, r in rows.items() if len(r) != 1 or r[0].get('qualificationValid') is not True]})
-        batch['windows'] = paired
-        batch['roles'] = {role: report.get('qualification') for role, report in reports.items()}
-        batch.update(q.qualify_batch(paired, windows))
+        batch.update(q.qualify_paired_batch(reports, expected, phase_a_eligible=not diagnostic))
         if any(exits.values()):
             batch.update(qualificationValid=False, qualificationStatus='INCOMPLETE_QUALIFICATION_BATCH', phaseAEligibleWindowCount=0)
     except Exception as exc:

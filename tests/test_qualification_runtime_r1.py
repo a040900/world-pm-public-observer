@@ -10,6 +10,7 @@ from unittest.mock import patch, AsyncMock
 from urllib.error import HTTPError
 from tools.research import world_polymarket_btc5m_leadlag_probe_r1 as wp
 from tools.research import world_pm_qualification_runtime_r1 as q
+from tools.research import world_pm_window_preparation_r1 as prep
 from tools.research import world_pm_pm_maker_first_shadow_r1 as maker
 from tools.research import world_pm_two_leg_paper_bot_r1 as taker
 
@@ -87,7 +88,7 @@ class RuntimeTests(unittest.TestCase):
              patch.object(wp.time, 'sleep'), patch.object(wp, 'fetch_polymarket_market', return_value=pm), \
              patch.object(maker.TradeAwareBook, 'run', feed):
             # Historical time only in a deterministic fixture, never prospective qualification.
-            with patch.object(maker.time, 'time', return_value=self.start + 1):
+            with patch.object(maker.time, 'time', return_value=self.start - 1):
                 row = asyncio.run(maker._run_window(start_ts=self.start, args=args, cash_decimals=6))
         self.assertEqual(request.call_count, 4)
         self.assertEqual(row['executionStatus'], 'INVALID_EXECUTION_WINDOW')
@@ -96,19 +97,27 @@ class RuntimeTests(unittest.TestCase):
         self.assertFalse(row['candidateCountEligibleForDenominator'])
 
     def valid(self):
-        return q.qualify_window({'startTs': self.start, 'worldMarket': {'market': 'x'}, 'pmMarket': {'conditionId': 'p'},
-            'radarPollCount': 100, 'measurementAuthorityHealthyPollCount': 50, 'measurementLoopCompleted': True})
+        coverage = q.ObservationCoverage(self.start, self.start+300)
+        for now in range(self.start-1, self.start+301):
+            leg = {"receivedAt": now, "sourceTimestamp": now, "ask": .5}
+            pm = {"healthy": True, "ready": True, "lastFrameAt": now, "sourceTimestampMs": now*1000}
+            coverage.observe(now, {"healthy": True, "yes": leg, "no": leg}, {"yes": pm, "no": pm})
+        return q.qualify_window({'startTs': self.start, 'endTs': self.start+300,
+            'worldMarket': {'market': 'x'}, 'pmMarket': {'conditionId': 'p'},
+            'radarPollCount': 100, 'measurementAuthorityHealthyPollCount': 50,
+            'measurementLoopEnteredAt': self.start,
+            'observationCoverage': coverage.finish(self.start+300), 'measurementLoopCompleted': True})
 
     def test_taker_discovery_failure_zero_polls_is_invalid(self):
         import argparse
-        now = [self.start + 1]
+        now = [self.start - 1]
         async def sleep(_):
-            now[0] = self.start + 301
+            return
         async def feed(self, stop):
             await stop.wait()
         pm = wp.PolymarketMarket(self.start, 'condition', 'up', 'down', {}, {}, '')
         with patch.object(wp, 'fetch_polymarket_market', return_value=pm), \
-             patch.object(taker.r23.radar, '_discover_world_market', side_effect=RuntimeError('HTTP 429')), \
+             patch.object(wp, 'discover_world_market', side_effect=RuntimeError('HTTP 429')), \
              patch.object(taker.r2s.r2.RollingTimelineBook, 'run', feed), \
              patch.object(taker.time, 'time', side_effect=lambda: now[0]), \
              patch.object(taker.asyncio, 'sleep', sleep):
@@ -145,7 +154,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(batch['phaseAEligibleWindowCount'], 0)
 
     def test_zero_polls_or_no_authority_invalid_even_with_discovery(self):
-        for key in ('radarPollCount', 'measurementAuthorityHealthyPollCount', 'measurementLoopCompleted'):
+        for key in ('radarPollCount', 'observationCoverage', 'measurementLoopCompleted'):
             row = self.valid(); row[key] = 0
             self.assertFalse(q.qualify_window(row)['qualificationValid'])
 
@@ -196,15 +205,60 @@ class RuntimeTests(unittest.TestCase):
                 wp.discover_world_market(self.start, rpc_url=wp.DEFAULT_SOLANA_RPC)
         self.assertFalse(Path(os.environ['WORLD_IDENTITY_CACHE']).exists())
 
-    def test_maker_pair_observable_diagnostics_do_not_change_qualification_rule(self):
+    def test_maker_pair_observable_poll_counts_do_not_establish_time_coverage(self):
         row = {"radarPollCount": 100, "measurementAuthorityHealthyPollCount": 1,
                "measurementLoopCompleted": True, "worldMarket": {"market": "x"},
                "pmMarket": {"conditionId": "p"}, "pairObservablePollCount": {
                    "WORLD_YES+PM_DOWN": 25, "WORLD_NO+PM_UP": 75}}
         before = copy.deepcopy(row["pairObservablePollCount"])
         out = q.qualify_window(row)
-        self.assertTrue(out["qualificationValid"])
+        self.assertFalse(out["qualificationValid"])
         self.assertEqual(out["pairObservablePollCount"], before)
+
+
+    def test_diagnostic_never_contributes_phase_a_windows(self):
+        result = q.qualify_batch([self.valid() for _ in range(6)], 6, phase_a_eligible=False)
+        self.assertTrue(result['qualificationValid'])
+        self.assertEqual(result['phaseAEligibleWindowCount'], 0)
+
+    def test_prestartexisting_split_requires_exact_metadata(self):
+        def earlier(url, **kwargs):
+            result = self.success(url, **kwargs)
+            if (kwargs.get('payload') or {}).get('method') == 'getSignaturesForAddress':
+                result['result'][0]['blockTime'] = self.start - 30
+            return result
+        with patch.object(wp.time, 'time', return_value=self.start-10), \
+             patch.object(wp.time, 'sleep'), patch.object(wp, '_json_request', side_effect=earlier):
+            market = wp.discover_world_market(self.start, rpc_url=wp.DEFAULT_SOLANA_RPC, deadline=self.start)
+        self.assertEqual(market.start_ts, self.start)
+        self.assertEqual(wp.DISCOVERY_TRACES[self.start]['signatureBlockTime'], self.start-30)
+
+
+    def test_uncached_discovery_has_bounded_pre_and_poststart_interval(self):
+        import argparse
+        now = [self.start-120.0]
+        original_sleep = asyncio.sleep
+        async def sleep(seconds):
+            now[0] += seconds
+            await original_sleep(0)
+        class Feed:
+            def __init__(self, tokens): pass
+            async def run(self, stop): await stop.wait()
+        called = []
+        def discovery(*args, **kwargs):
+            called.append((now[0], kwargs['deadline']))
+            raise TimeoutError('not available')
+        async def check():
+            args = argparse.Namespace(rpc_url=wp.DEFAULT_SOLANA_RPC, world_discovery_timeout_seconds=60)
+            p = await prep.prepare(self.start, args, Feed, None)
+            self.assertIn('executionError', p.row)
+        pm = wp.PolymarketMarket(self.start, 'p', 'up', 'down', {}, {}, '')
+        with patch.object(prep.time, 'time', side_effect=lambda: now[0]), \
+             patch.object(prep.asyncio, 'sleep', sleep), \
+             patch.object(wp, 'fetch_polymarket_market', return_value=pm), \
+             patch.object(wp, 'discover_world_market', side_effect=discovery):
+            asyncio.run(check())
+        self.assertEqual(called, [(self.start-60, self.start+60)])
 
 
 if __name__ == '__main__':

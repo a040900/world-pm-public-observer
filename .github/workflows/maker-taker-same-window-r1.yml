@@ -28,7 +28,7 @@ jobs:
         if: always()
         run: |
           if [ -f artifacts/batch.json ]; then
-            python -c 'import json; b=json.load(open("artifacts/batch.json")); print("## " + b["qualificationStatus"]); print(json.dumps({k:b.get(k) for k in ("requestedWindowCount","validQualificationWindowCount","invalidExecutionWindowCount","qualificationValid","phaseAEligibleWindowCount")}, indent=2))' >> "$GITHUB_STEP_SUMMARY"
+            python -c 'import json; b=json.load(open("artifacts/batch.json")); print("## " + b["qualificationStatus"]); print(json.dumps({k:b.get(k) for k in ("requestedWindowCount","validQualificationWindowCount","invalidExecutionWindowCount","qualificationValid","phaseAEligibleWindowCount","observedSeconds","unknownSeconds","scheduledSeconds","observationAvailability","frequencyScope")}, indent=2))' >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@v4
         if: always()

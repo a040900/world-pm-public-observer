@@ -18,6 +18,7 @@ submission, order placement, or capital.
 from __future__ import annotations
 
 from tools.research import world_pm_qualification_runtime_r1 as qualification
+from tools.research import world_pm_window_preparation_r1 as preparation
 
 import argparse
 import asyncio
@@ -716,71 +717,21 @@ class TradeAwareBook(r24.PolymarketTimelineBook):
         self.connected = False
 
 
-async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals: int) -> dict[str, Any]:
+async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals: int, prepared=None) -> dict[str, Any]:
     end_ts = start_ts + WINDOW_SECONDS
-    if time.time() < start_ts:
-        await asyncio.sleep(start_ts - time.time())
-    try:
-        pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
-    except Exception as exc:
-        return qualification.qualify_window({"startTs": start_ts, "endTs": end_ts,
-            "executionError": f"PM_DISCOVERY:{type(exc).__name__}:{exc}",
-            "radarPollCount": 0, "shadowCandidates": [], "candidates": [], "summary": {"candidateCount": 0}})
-    stop = asyncio.Event()
-    feed = TradeAwareBook([pm_market.up_token, pm_market.down_token])
-    feed_task = asyncio.create_task(feed.run(stop))
-    try:
-        world_market = await asyncio.to_thread(
-            r23.radar._discover_world_market,
-            start_ts,
-            args.rpc_url,
-            min(float(end_ts), time.time() + args.world_discovery_timeout_seconds),
-        )
-    except Exception as exc:
-        world_market = None
-        world_error = f"{type(exc).__name__}:{exc}"
-    else:
-        world_error = None
-
-    row: dict[str, Any] = {
-        "startTs": start_ts,
-        "endTs": end_ts,
-        "worldDiscoveryError": world_error,
-        "worldDiscoveryTrace": r23.wp.DISCOVERY_TRACES.get(start_ts, {}),
-        "pmMarket": {"conditionId": pm_market.condition_id, "upToken": pm_market.up_token, "downToken": pm_market.down_token},
-        "radarPollCount": 0,
-        "measurementLoopStartupDelaySeconds": None,
-        "pairObservablePollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
-        "pairObservationFailureCount": {
-            "WORLD_YES+PM_DOWN": {"PM_NOT_FRESH": 0, "WORLD_NOT_HEALTHY": 0, "WORLD_ASK_MISSING": 0, "WORLD_TOO_OLD": 0},
-            "WORLD_NO+PM_UP": {"PM_NOT_FRESH": 0, "WORLD_NOT_HEALTHY": 0, "WORLD_ASK_MISSING": 0, "WORLD_TOO_OLD": 0},
-        },
-        "shadowCandidates": [],
-        "summary": {},
-    }
-    if world_market is None:
-        stop.set()
-        feed_task.cancel()
-        await asyncio.gather(feed_task, return_exceptions=True)
-        row["summary"] = {"candidateCount": 0, "shadowFillCount": 0, "survivingProtectedEdgeCount": 0}
+    prepared = await prepared if prepared is not None else await preparation.prepare(
+        start_ts, args, TradeAwareBook, r2s.GapRadar)
+    row = {**prepared.row, "radarPollCount": 0, "measurementLoopStartupDelaySeconds": None,
+           "pairObservablePollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
+           "pairObservationFailureCount": {
+               pair: {k: 0 for k in ("PM_NOT_FRESH", "WORLD_NOT_HEALTHY", "WORLD_ASK_MISSING", "WORLD_TOO_OLD")}
+               for pair in ("WORLD_YES+PM_DOWN", "WORLD_NO+PM_UP")},
+           "shadowCandidates": [], "summary": {"candidateCount": 0}}
+    if row.get("executionError"):
         return qualification.qualify_window(row)
-
-    try:
-        yes_decimals, no_decimals = await asyncio.gather(
-            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
-            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
-        )
-    except Exception as exc:
-        row["executionError"] = f"TOKEN_DECIMALS:{type(exc).__name__}:{exc}"
-        stop.set()
-        feed_task.cancel()
-        await asyncio.gather(feed_task, return_exceptions=True)
-        return qualification.qualify_window(row)
-
-    row["worldMarket"] = {"market": world_market.market, "yesMint": world_market.yes_mint, "noMint": world_market.no_mint,
-                          "yesDecimals": yes_decimals, "noDecimals": no_decimals}
-    dflow = r2s.GapRadar(world_market.yes_mint, world_market.no_mint)
-    dflow_task = asyncio.create_task(dflow.run(stop))
+    pm_market, world_market = prepared.pm, prepared.world
+    feed, dflow, stop = prepared.feed, prepared.radar, prepared.stop
+    yes_decimals, no_decimals = prepared.decimals
     world_session = requests.Session()
     receipt_tasks: dict[str, asyncio.Task[Any]] = {}
     tx_evidence_cache: dict[str, dict[str, Any]] = {}
@@ -814,12 +765,14 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
         ("WORLD_NO+PM_UP", "no", world_market.no_mint, no_decimals, pm_market.up_token, pm_market.down_token),
     )
     try:
+        await asyncio.sleep(max(0.0, start_ts - time.time()))
         while time.time() < end_ts:
             now = time.time()
             row["radarPollCount"] += 1
             if row["measurementLoopStartupDelaySeconds"] is None:
                 row["measurementLoopStartupDelaySeconds"] = max(0.0, now - start_ts)
             world_snapshot = dflow.snapshot(now)
+            preparation.record_poll(prepared, now, world_snapshot)
             qualification.observe_health(row, world_snapshot,
                 [feed.snapshot(pm_market.up_token), feed.snapshot(pm_market.down_token)], now)
             for pair, side, world_mint, world_decimals, pm_token, complement_token in pairs:
@@ -1043,6 +996,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     "pmToken": pm_token,
                     "worldMint": world_mint,
                     "placedAt": refreshed_at,
+                    "radarObservedAt": now,
                     "makerBid": maker_bid,
                     "bestAskAtPlacement": best_ask,
                     "entrySnapshotReason": entry["reason"],
@@ -1135,13 +1089,12 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                 _refresh_candidate_economics(current)
                 current["completedAt"] = time.time()
                 row["shadowCandidates"].append(current)
-        stop.set()
-        dflow_task.cancel()
-        feed_task.cancel()
+        await prepared.close()
+        row["observationCoverage"] = prepared.row.get("observationCoverage")
         for task in receipt_tasks.values():
             if not task.done():
                 task.cancel()
-        await asyncio.gather(dflow_task, feed_task, *receipt_tasks.values(), return_exceptions=True)
+        await asyncio.gather(*receipt_tasks.values(), return_exceptions=True)
         world_session.close()
 
     candidates = row["shadowCandidates"]
@@ -1181,12 +1134,18 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     server_now = time.time()
     first_start_ts = args.start_ts if args.start_ts is not None else r23._next_full_window(server_now)
     windows = []
-    for index in range(args.windows):
-        start_ts = first_start_ts + index * WINDOW_SECONDS
-        window = await _run_window(start_ts=start_ts, args=args, cash_decimals=cash_decimals)
-        window["windowIndex"] = index + 1
-        windows.append(window)
-        print(json.dumps({"completedWindow": index + 1, "summary": window["summary"]}, sort_keys=True), flush=True)
+    preparations = {first_start_ts+i*WINDOW_SECONDS: asyncio.create_task(preparation.prepare(
+        first_start_ts+i*WINDOW_SECONDS, args, TradeAwareBook, r2s.GapRadar)) for i in range(args.windows)}
+    try:
+        for index in range(args.windows):
+            start_ts = first_start_ts + index * WINDOW_SECONDS
+            window = await _run_window(start_ts=start_ts, args=args, cash_decimals=cash_decimals,
+                                       prepared=preparations[start_ts])
+            window["windowIndex"] = index + 1
+            windows.append(window)
+            print(json.dumps({"completedWindow": index + 1, "summary": window["summary"]}, sort_keys=True), flush=True)
+    finally:
+        await preparation.close_preparations(preparations)
     candidates = [c for w in windows for c in w.get("shadowCandidates", [])]
     fills = [c for c in candidates if float(c.get("confirmedFillLowerBoundShares") or c.get("cumulativeFillShares") or 0.0) > 0]
     plausible = [c for c in candidates if c.get("highestQueueClassification") in {"PLAUSIBLE_FILL", "DEFINITE_FILL"}]

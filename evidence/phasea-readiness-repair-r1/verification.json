@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "WORLD_PM_PHASE_A_READINESS_REPAIR_R2",
+  "noTrade": true,
+  "baseObserverSha": "9e2a51a0604ffb56205378e314e170d2dc7a04d9",
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "state": "MERGE_READY_DUAL_DENOMINATOR_POLICY_ADOPTED",
+  "phaseAAdmission": true,
+  "phaseAContribution": 0,
+  "localVerification": {
+    "allTestsPassed": 72,
+    "compileAll": "PASS",
+    "diffCheck": "PASS",
+    "makerAndTakerChangedTopLevelFunctions": [
+      "run",
+      "_run_window"
+    ],
+    "frozenCalculationFunctionsChanged": false,
+    "testCommand": "python -m unittest discover -s tests -q",
+    "dualDenominatorIntegrationTestsPassed": 7
+  },
+  "independentReviewer": {
+    "model": "gpt-6-luna",
+    "targetedTestsAddedAndPassed": 12,
+    "scope": "Final bounded dual-denominator repair, late startup, exposure/numerator alignment, raw evidence preservation, NO_TRADE",
+    "materialOpenItems": [],
+    "nonBlockingLimit": "Cancelling asyncio.to_thread cannot interrupt an already running public request; existing request/deadline bounds still apply",
+    "finalTimingVerification": {
+      "result": "NO_MATERIAL_REGRESSION_FOUND",
+      "newTimingTest": "PASS",
+      "ownedExposureTestsPassed": 12,
+      "phaseAReadinessEstablished": true,
+      "livePreT0ReliabilityEstablished": false
+    }
+  },
+  "publicIdentityEvidence": {
+    "priorCatalogActionsRuns": [
+      36379455565,
+      36379463459
+    ],
+    "catalogOutcome": "401 for events; independent plain markets GET 403",
+    "boundedPublicSignatureSample": 40,
+    "decodedTransactions": 31,
+    "splitInstructions": 6,
+    "distinctVerifiedBTCMintDescriptions": 2,
+    "verifiedPreT0IdentitySource": false,
+    "interpretation": "No source was established by the bounded check; this is not proof that no such source exists."
+  },
+  "preservedExecutionHistory": [
+    36309301112,
+    36309585620,
+    36318577787
+  ],
+  "nextStep": "Merge PR 13 and start fresh prospective Phase A collection using the fixed time-only schedule. Retain observed/unknown/scheduled denominators and per-pair/per-role scopes. No new full review is required.",
+  "branchReadinessDiagnostic": {
+    "runId": 36406967691,
+    "runtimeSha": "123462ad45e27cd2c63ea459e73aefe42b9c7d83",
+    "status": "NO_RESULT_PRESTART_IDENTITY_OR_FEEDS_UNAVAILABLE",
+    "furtherLiveDiagnostics": "MANUAL_DISPATCH_ONLY",
+    "error": "PREPARATION:TimeoutError:WORLD_CURRENT_BTC5M_MARKET_NOT_DISCOVERED",
+    "artifactSha256": "fa56742e680365cfcbc6d42fddffddb236b7519a97be235460460da4e78294f5",
+    "startTs": 1790589900,
+    "preparationStartedAt": 1790589780.0757754,
+    "completedAt": 1790589840.243875,
+    "phaseAEligibleWindowCount": 0,
+    "requestCounts": {
+      "getSignaturesForAddress": 8,
+      "getTransaction": 82,
+      "GET": 6
+    },
+    "requestErrors": [
+      {
+        "endpoint": "https://api.mainnet-beta.solana.com",
+        "method": "getTransaction",
+        "attempt": 1,
+        "at": 1790589785.676816,
+        "error": "HTTPError:HTTP Error 429: Too Many Requests"
+      }
+    ],
+    "interpretation": "This bounded prestart attempt did not establish the target identity. It did not observe the entire remaining period before T0 and is not proof that public prestart identity is impossible.",
+    "qualificationInterpretation": "NO_RESULT; source availability is not established; no negative edge claim",
+    "timingCorrection": {
+      "problem": "The initial 60-second uncached search began at T0-120 and ended near T0-60, so it did not test the last prestart minute.",
+      "repair": "Defer an uncached bounded search until T0 minus the configured discovery timeout; verified cache entries still prepare immediately.",
+      "deterministicVerification": "PASS: default 60-second discovery starts at T0-60 and retains deadline T0.",
+      "liveVerification": "NOT_ESTABLISHED_FOR_CORRECTED_TIMING"
+    },
+    "currentPolicyInterpretation": "Preserved historical prestart-efficiency diagnostic; NO_RESULT is not negative edge evidence or a Phase A hard gate. No new live diagnostic was required for this bounded policy closure."
+  },
+  "supersedesDraftCommit": "fe9edfc2b752ca5e098c1e11e620337f5c788863",
+  "readinessVerdict": "READY_FOR_PHASE_A",
+  "authorityResearchStateChanged": false,
+  "phaseAAdmissionMeaning": "Fresh prospective data collection is ready under the explicit owner policy; no existing or new batch is promoted by this repair.",
+  "ownerPolicy": "DUAL_OBSERVED_AND_SCHEDULED_SECONDS_R1; partial exposure allowed; pre-T0 identity not a hard gate.",
+  "policyArtifact": "evidence/phasea-readiness-repair-r1/dual-denominator-policy.json",
+  "nonBlockingRuntimeLimitations": [
+    "Reliable public pre-T0 identity has not been demonstrated; missing startup is UNKNOWN and no longer blocks known later exposure.",
+    "Public RPC failure can still exhaust bounded deadlines and create invalid slots.",
+    "Cancelling a to_thread task cannot terminate its bounded synchronous request immediately."
+  ]
+}

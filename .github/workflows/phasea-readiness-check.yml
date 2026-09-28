@@ -1,0 +1,39 @@
+name: PHASE_A_READINESS_BOUNDED_CHECK
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/phasea-observation-readiness-r1]
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - run: python -m unittest discover -s tests -v
+      - run: python -m py_compile tools/research/*.py
+  prestart-diagnostic:
+    if: github.event_name == 'workflow_dispatch'
+    needs: deterministic
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: One predetermined future window, readiness only
+        env:
+          WORLD_IDENTITY_CACHE: artifacts/world_identity_diagnostic.json
+          WORLD_PM_PHASE_A_ELIGIBLE: '0'
+        run: python -m tools.research.world_pm_prestart_readiness_check_r1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prestart-readiness-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 90
