@@ -196,6 +196,16 @@ class RuntimeTests(unittest.TestCase):
                 wp.discover_world_market(self.start, rpc_url=wp.DEFAULT_SOLANA_RPC)
         self.assertFalse(Path(os.environ['WORLD_IDENTITY_CACHE']).exists())
 
+    def test_maker_pair_observable_diagnostics_do_not_change_qualification_rule(self):
+        row = {"radarPollCount": 100, "measurementAuthorityHealthyPollCount": 1,
+               "measurementLoopCompleted": True, "worldMarket": {"market": "x"},
+               "pmMarket": {"conditionId": "p"}, "pairObservablePollCount": {
+                   "WORLD_YES+PM_DOWN": 25, "WORLD_NO+PM_UP": 75}}
+        before = copy.deepcopy(row["pairObservablePollCount"])
+        out = q.qualify_window(row)
+        self.assertTrue(out["qualificationValid"])
+        self.assertEqual(out["pairObservablePollCount"], before)
+
 
 if __name__ == '__main__':
     unittest.main()
