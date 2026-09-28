@@ -1,35 +1,35 @@
 {
-  "schemaVersion": "WORLD_PM_PHASE_A_READINESS_REPAIR_DRAFT_R1",
+  "schemaVersion": "WORLD_PM_PHASE_A_READINESS_REPAIR_R2",
   "noTrade": true,
   "baseObserverSha": "9e2a51a0604ffb56205378e314e170d2dc7a04d9",
   "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
-  "state": "DRAFT_PUBLIC_PRESTART_SOURCE_AND_DENOMINATOR_POLICY_PENDING",
-  "phaseAAdmission": false,
+  "state": "MERGE_READY_DUAL_DENOMINATOR_POLICY_ADOPTED",
+  "phaseAAdmission": true,
   "phaseAContribution": 0,
   "localVerification": {
-    "allTestsPassed": 63,
+    "allTestsPassed": 72,
     "compileAll": "PASS",
     "diffCheck": "PASS",
     "makerAndTakerChangedTopLevelFunctions": [
       "run",
       "_run_window"
     ],
-    "frozenCalculationFunctionsChanged": false
+    "frozenCalculationFunctionsChanged": false,
+    "testCommand": "python -m unittest discover -s tests -q",
+    "dualDenominatorIntegrationTestsPassed": 7
   },
   "independentReviewer": {
     "model": "gpt-6-luna",
-    "targetedTestsAddedAndPassed": 10,
-    "scope": "Observation exposure, known no_route versus unknown, unchanged PM heartbeat, bounds preservation, preparation cleanup, public identity availability",
-    "materialOpenItems": [
-      "Pre-T0 identity source not established",
-      "Whole-window versus observed-time denominator policy awaiting owner clarification; draft strict complete gate is not Phase A admitted"
-    ],
+    "targetedTestsAddedAndPassed": 12,
+    "scope": "Final bounded dual-denominator repair, late startup, exposure/numerator alignment, raw evidence preservation, NO_TRADE",
+    "materialOpenItems": [],
     "nonBlockingLimit": "Cancelling asyncio.to_thread cannot interrupt an already running public request; existing request/deadline bounds still apply",
     "finalTimingVerification": {
       "result": "NO_MATERIAL_REGRESSION_FOUND",
       "newTimingTest": "PASS",
-      "ownedExposureTestsPassed": 10,
-      "phaseAReadinessEstablished": false
+      "ownedExposureTestsPassed": 12,
+      "phaseAReadinessEstablished": true,
+      "livePreT0ReliabilityEstablished": false
     }
   },
   "publicIdentityEvidence": {
@@ -50,7 +50,7 @@
     36309585620,
     36318577787
   ],
-  "nextStep": "Keep PR draft and Phase A contribution zero. Resolve the whole-window versus observed-time denominator policy and establish public pre-T0 readiness before admitting a six-window qualification.",
+  "nextStep": "Merge PR 13 and start fresh prospective Phase A collection using the fixed time-only schedule. Retain observed/unknown/scheduled denominators and per-pair/per-role scopes. No new full review is required.",
   "branchReadinessDiagnostic": {
     "runId": 36406967691,
     "runtimeSha": "123462ad45e27cd2c63ea459e73aefe42b9c7d83",
@@ -83,6 +83,18 @@
       "repair": "Defer an uncached bounded search until T0 minus the configured discovery timeout; verified cache entries still prepare immediately.",
       "deterministicVerification": "PASS: default 60-second discovery starts at T0-60 and retains deadline T0.",
       "liveVerification": "NOT_ESTABLISHED_FOR_CORRECTED_TIMING"
-    }
-  }
+    },
+    "currentPolicyInterpretation": "Preserved historical prestart-efficiency diagnostic; NO_RESULT is not negative edge evidence or a Phase A hard gate. No new live diagnostic was required for this bounded policy closure."
+  },
+  "supersedesDraftCommit": "fe9edfc2b752ca5e098c1e11e620337f5c788863",
+  "readinessVerdict": "READY_FOR_PHASE_A",
+  "authorityResearchStateChanged": false,
+  "phaseAAdmissionMeaning": "Fresh prospective data collection is ready under the explicit owner policy; no existing or new batch is promoted by this repair.",
+  "ownerPolicy": "DUAL_OBSERVED_AND_SCHEDULED_SECONDS_R1; partial exposure allowed; pre-T0 identity not a hard gate.",
+  "policyArtifact": "evidence/phasea-readiness-repair-r1/dual-denominator-policy.json",
+  "nonBlockingRuntimeLimitations": [
+    "Reliable public pre-T0 identity has not been demonstrated; missing startup is UNKNOWN and no longer blocks known later exposure.",
+    "Public RPC failure can still exhaust bounded deadlines and create invalid slots.",
+    "Cancelling a to_thread task cannot terminate its bounded synchronous request immediately."
+  ]
 }

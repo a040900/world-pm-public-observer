@@ -22,13 +22,19 @@ class PreparedWindow:
     decimals: tuple = ()
     coverage: object = None
     closed: bool = False
+    coverage_error: str | None = None
 
     async def close(self):
         if self.closed:
             return
         self.closed = True
         if self.coverage is not None:
-            self.row["observationCoverage"] = self.coverage.finish(time.time())
+            try:
+                self.row["observationCoverage"] = self.coverage.finish(time.time())
+            except Exception as exc:
+                self.coverage_error = f"{type(exc).__name__}:{exc}"
+        if self.coverage_error:
+            self.row.setdefault("observationCoverage", {})["accountingError"] = self.coverage_error
         self.stop.set()
         for task in self.tasks:
             task.cancel()
@@ -44,15 +50,23 @@ def token_decimals(mint, rpc_url, deadline):
     return value
 
 
+def record_poll(p, now, world):
+    # Also sample at the actual radar decision, so candidate timestamps align with
+    # exposure. This records availability only; it never admits a candidate.
+    p.coverage.observe(now, world, {
+        "yes": p.feed.snapshot(p.pm.down_token), "no": p.feed.snapshot(p.pm.up_token)})
+
+
 async def _monitor(p):
-    while not p.stop.is_set():
-        now = time.time()
-        # Side names refer to World; the paired PM token is the complement.
-        p.coverage.observe(now, p.radar.snapshot(now), {
-            "yes": p.feed.snapshot(p.pm.down_token), "no": p.feed.snapshot(p.pm.up_token)})
-        if now >= p.start + 300:
-            return
-        await asyncio.sleep(q.POLL_SECONDS)
+    try:
+        while not p.stop.is_set():
+            now = time.time()
+            record_poll(p, now, p.radar.snapshot(now))
+            if now >= p.start + 300:
+                return
+            await asyncio.sleep(q.POLL_SECONDS)
+    except Exception as exc:
+        p.coverage_error = f"{type(exc).__name__}:{exc}"
 
 
 async def prepare(start, args, feed_factory, radar_factory):
@@ -61,23 +75,24 @@ async def prepare(start, args, feed_factory, radar_factory):
     p = PreparedWindow(start)
     p.row = {"startTs": start, "endTs": start+300, "preparationStartedAt": time.time()}
     try:
-        if time.time() >= start:
-            raise TimeoutError("PRESTART_PREPARATION_ALREADY_LATE")
+        if time.time() >= start + 300:
+            raise TimeoutError("WINDOW_ALREADY_ENDED")
         p.pm = await asyncio.to_thread(wp.fetch_polymarket_market, start)
         p.row["pmMarket"] = {"conditionId": p.pm.condition_id, "upToken": p.pm.up_token,
                              "downToken": p.pm.down_token}
         p.feed = feed_factory([p.pm.up_token, p.pm.down_token])
         p.tasks.append(asyncio.create_task(p.feed.run(p.stop)))
-        # Keep the bounded discovery attempt adjacent to T0. Starting a 60s
-        # attempt at T0-120 would miss identities first published at T0-30.
-        # Already verified cache entries can warm immediately.
+        # Keep the prestart attempt adjacent to T0, but allow the same bounded
+        # scan to continue after T0. Missing startup time remains UNKNOWN; no
+        # historical quote or candidate is replayed to fill it.
         if wp._cached_world_market(start) is None:
             await asyncio.sleep(max(0.0, start - args.world_discovery_timeout_seconds - time.time()))
-        deadline = min(float(start), time.time() + args.world_discovery_timeout_seconds)
+        deadline = min(float(start+300), max(float(start), time.time()) + args.world_discovery_timeout_seconds)
         p.world = await asyncio.to_thread(wp.discover_world_market, start, rpc_url=args.rpc_url, deadline=deadline)
         p.row["worldDiscoveryTrace"] = wp.DISCOVERY_TRACES.get(start, {})
         p.decimals = tuple(await asyncio.gather(*[
-            asyncio.to_thread(token_decimals, mint, args.rpc_url, float(start))
+            asyncio.to_thread(token_decimals, mint, args.rpc_url,
+                                  min(float(start+300), time.time()+args.world_discovery_timeout_seconds))
             for mint in (p.world.yes_mint, p.world.no_mint)]))
         p.row["worldMarket"] = {"market": p.world.market, "yesMint": p.world.yes_mint,
                                 "noMint": p.world.no_mint, "yesDecimals": p.decimals[0],
@@ -86,10 +101,8 @@ async def prepare(start, args, feed_factory, radar_factory):
         p.tasks.append(asyncio.create_task(p.radar.run(p.stop)))
         p.coverage = q.ObservationCoverage(start, start+300)
         p.tasks.append(asyncio.create_task(_monitor(p)))
-        while p.coverage.ready_at is None and time.time() < start:
-            await asyncio.sleep(q.POLL_SECONDS)
-        if p.coverage.ready_at is None or p.coverage.ready_at > start:
-            raise TimeoutError("PRESTART_FEEDS_NOT_READY")
+        # Start the measurement loop even when feeds have not become known yet.
+        # Its independent exposure trace excludes all unready/startup seconds.
         p.row["preparationCompletedAt"] = time.time()
     except asyncio.CancelledError:
         await p.close()

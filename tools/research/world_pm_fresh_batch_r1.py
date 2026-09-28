@@ -65,17 +65,7 @@ def main():
         batch['processExitCodes'] = exits
         reports = {role: json.loads((root / f'{role}.json').read_text(encoding='utf-8')) for role in commands}
         expected = [int(first) + i * 300 for i in range(windows)]
-        paired = []
-        for start in expected:
-            rows = {role: [w for w in report.get('windows', []) if w.get('startTs') == start]
-                    for role, report in reports.items()}
-            valid = all(len(r) == 1 and r[0].get('qualificationValid') is True for r in rows.values())
-            paired.append({'startTs': start, 'qualificationValid': valid,
-                'invalidExecutionReasons': [f'{role}:{r[0].get("invalidExecutionReasons") if len(r) == 1 else "MISSING_OR_DUPLICATE_WINDOW"}'
-                                           for role, r in rows.items() if len(r) != 1 or r[0].get('qualificationValid') is not True]})
-        batch['windows'] = paired
-        batch['roles'] = {role: report.get('qualification') for role, report in reports.items()}
-        batch.update(q.qualify_batch(paired, windows, phase_a_eligible=not diagnostic))
+        batch.update(q.qualify_paired_batch(reports, expected, phase_a_eligible=not diagnostic))
         if any(exits.values()):
             batch.update(qualificationValid=False, qualificationStatus='INCOMPLETE_QUALIFICATION_BATCH', phaseAEligibleWindowCount=0)
     except Exception as exc:

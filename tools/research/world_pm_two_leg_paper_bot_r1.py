@@ -852,6 +852,7 @@ async def _run_window(
             loop_at = time.time()
             row["radarPollCount"] += 1
             world_snapshot = dflow.snapshot(loop_at)
+            preparation.record_poll(prepared, loop_at, world_snapshot)
             qualification.observe_health(row, world_snapshot,
                 [pm_feed.snapshot(pm_market.up_token), pm_feed.snapshot(pm_market.down_token)], loop_at)
             for pair, side, mint, decimals, token in pairs:

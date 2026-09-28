@@ -772,6 +772,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
             if row["measurementLoopStartupDelaySeconds"] is None:
                 row["measurementLoopStartupDelaySeconds"] = max(0.0, now - start_ts)
             world_snapshot = dflow.snapshot(now)
+            preparation.record_poll(prepared, now, world_snapshot)
             qualification.observe_health(row, world_snapshot,
                 [feed.snapshot(pm_market.up_token), feed.snapshot(pm_market.down_token)], now)
             for pair, side, world_mint, world_decimals, pm_token, complement_token in pairs:
@@ -995,6 +996,7 @@ async def _run_window(*, start_ts: int, args: argparse.Namespace, cash_decimals:
                     "pmToken": pm_token,
                     "worldMint": world_mint,
                     "placedAt": refreshed_at,
+                    "radarObservedAt": now,
                     "makerBid": maker_bid,
                     "bestAskAtPlacement": best_ask,
                     "entrySnapshotReason": entry["reason"],

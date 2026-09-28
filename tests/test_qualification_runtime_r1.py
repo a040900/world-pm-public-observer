@@ -234,7 +234,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(wp.DISCOVERY_TRACES[self.start]['signatureBlockTime'], self.start-30)
 
 
-    def test_uncached_discovery_uses_final_bounded_prestart_interval(self):
+    def test_uncached_discovery_has_bounded_pre_and_poststart_interval(self):
         import argparse
         now = [self.start-120.0]
         original_sleep = asyncio.sleep
@@ -258,7 +258,7 @@ class RuntimeTests(unittest.TestCase):
              patch.object(wp, 'fetch_polymarket_market', return_value=pm), \
              patch.object(wp, 'discover_world_market', side_effect=discovery):
             asyncio.run(check())
-        self.assertEqual(called, [(self.start-60, self.start)])
+        self.assertEqual(called, [(self.start-60, self.start+60)])
 
 
 if __name__ == '__main__':
