@@ -653,7 +653,8 @@ async def _run_window(
     okx_task = asyncio.create_task(cex.run_okx(stop))
 
     world_points: deque[dict[str, Any]] = deque(maxlen=MAX_WORLD_POINTS)
-    # None means crossing continuity is unknown after startup or any unhealthy poll.\n    above: dict[float, bool | None] = {threshold: None for threshold in WORLD_THRESHOLDS}
+    # None means crossing continuity is unknown after startup or any unhealthy poll.
+    above: dict[float, bool | None] = {threshold: None for threshold in WORLD_THRESHOLDS}
     last_trigger = {threshold: -float("inf") for threshold in WORLD_THRESHOLDS}
     sequence = {threshold: 0 for threshold in WORLD_THRESHOLDS}
     pending: list[asyncio.Task[dict[str, Any]]] = []
