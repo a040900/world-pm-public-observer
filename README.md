@@ -59,3 +59,17 @@ A qualification-valid window requires both market identities, nonzero radar poll
 Each role and the paired batch report requestedWindowCount, validQualificationWindowCount, invalidExecutionWindowCount, missingExecutionWindowCount and invalidExecutionReasons. Any absent or invalid window yields INCOMPLETE_QUALIFICATION_BATCH, qualificationValid=false and zero Phase A eligible windows. The launcher exits nonzero after retaining evidence. Only six valid paired windows can make a batch eligible for authority import; the public runtime cannot itself promote research state.
 
 Historical runs 36309301112, 36309585620 and 36318577787 remain execution history and contribute zero fresh Phase A windows. Reproducible observations, hashes and the measurement-scope comparison are under evidence/runtime-repair-20260927/. The original measurement freeze remains fcd316ad0cfe0cadeb035716894103ea1ee73063.
+
+## Draft prestart and observation-exposure repair
+
+This branch is not Phase A admitted. The public frontend catalog returned HTTP 401/403 in the bounded checks. No reliable public pre-T0 identity source has yet been established. Allowing an exactly verified Split from a fixed prestart lookback removes a logical search restriction; it does not demonstrate that such an instruction will exist before T0.
+
+Preparation for each predetermined window starts up to 120 seconds before T0. It fetches the unchanged PM identity, validated World identity and mint decimals and starts the same feeds. Preparation for the next window can overlap observation of the current window; candidate processing stays serial and never begins before T0. Failed or late preparation retains an execution-invalid record. It does not replace the slot or import retrospective data.
+
+The independent observation sampler records wall-clock exposure for both pairs, including startup and tail gaps. Its freshness leases are bounded by the existing World two-second radar age and PM 10+5-second heartbeat budget. A fresh explicit no_route response is a known lack of radar quote. Other errors, absent responses or unavailable books are unknown. An unchanged PM book with a live subscribed heartbeat can be observed even while it fails the separate, unchanged candidate-entry source TTL. Quote presence is not an observation coverage percentage.
+
+Coverage output preserves requested seconds, observed seconds, unknown intervals and known quote/no-route seconds. The draft whole-window gate requires complete exposure and prestart readiness; it is intentionally not an approved policy for tolerating small unknown gaps. The owner was asked whether to retain the complete five-minute estimand or use an explicitly observed-time estimand. That decision remains pending. Neither this gate nor the existence of a passing unit test grants Phase A admission.
+
+Diagnostic requests always contribute zero Phase A windows in both role reports and batch aggregation. Existing candidate, fill, inventory and hedge evidence is preserved. Frozen maker/taker calculation functions, condition tape, admission thresholds, fees and quote semantics remain unchanged.
+
+PHASE_A_READINESS_BOUNDED_CHECK runs deterministic checks and one fixed future-window readiness diagnostic. It requests no exact hedge quote and submits no transaction. Its artifact always has phaseAEligibleWindowCount=0; a failed identity lookup is a diagnostic NO_RESULT, not zero-candidate edge evidence.

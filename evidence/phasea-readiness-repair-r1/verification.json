@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "WORLD_PM_PHASE_A_READINESS_REPAIR_DRAFT_R1",
+  "noTrade": true,
+  "baseObserverSha": "9e2a51a0604ffb56205378e314e170d2dc7a04d9",
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "state": "DRAFT_PUBLIC_PRESTART_SOURCE_AND_DENOMINATOR_POLICY_PENDING",
+  "phaseAAdmission": false,
+  "phaseAContribution": 0,
+  "localVerification": {
+    "allTestsPassed": 61,
+    "compileAll": "PASS",
+    "diffCheck": "PASS",
+    "makerAndTakerChangedTopLevelFunctions": [
+      "run",
+      "_run_window"
+    ],
+    "frozenCalculationFunctionsChanged": false
+  },
+  "independentReviewer": {
+    "model": "gpt-6-luna",
+    "targetedTestsAddedAndPassed": 9,
+    "scope": "Observation exposure, known no_route versus unknown, unchanged PM heartbeat, bounds preservation, preparation cleanup, public identity availability",
+    "materialOpenItems": [
+      "Pre-T0 identity source not established",
+      "Whole-window versus observed-time denominator policy awaiting owner clarification; draft strict complete gate is not Phase A admitted"
+    ],
+    "nonBlockingLimit": "Cancelling asyncio.to_thread cannot interrupt an already running public request; existing request/deadline bounds still apply"
+  },
+  "publicIdentityEvidence": {
+    "priorCatalogActionsRuns": [
+      36379455565,
+      36379463459
+    ],
+    "catalogOutcome": "401 for events; independent plain markets GET 403",
+    "boundedPublicSignatureSample": 40,
+    "decodedTransactions": 31,
+    "splitInstructions": 6,
+    "distinctVerifiedBTCMintDescriptions": 2,
+    "verifiedPreT0IdentitySource": false,
+    "interpretation": "No source was established by the bounded check; this is not proof that no such source exists."
+  },
+  "preservedExecutionHistory": [
+    36309301112,
+    36309585620,
+    36318577787
+  ],
+  "nextStep": "Inspect one-window branch readiness diagnostic artifact; do not merge or launch a six-window qualification until public identity availability and denominator policy are resolved."
+}

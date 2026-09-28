@@ -274,7 +274,11 @@ def discover_world_market(start_ts: int, *, rpc_url: str, signature_limit: int =
                           deadline: float | None = None) -> WorldMarket:
     deadline = deadline if deadline is not None else time.time() + 45.0
     target = world_description("BTC", start_ts, start_ts + MARKET_SECONDS)
-    trace: dict[str, Any] = {"startTs": start_ts, "requests": [], "cacheHit": False}
+    # A verified Split may predate its market's start. This is a bounded search
+    # allowance, not evidence that future identities are always publicly available.
+    earliest_signature = start_ts - 600 if time.time() < start_ts else start_ts
+    trace: dict[str, Any] = {"startTs": start_ts, "requests": [], "cacheHit": False,
+                             "earliestSignatureBlockTime": earliest_signature}
     DISCOVERY_TRACES[start_ts] = trace
     cached = _cached_world_market(start_ts)
     if cached:
@@ -305,7 +309,7 @@ def discover_world_market(start_ts: int, *, rpc_url: str, signature_limit: int =
                 {"limit": signature_limit, "commitment": CONFIRMED}], deadline=deadline, trace=trace) or []
             for row in rows:
                 if (not isinstance(row, Mapping) or row.get("err") is not None
-                        or int(row.get("blockTime") or 0) < start_ts):
+                        or int(row.get("blockTime") or 0) < earliest_signature):
                     continue
                 signature = str(row["signature"])
                 if signature in seen:
@@ -338,6 +342,8 @@ def discover_world_market(start_ts: int, *, rpc_url: str, signature_limit: int =
                     market = WorldMarket(start_ts, start_ts + MARKET_SECONDS, str(accounts[1]),
                                          yes_mint, str(accounts[4]), target)
                     trace["signature"] = signature
+                    trace["signatureBlockTime"] = row.get("blockTime")
+                    trace["identityObservedAt"] = time.time()
                     trace["metadataSha256"] = hashlib.sha256(json.dumps(metadata, sort_keys=True).encode()).hexdigest()
                     _save_world_identity(market, trace)
                     return market

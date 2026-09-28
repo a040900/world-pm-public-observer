@@ -10,6 +10,7 @@ It cannot sign, submit transactions, place real orders, or use capital.
 from __future__ import annotations
 
 from tools.research import world_pm_qualification_runtime_r1 as qualification
+from tools.research import world_pm_window_preparation_r1 as preparation
 
 import argparse
 import asyncio
@@ -823,79 +824,20 @@ async def _run_window(
     ledger: core.EventLedger,
     cash_decimals: int,
     pm_clock_offset_seconds: float,
+    prepared=None,
 ) -> dict[str, Any]:
     end_ts = start_ts + r23.WINDOW_SECONDS
-    if time.time() < start_ts:
-        await asyncio.sleep(start_ts - time.time())
-    try:
-        pm_market = await asyncio.to_thread(r23.wp.fetch_polymarket_market, start_ts)
-    except Exception as exc:
-        return qualification.qualify_window({"startTs": start_ts, "endTs": end_ts,
-            "executionError": f"PM_DISCOVERY:{type(exc).__name__}:{exc}",
-            "radarPollCount": 0, "shadowCandidates": [], "candidates": [], "summary": {"candidateCount": 0}})
-    stop = asyncio.Event()
-    pm_feed = r2s.r2.RollingTimelineBook([pm_market.up_token, pm_market.down_token])
-    pm_task = asyncio.create_task(pm_feed.run(stop))
-    try:
-        world_market = await asyncio.to_thread(
-            r23.radar._discover_world_market,
-            start_ts,
-            args.rpc_url,
-            min(float(end_ts), time.time() + args.world_discovery_timeout_seconds),
-        )
-    except Exception as exc:
-        world_market = None
-        world_error = f"{type(exc).__name__}:{exc}"
-    else:
-        world_error = None
-
-    row: dict[str, Any] = {
-        "windowIndex": window_index,
-        "startTs": start_ts,
-        "endTs": end_ts,
-        "worldDiscoveryError": world_error,
-        "worldDiscoveryTrace": r23.wp.DISCOVERY_TRACES.get(start_ts, {}),
-        "pmMarket": {"conditionId": pm_market.condition_id, "upToken": pm_market.up_token, "downToken": pm_market.down_token},
-        "radarPollCount": 0,
-        "candidates": [],
-        "radarEpisodeCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
-        "radarFreshnessRejectPollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
-    }
-    if world_market is None:
-        while time.time() < end_ts:
-            await asyncio.sleep(min(1.0, max(0.0, end_ts - time.time())))
-        stop.set()
-        pm_task.cancel()
-        await asyncio.gather(pm_task, return_exceptions=True)
+    prepared = await prepared if prepared is not None else await preparation.prepare(
+        start_ts, args, r2s.r2.RollingTimelineBook, r2s.GapRadar)
+    row = {**prepared.row, "windowIndex": window_index, "radarPollCount": 0, "candidates": [],
+           "radarEpisodeCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0},
+           "radarFreshnessRejectPollCount": {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0}}
+    if row.get("executionError"):
         return qualification.qualify_window(row)
-
-    try:
-        yes_decimals, no_decimals = await asyncio.gather(
-            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.yes_mint, args.rpc_url),
-            asyncio.to_thread(r2s.r2._retry_token_decimals, world_market.no_mint, args.rpc_url),
-        )
-    except Exception as exc:
-        row["executionError"] = f"TOKEN_DECIMALS:{type(exc).__name__}:{exc}"
-        stop.set()
-        pm_task.cancel()
-        await asyncio.gather(pm_task, return_exceptions=True)
-        return qualification.qualify_window(row)
-
-    row["worldMarket"] = {
-        "market": world_market.market,
-        "yesMint": world_market.yes_mint,
-        "noMint": world_market.no_mint,
-        "yesDecimals": yes_decimals,
-        "noDecimals": no_decimals,
-    }
-    row["pmMarket"] = {
-        "conditionId": pm_market.condition_id,
-        "upToken": pm_market.up_token,
-        "downToken": pm_market.down_token,
-        "feeSchedule": pm_market.fee_schedule,
-    }
-    dflow = r2s.GapRadar(world_market.yes_mint, world_market.no_mint)
-    dflow_task = asyncio.create_task(dflow.run(stop))
+    pm_market, world_market = prepared.pm, prepared.world
+    pm_feed, dflow, stop = prepared.feed, prepared.radar, prepared.stop
+    yes_decimals, no_decimals = prepared.decimals
+    row["pmMarket"]["feeSchedule"] = pm_market.fee_schedule
     active = {"WORLD_YES+PM_DOWN": False, "WORLD_NO+PM_UP": False}
     last = {"WORLD_YES+PM_DOWN": -float("inf"), "WORLD_NO+PM_UP": -float("inf")}
     sampled = {"WORLD_YES+PM_DOWN": 0, "WORLD_NO+PM_UP": 0}
@@ -905,6 +847,7 @@ async def _run_window(
         ("WORLD_NO+PM_UP", "no", world_market.no_mint, no_decimals, pm_market.up_token),
     )
     try:
+        await asyncio.sleep(max(0.0, start_ts-time.time()))
         while time.time() < end_ts:
             loop_at = time.time()
             row["radarPollCount"] += 1
@@ -980,10 +923,8 @@ async def _run_window(
     except Exception as exc:
         row["executionError"] = f"{type(exc).__name__}:{exc}"
     finally:
-        stop.set()
-        dflow_task.cancel()
-        pm_task.cancel()
-        await asyncio.gather(dflow_task, pm_task, return_exceptions=True)
+        await prepared.close()
+        row["observationCoverage"] = prepared.row.get("observationCoverage")
         row["pmFeedDiagnostics"] = {
             "frameCount": pm_feed.frame_count,
             "reconnectCount": pm_feed.reconnect_count,
@@ -1066,6 +1007,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "runState": "RUNNING",
     }
     _write_json(args.out, report)
+    preparations = {}
     try:
         clock = await asyncio.to_thread(r23._calibrate_pm_clock)
         server_now = _finite(clock.get("serverNowEstimate")) or time.time()
@@ -1091,6 +1033,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         report["firstWindowStartTs"] = first
         cash_decimals = await asyncio.to_thread(r2s.r2._retry_token_decimals, r23.wp.CASH_MINT, args.rpc_url)
         report["cashDecimals"] = cash_decimals
+        preparations = {first+i*r23.WINDOW_SECONDS: asyncio.create_task(preparation.prepare(
+            first+i*r23.WINDOW_SECONDS, args, r2s.r2.RollingTimelineBook, r2s.GapRadar)) for i in range(args.windows)}
         for index in range(args.windows):
             row = await _run_window(
                 window_index=index + 1,
@@ -1100,6 +1044,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                 ledger=ledger,
                 cash_decimals=cash_decimals,
                 pm_clock_offset_seconds=pm_clock_offset_seconds,
+                prepared=preparations[first+index*r23.WINDOW_SECONDS],
             )
             report["windows"].append(row)
             report["ledgerState"] = ledger.state
@@ -1124,6 +1069,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         report["error"] = f"{type(exc).__name__}:{exc}"
         raise
     finally:
+        await preparation.close_preparations(preparations)
         ledger.close()
         report["ledgerState"] = ledger.state
         report["invariants"] = core.invariant_report(ledger.state)
