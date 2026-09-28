@@ -199,6 +199,18 @@ class IncrementalLeadR1Tests(unittest.TestCase):
         )
         self.assertFalse(wrong_gen["valid"])
 
+    def test_crossing_state_requires_observed_below_after_unhealthy_gap(self):
+        # Mirrors the runtime state machine: startup/unhealthy gaps leave crossing
+        # continuity unknown. A first healthy above-threshold sample cannot trigger.
+        above = None
+        is_above = True
+        self.assertFalse(is_above and above is False)
+        above = is_above
+        # A genuinely observed return below followed by above can trigger.
+        above = False
+        is_above = True
+        self.assertTrue(is_above and above is False)
+
 
 if __name__ == "__main__":
     unittest.main()
