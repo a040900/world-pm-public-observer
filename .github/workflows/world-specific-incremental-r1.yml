@@ -33,11 +33,14 @@ jobs:
             'privateAuthorityProtocolCommit':'522b8d16a6b6cb3565e21ee6f0451521cdf30734',
             'windows':6,
             'mode':'PUBLIC_READ_ONLY_NO_TRADE',
-            'supersedesInvalidRun':36340519054,
+            'supersedesInvalidRun':36379323776,
             'observerTimeRule':'LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA',
           }
           for k,v in expected.items():
               assert r.get(k)==v, (k,r.get(k),v)
+          assert r.get('freshRerunAuthorityCommit')=='c539f58033960853d60f3b7d3cb45ade16db5171'
+          assert r.get('runtimeRepairCommit')=='3241ae50409630d41e7e6c108d22a2c4fbe0cfa1'
+          assert r.get('executionAuthorityRule')=='NEXT_SINGLE_REQUEST_TRIGGERED_RUN_ONLY_DUPLICATES_ZERO_RESEARCH_SCORE'
           print('FROZEN_REQUEST_BINDING_PASS')
           PY
       - name: Prospective six-window diagnostic
