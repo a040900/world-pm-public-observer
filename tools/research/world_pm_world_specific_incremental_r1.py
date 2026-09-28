@@ -367,6 +367,14 @@ class CexTape:
         return {"valid": True, "binance": b, "okx": o, "sign": sign}
 
 
+def _crossing_should_trigger(previous_above: bool | None, current_above: bool, elapsed_since_trigger: float) -> bool:
+    return bool(
+        current_above
+        and previous_above is False
+        and elapsed_since_trigger >= EPISODE_COOLDOWN_SECONDS
+    )
+
+
 def _conditioning_class(world_sign: int, cex_sign: int) -> str:
     if world_sign not in (-1, 1):
         return "UNSCORABLE"
@@ -675,10 +683,10 @@ async def _run_window(
                 delta = world_value - world_prior
                 for threshold in WORLD_THRESHOLDS:
                     is_above = abs(delta) >= threshold
-                    if (
-                        is_above
-                        and above[threshold] is False
-                        and anchor_at - last_trigger[threshold] >= EPISODE_COOLDOWN_SECONDS
+                    if _crossing_should_trigger(
+                        above[threshold],
+                        is_above,
+                        anchor_at - last_trigger[threshold],
                     ):
                         sequence[threshold] += 1
                         event = _classify_episode(
