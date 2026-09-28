@@ -140,6 +140,65 @@ class IncrementalLeadR1Tests(unittest.TestCase):
         book._record("x", 1000.2)
         self.assertEqual(book.state_at("x", 1000.1)["effectiveAt"], 1000.0)
 
+    def test_real_causal_state_point_contains_bids_and_asks(self):
+        book = object.__new__(r.CausalTimelineBook)
+        book.books = {
+            "x": {
+                "ready": True,
+                "bids": {"0.49": "10"},
+                "asks": {"0.51": "12"},
+                "eventCount": 7,
+                "sourceTimestampMs": 999000,
+            }
+        }
+        book.connection_generation = 3
+        point = book._state_point("x", 1000.0)
+        self.assertEqual(point["bids"][0]["price"], 0.49)
+        self.assertEqual(point["asks"][0]["price"], 0.51)
+        self.assertEqual(point["connectionGeneration"], 3)
+
+    def test_old_unchanged_book_is_valid_when_feed_liveness_is_fresh(self):
+        class FakeFeed:
+            def state_at(self, token, cutoff):
+                price = (.59, .61) if token == "up" else (.39, .41)
+                return {
+                    "bids": [{"price": price[0]}],
+                    "asks": [{"price": price[1]}],
+                    "sourceTimestampMs": 900000.0,
+                    "effectiveAt": 995.0,
+                    "connectionGeneration": 4,
+                }
+            def health_at(self, cutoff):
+                return {"receivedAt": 999.95, "healthy": True, "connectionGeneration": 4}
+        out = r._pm_proxy_at(FakeFeed(), "up", "down", cutoff=1000.0)
+        self.assertTrue(out["valid"])
+        self.assertAlmostEqual(out["proxy"], .6)
+
+    def test_pm_proxy_rejects_stale_or_wrong_generation_liveness(self):
+        class FakeFeed:
+            def __init__(self, health):
+                self.health = health
+            def state_at(self, token, cutoff):
+                return {
+                    "bids": [{"price": .49}],
+                    "asks": [{"price": .51}],
+                    "sourceTimestampMs": 999000.0,
+                    "effectiveAt": 999.0,
+                    "connectionGeneration": 5,
+                }
+            def health_at(self, cutoff):
+                return self.health
+        stale = r._pm_proxy_at(
+            FakeFeed({"receivedAt": 999.0, "healthy": True, "connectionGeneration": 5}),
+            "up", "down", cutoff=1000.0,
+        )
+        self.assertFalse(stale["valid"])
+        wrong_gen = r._pm_proxy_at(
+            FakeFeed({"receivedAt": 999.95, "healthy": True, "connectionGeneration": 6}),
+            "up", "down", cutoff=1000.0,
+        )
+        self.assertFalse(wrong_gen["valid"])
+
 
 if __name__ == "__main__":
     unittest.main()
