@@ -136,10 +136,12 @@ class ReviewerRuntimeTests(unittest.TestCase):
         # World moved during the gap, so the first healthy post-gap sample has a
         # valid above-threshold one-second delta. Prior crossing continuity is
         # unknown, therefore that recovery sample must initialize only.
-        self.assertFalse(any(20.0 <= x < 23.8 for x in times), times)
-        # A later healthy below-threshold state re-arms the detector; the genuine
-        # below->above crossing around t~24 is then admissible.
-        self.assertTrue(any(23.8 <= x <= 24.3 for x in times), times)
+        self.assertFalse(any(20.0 <= x < 21.5 for x in times), times)
+        # Once conditioning is healthy again, a later observed below-threshold
+        # delta may re-arm the detector. The high->low crossing around t~22 and
+        # the later low->high crossing around t~24 are both admissible.
+        self.assertTrue(any(21.8 <= x <= 22.4 for x in times), times)
+        self.assertTrue(any(23.8 <= x <= 24.4 for x in times), times)
 
 
 if __name__ == "__main__":
