@@ -42,10 +42,17 @@ class _Radar:
 
     def snapshot(self, at):
         t = at - self.t0
-        if 10.0 <= t < 20.0:
-            return {"healthy": False}
         level = 0.60
-        if 5.0 <= t < 6.0 or 21.0 <= t < 22.0 or 24.0 <= t < 25.0:
+        # First ordinary crossing around t=5.
+        if 5.0 <= t < 6.0:
+            level = 0.63
+        # During the conditioning-source gap below, World remains healthy and
+        # moves above threshold near the end of the gap. This preserves the
+        # one-second World lookback needed to expose a synthetic recovery crossing.
+        if 19.5 <= t < 22.0:
+            level = 0.63
+        # After a healthy below-threshold re-arm, create a genuine crossing.
+        if 24.0 <= t < 25.0:
             level = 0.63
         return {
             "healthy": True,
@@ -55,6 +62,8 @@ class _Radar:
 
 
 class _Cex:
+    t0 = 0.0
+
     def __init__(self):
         self.message_count = {"binance": 5, "okx": 5}
         self.errors = {"binance": [], "okx": []}
@@ -66,6 +75,9 @@ class _Cex:
         return
 
     def consensus(self, at):
+        t = at - self.t0
+        if 10.0 <= t < 20.0:
+            return {"valid": False, "sign": 0, "binance": {"valid": False}, "okx": {"valid": True}}
         return {"valid": True, "sign": 1, "binance": {"valid": True}, "okx": {"valid": True}}
 
 
@@ -91,6 +103,7 @@ class ReviewerRuntimeTests(unittest.TestCase):
         t0 = 1790400000
         clock = _Clock(t0)
         radar = _Radar(t0)
+        _Cex.t0 = float(t0)
         args = types.SimpleNamespace(rpc_url="https://stub.invalid", world_discovery_timeout_seconds=60.0)
 
         with (
@@ -119,11 +132,13 @@ class ReviewerRuntimeTests(unittest.TestCase):
 
         times = [float(e["triggeredAt"]) - t0 for e in row["events"]]
         self.assertTrue(any(4.8 <= x <= 5.3 for x in times), times)
-        # Gap is [10,20). At t~21 a valid above-threshold delta exists, but prior
-        # crossing continuity is unknown, so that sample must initialize only.
+        # CEX conditioning is unhealthy on [10,20), while World remains healthy.
+        # World moved during the gap, so the first healthy post-gap sample has a
+        # valid above-threshold one-second delta. Prior crossing continuity is
+        # unknown, therefore that recovery sample must initialize only.
         self.assertFalse(any(20.0 <= x < 23.8 for x in times), times)
-        # A healthy below-threshold state around t~23 re-arms the detector, so the
-        # subsequent real below->above crossing around t~24 is admissible.
+        # A later healthy below-threshold state re-arms the detector; the genuine
+        # below->above crossing around t~24 is then admissible.
         self.assertTrue(any(23.8 <= x <= 24.3 for x in times), times)
 
 
