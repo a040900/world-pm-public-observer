@@ -21,7 +21,7 @@ jobs:
           python - <<'PY'
           import json
           r=json.load(open('.github/run-requests/world-specific-incremental-r1.json'))
-          assert r['privateAuthorityProtocolCommit']=='9ec4748009865b75b2948b5201adcbc90aa0fa3b'
+          assert r['privateAuthorityProtocolCommit']=='522b8d16a6b6cb3565e21ee6f0451521cdf30734'
           assert r['supersedesInvalidRun']==36340519054
           assert r['engineeringSmokeRun']==36372573638
           assert r['crossingContinuityRule']=='UNKNOWN_AFTER_STARTUP_OR_UNHEALTHY_GAP_FIRST_HEALTHY_SAMPLE_INITIALIZES_ONLY'
