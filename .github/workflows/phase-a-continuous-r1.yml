@@ -1,5 +1,8 @@
 name: PHASE_A_CONTINUOUS_R1
 on:
+  push:
+    branches: [main]
+    paths: ['.github/run-requests/phase-a-continuous-start.json']
   workflow_dispatch:
     inputs:
       accepted_valid_windows:
@@ -36,8 +39,8 @@ jobs:
       - name: Run bounded Phase A batches
         id: phasea
         env:
-          START_ACCEPTED: ${{ inputs.accepted_valid_windows }}
-          START_BATCH: ${{ inputs.batch_ordinal }}
+          START_ACCEPTED: ${{ inputs.accepted_valid_windows || '18' }}
+          START_BATCH: ${{ inputs.batch_ordinal || '4' }}
         run: |
           python - <<'PY'
           import json, os, subprocess, time
