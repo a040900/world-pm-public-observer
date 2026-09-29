@@ -1,0 +1,146 @@
+name: PHASE_A_CONTINUOUS_R1
+on:
+  workflow_dispatch:
+    inputs:
+      accepted_valid_windows:
+        description: Accepted Phase A valid windows before this run
+        required: true
+        default: "18"
+      batch_ordinal:
+        description: Next Phase A batch ordinal
+        required: true
+        default: "4"
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: world-pm-fresh-prospective
+  cancel-in-progress: false
+
+jobs:
+  continuous:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 235
+    env:
+      TARGET_VALID_WINDOWS: "72"
+      MAX_RUN_SECONDS: "12600"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: Frozen measurement and runtime regression checks
+        run: |
+          python -m unittest discover -s tests -v
+          python -m py_compile tools/research/*.py
+      - name: Run bounded Phase A batches
+        id: phasea
+        env:
+          START_ACCEPTED: ${{ inputs.accepted_valid_windows }}
+          START_BATCH: ${{ inputs.batch_ordinal }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, time
+          from pathlib import Path
+
+          accepted = int(os.environ["START_ACCEPTED"])
+          batch = int(os.environ["START_BATCH"])
+          target = int(os.environ["TARGET_VALID_WINDOWS"])
+          max_seconds = int(os.environ["MAX_RUN_SECONDS"])
+          started = time.time()
+          base = json.loads(Path(".github/run-requests/maker-taker-r1.json").read_text())
+          stop_reason = "TIME_HANDOFF"
+
+          while accepted < target:
+              # Keep enough headroom for one complete six-window batch and artifact finalization.
+              if time.time() - started > max_seconds - 2700:
+                  break
+
+              request = dict(base)
+              request.pop("retryOfRun", None)
+              request.pop("retryReason", None)
+              request["requestId"] = f"phase-a-continuous-batch-{batch:02d}-run-{os.environ['GITHUB_RUN_ID']}"
+              request["phaseA"] = {
+                  "targetValidWindows": target,
+                  "batchOrdinal": batch,
+                  "acceptedValidWindowsBeforeBatch": accepted,
+                  "denominatorPolicy": "DUAL_OBSERVED_SECONDS_AND_SCHEDULED_SECONDS_R1",
+              }
+              req = Path(f".phase-a-request-{batch:02d}.json")
+              out = Path(f"continuous-artifacts/batch-{batch:02d}-attempt-1")
+              req.write_text(json.dumps(request, indent=2) + "\n")
+              rc = subprocess.call([
+                  "python", "-m", "tools.research.world_pm_fresh_batch_r1",
+                  "--request", str(req), "--out-dir", str(out)
+              ])
+              result = json.loads((out / "batch.json").read_text())
+              if result.get("qualificationValid") and result.get("phaseAEligibleWindowCount") == 6:
+                  accepted += 6
+                  batch += 1
+                  continue
+
+              blob = json.dumps(result, sort_keys=True)
+              transient = any(x in blob for x in (
+                  "WORLD_DISCOVERY_DEADLINE",
+                  "WORLD_DISCOVERY_CACHE_LOCK_DEADLINE",
+              ))
+              if transient:
+                  retry_out = Path(f"continuous-artifacts/batch-{batch:02d}-attempt-2")
+                  rc = subprocess.call([
+                      "python", "-m", "tools.research.world_pm_fresh_batch_r1",
+                      "--request", str(req), "--out-dir", str(retry_out)
+                  ])
+                  retry = json.loads((retry_out / "batch.json").read_text())
+                  if retry.get("qualificationValid") and retry.get("phaseAEligibleWindowCount") == 6:
+                      accepted += 6
+                      batch += 1
+                      continue
+                  blob = json.dumps(retry, sort_keys=True)
+                  if any(x in blob for x in (
+                      "WORLD_DISCOVERY_DEADLINE",
+                      "WORLD_DISCOVERY_CACHE_LOCK_DEADLINE",
+                  )):
+                      stop_reason = "TIME_HANDOFF"
+                      break
+
+              stop_reason = "MATERIAL_OR_UNCLASSIFIED_FAILURE"
+              break
+
+          if accepted >= target:
+              stop_reason = "PHASE_A_COMPLETE"
+
+          Path("continuous-artifacts/state.json").parent.mkdir(parents=True, exist_ok=True)
+          Path("continuous-artifacts/state.json").write_text(json.dumps({
+              "acceptedValidWindows": accepted,
+              "nextBatchOrdinal": batch,
+              "targetValidWindows": target,
+              "stopReason": stop_reason,
+              "noTrade": True,
+          }, indent=2) + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"accepted={accepted}\nnext_batch={batch}\nstop_reason={stop_reason}\n")
+          PY
+      - name: Upload continuous Phase A artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-a-continuous-${{ github.run_id }}
+          path: continuous-artifacts/
+          retention-days: 90
+      - name: Hand off to next Actions run
+        if: steps.phasea.outputs.stop_reason == 'TIME_HANDOFF' && steps.phasea.outputs.accepted < 72
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTED: ${{ steps.phasea.outputs.accepted }}
+          NEXT_BATCH: ${{ steps.phasea.outputs.next_batch }}
+        run: |
+          curl --fail-with-body -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/phase-a-continuous-r1.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"accepted_valid_windows\":\"$ACCEPTED\",\"batch_ordinal\":\"$NEXT_BATCH\"}}"
+      - name: Fail closed on material or unclassified failure
+        if: steps.phasea.outputs.stop_reason == 'MATERIAL_OR_UNCLASSIFIED_FAILURE'
+        run: exit 2
