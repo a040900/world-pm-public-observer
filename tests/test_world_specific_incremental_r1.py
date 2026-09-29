@@ -9,20 +9,10 @@ class IncrementalLeadR1Tests(unittest.TestCase):
         from tools.research import world_polymarket_btc5m_leadlag_probe_r1 as wp
 
         start_ts = 2_000_000_000
-        captured = {}
-
-        def fake_rpc(rpc_url, method, params, **kwargs):
-            if method == "getSignaturesForAddress":
-                captured["trace"] = kwargs["trace"]
-                return []
-            raise AssertionError(method)
-
         with (
             mock.patch.object(wp, "_cached_world_market", return_value=None),
             mock.patch.object(wp, "_identity_cache_path") as cache_path,
-            mock.patch.object(wp, "_rpc", side_effect=fake_rpc),
-            mock.patch.object(wp.time, "time", side_effect=lambda: start_ts + 100),
-            mock.patch.object(wp.time, "sleep", return_value=None),
+            mock.patch.object(wp.time, "time", return_value=start_ts + 100),
         ):
             import tempfile
             from pathlib import Path
@@ -31,7 +21,10 @@ class IncrementalLeadR1Tests(unittest.TestCase):
                 with self.assertRaises(TimeoutError):
                     wp.discover_world_market(start_ts, rpc_url="stub", deadline=start_ts + 50)
 
-        self.assertEqual(captured["trace"]["earliestSignatureBlockTime"], start_ts - 600)
+        self.assertEqual(
+            wp.DISCOVERY_TRACES[start_ts]["earliestSignatureBlockTime"],
+            start_ts - 600,
+        )
 
     def test_proxy_and_conditioning_semantics(self):
         self.assertAlmostEqual(r._normalized_two_side(.6, .4), .6)
