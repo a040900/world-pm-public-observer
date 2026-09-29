@@ -1,0 +1,24 @@
+name: Structural Radar External Runtime R0
+on:
+  push:
+    branches: [runtime/structural-radar-r0-20260929]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout research branch
+        uses: actions/checkout@v4
+        with:
+          repository: a040900/polymarket-quant-sandbox
+          ref: research/prediction-structural-constraint-radar-r0-20260929
+          path: research
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.9'}
+      - name: Validate payoff core
+        working-directory: research
+        run: |
+          python -m unittest tests.research.test_prediction_market_structural_constraint_core_r0 -v
+          python -m py_compile tools/research/prediction_market_structural_constraint_core_r0.py
