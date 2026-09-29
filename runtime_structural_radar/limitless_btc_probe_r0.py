@@ -1,11 +1,16 @@
-import json, requests
+import json
+import urllib.parse
+import urllib.request
 
 BASE="https://api.limitless.exchange"
 
 def get(path, **params):
-    r=requests.get(BASE+path, params=params, timeout=20, headers={"User-Agent":"structural-radar-r0/1.0"})
-    r.raise_for_status()
-    return r.json()
+    url = BASE + path
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"User-Agent":"structural-radar-r0/1.0"})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return json.loads(resp.read().decode("utf-8"))
 
 def flatten(rows):
     out=[]
@@ -38,7 +43,7 @@ def main():
             result["queries"][q]={"error":f"{type(exc).__name__}:{exc}"}
     for slug,row in list(seen.items())[:100]:
         try:
-            b=get(f"/markets/{slug}/orderbook")
+            b=get(f"/markets/{urllib.parse.quote(slug, safe='')}/orderbook")
             bids=b.get("bids") or []
             asks=b.get("asks") or []
             result["books"].append({
