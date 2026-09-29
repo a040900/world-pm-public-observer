@@ -276,7 +276,7 @@ def discover_world_market(start_ts: int, *, rpc_url: str, signature_limit: int =
     target = world_description("BTC", start_ts, start_ts + MARKET_SECONDS)
     # A verified Split may predate its market's start. This is a bounded search
     # allowance, not evidence that future identities are always publicly available.
-    earliest_signature = start_ts - 600 if time.time() < start_ts else start_ts
+    earliest_signature = start_ts - 600
     trace: dict[str, Any] = {"startTs": start_ts, "requests": [], "cacheHit": False,
                              "earliestSignatureBlockTime": earliest_signature}
     DISCOVERY_TRACES[start_ts] = trace
