@@ -2,12 +2,12 @@ import asyncio, json, re, sys, subprocess
 
 async def main():
     try:
-        import ccxt.async_support as ccxt
+        from ccxt.async_support.prediction.limitless import limitless
     except Exception:
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "ccxt"])
-        import ccxt.async_support as ccxt
+        from ccxt.async_support.prediction.limitless import limitless
 
-    ex = ccxt.prediction.limitless({"enableRateLimit": True})
+    ex = limitless({"enableRateLimit": True})
     out={"venue":"limitless","queries":{}}
     try:
         for q in ["bitcoin", "btc"]:
