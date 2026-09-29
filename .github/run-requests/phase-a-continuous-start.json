@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "PHASE_A_CONTINUOUS_START_R1",
+  "acceptedValidWindows": 18,
+  "nextBatchOrdinal": 4,
+  "targetValidWindows": 72,
+  "noTrade": true,
+  "note": "One-time ignition. Subsequent runs self-dispatch via workflow_dispatch."
+}
