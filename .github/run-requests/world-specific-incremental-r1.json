@@ -11,7 +11,7 @@
   "supersedesInvalidRun": 36379323776,
   "invalidRunReason": "ABOVE_INITIALIZATION_COMMENTED_OUT_NAMEERROR_ALL_SIX_WINDOWS_INVALID",
   "observerTimeRule": "LOCAL_RECEIPT_TIME_ONLY_SOURCE_TIMESTAMPS_METADATA",
-  "activation": "FRESH_R1_RERUN_AFTER_PREFLIGHT_BINDING_REPAIR",
+  "activation": "FRESH_R1_AFTER_WORLD_PRESTART_SPLIT_DISCOVERY_REPAIR",
   "validationRun": 36372521863,
   "validationCommit": "18f369a54fed6f714aa135088eab4923936b7c79",
   "priorRunEvidenceAdmissible": false,
@@ -29,5 +29,9 @@
   "executionAuthorityRule": "NEXT_SINGLE_REQUEST_TRIGGERED_RUN_ONLY_DUPLICATES_ZERO_RESEARCH_SCORE",
   "preflightFailureRun": 36461824473,
   "preflightFailureResearchScore": 0,
-  "preflightBindingRepairCommit": "864874e1383ddc2767b5f4b7b20a3ac529d202a7"
+  "preflightBindingRepairCommit": "864874e1383ddc2767b5f4b7b20a3ac529d202a7",
+  "discoveryRepairAuthorityCommit": "41cc870f1d226ab5d7b6b97dfb63d9023e3a1399",
+  "discoveryRepairCommit": "577283a416f4cd955603680c3ba8ee3aae4a3798",
+  "discoveryRepairValidationRun": 36501700738,
+  "supersedesIncompleteRun": 36464731799
 }
