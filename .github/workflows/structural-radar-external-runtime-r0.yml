@@ -15,4 +15,4 @@ jobs:
       - name: Validate payoff core
         run: |
           python -m unittest runtime_structural_radar.test_prediction_market_structural_constraint_core_r0 -v
-          python -m py_compile runtime_structural_radar/prediction_market_structural_constraint_core_r0.py
+          python -m py_compile runtime_structural_radar/prediction_market_structural_constraint_core_r0.py\n      - name: Probe Limitless BTC current books\n        run: python runtime_structural_radar/limitless_btc_probe_r0.py > limitless-btc-probe.json\n      - uses: actions/upload-artifact@v4\n        if: always()\n        with:\n          name: limitless-btc-probe-${{ github.run_id }}\n          path: limitless-btc-probe.json
