@@ -9,16 +9,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Checkout research branch
-        uses: actions/checkout@v4
-        with:
-          repository: a040900/polymarket-quant-sandbox
-          ref: research/prediction-structural-constraint-radar-r0-20260929
-          path: research
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.9'}
       - name: Validate payoff core
-        working-directory: research
         run: |
-          python -m unittest tests.research.test_prediction_market_structural_constraint_core_r0 -v
-          python -m py_compile tools/research/prediction_market_structural_constraint_core_r0.py
+          python -m unittest runtime_structural_radar.test_prediction_market_structural_constraint_core_r0 -v
+          python -m py_compile runtime_structural_radar/prediction_market_structural_constraint_core_r0.py
