@@ -24,7 +24,7 @@ jobs:
       - name: Run zero-score liveness probe
         run: |
           mkdir -p artifacts
-          python tools/research/world_exact_quote_liveness_r0.py
+          PYTHONPATH=. python tools/research/world_exact_quote_liveness_r0.py
       - name: Hash artifact
         if: always()
         run: |
