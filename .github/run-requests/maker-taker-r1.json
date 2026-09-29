@@ -5,7 +5,7 @@
   "privateAuthorityRepo": "a040900/prediction-market-relative-value",
   "privateAuthorityResearchSha": "3ab1d113149511c44080e13db1d9a9eb4f12730b",
   "mode": "NO_TRADE_PUBLIC_READ_ONLY_PHASE_A",
-  "requestId": "phase-a-batch-04-20260929",
+  "requestId": "phase-a-batch-04-retry-01-20260929",
   "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
   "executionRuntimeSha": "GITHUB_SHA_RECORDED_IN_BATCH_ARTIFACT",
   "schedulingRule": "RUNNER_SERVER_TIME_PLUS_120_SECONDS_CEIL_TO_300",
@@ -24,5 +24,7 @@
     "batchOrdinal": 4,
     "acceptedValidWindowsBeforeBatch": 18,
     "denominatorPolicy": "DUAL_OBSERVED_SECONDS_AND_SCHEDULED_SECONDS_R1"
-  }
+  },
+  "retryOfRun": 36498928633,
+  "retryReason": "TRANSIENT_WORLD_DISCOVERY_DEADLINE_AND_CACHE_LOCK_DEADLINE"
 }
