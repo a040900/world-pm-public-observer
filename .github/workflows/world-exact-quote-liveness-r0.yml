@@ -1,0 +1,39 @@
+name: WORLD_EXACT_QUOTE_LIVENESS_R0
+
+on:
+  push:
+    branches:
+      - research/economic-first-reassessment-r1-20260930
+    paths:
+      - tools/research/world_exact_quote_liveness_r0.py
+      - .github/workflows/world-exact-quote-liveness-r0.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run zero-score liveness probe
+        run: |
+          mkdir -p artifacts
+          python tools/research/world_exact_quote_liveness_r0.py
+      - name: Hash artifact
+        if: always()
+        run: |
+          sha256sum artifacts/world-exact-quote-liveness-r0.json > artifacts/world-exact-quote-liveness-r0.sha256
+          cat artifacts/world-exact-quote-liveness-r0.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-exact-quote-liveness-r0-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
