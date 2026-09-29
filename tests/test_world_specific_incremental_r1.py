@@ -21,7 +21,7 @@ class IncrementalLeadR1Tests(unittest.TestCase):
             mock.patch.object(wp, "_cached_world_market", return_value=None),
             mock.patch.object(wp, "_identity_cache_path") as cache_path,
             mock.patch.object(wp, "_rpc", side_effect=fake_rpc),
-            mock.patch.object(wp.time, "time", side_effect=[start_ts + 1, start_ts + 1, start_ts + 1, start_ts + 1, start_ts + 100]),
+            mock.patch.object(wp.time, "time", side_effect=lambda: start_ts + 100),
             mock.patch.object(wp.time, "sleep", return_value=None),
         ):
             import tempfile
