@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "WORLD_PM_BTC5M_PHASE_A_FINAL_ADJUDICATION_R1",
+  "adjudicatedAtUtc": "2026-09-29T11:36:00Z",
+  "noTrade": true,
+  "measurementFreezeSha": "fcd316ad0cfe0cadeb035716894103ea1ee73063",
+  "stoppingRule": {
+    "targetValidWindows": 72,
+    "validWindowsIncluded": 72,
+    "postTargetValidWindowsExcluded": 6,
+    "selection": "first 12 chronologically valid 6-window batches; invalid attempts excluded; post-target batch excluded"
+  },
+  "maker": {
+    "scheduledSeconds": 21600,
+    "observedSeconds": 13556.203744411469,
+    "unknownSeconds": 8043.7962555885315,
+    "observationAvailability": 0.6276020252042347,
+    "candidateCount": 10,
+    "strategyCandidateCount": 8,
+    "operationalCandidateCount": 10,
+    "definiteFillCount": 6,
+    "shadowFillCount": 6,
+    "definiteProtectedEdgeUnknownCount": 2,
+    "definiteSurvivingProtectedEdgeCount": 1,
+    "survivingProtectedEdgeCount": 1,
+    "survivor": {
+      "pair": "WORLD_NO+PM_UP",
+      "makerBid": 0.95,
+      "shares": 5,
+      "cumulativeProtectedUnitCost": 0.996875,
+      "grossProtectedEdgePerShare": 0.003125,
+      "grossProtectedEdgeBps": 31.25,
+      "grossProtectedEdgeUsdAtObservedSize": 0.015625
+    },
+    "concentration": "All 10 maker candidates occurred in the first 18 formal windows; the final 54 formal windows had candidateCount=0."
+  },
+  "taker": {
+    "scheduledSeconds": 21600,
+    "observedSeconds": 13555.93440079689,
+    "unknownSeconds": 8044.06559920311,
+    "observationAvailability": 0.6275895555924487,
+    "candidateCount": 281,
+    "strategyCandidateCount": 274,
+    "operationalCandidateCount": 281,
+    "noTradeDecisionCount": 23,
+    "unknownDecisionCount": 258,
+    "paperTradeDecisionCount": 0,
+    "twoLegSimulationCompleteCount": 0,
+    "secondLegPositiveCompleteCount": 0,
+    "pmSourceFreshnessRejectedPollCount": 20576
+  },
+  "interpretation": {
+    "supported": [
+      "Public measurement/runtime produced a completed fixed 72-window Phase A sample.",
+      "Maker path produced one fully hedged protected-edge survivor under frozen measurement semantics."
+    ],
+    "notSupported": [
+      "A repeatable high-frequency maker edge.",
+      "A taker two-leg executable edge.",
+      "Evidence sufficient to estimate durable positive expected value or capital-scalable returns.",
+      "A return profile shown to exceed the user's Bitfinex lending benchmark."
+    ],
+    "limitations": [
+      "Maker observation availability was 62.76%; 37.24% of scheduled time was unknown and is not interpreted as zero opportunity.",
+      "The single maker survivor was only 31.25 bps gross protected edge at the observed 5-share size, about USD 0.015625 gross.",
+      "Historical settlement/payoff mismatch risk remains unresolved and is not erased by the Phase A survivor."
+    ]
+  },
+  "verdict": "PARK_PRIMARY_ROUTE_NO_EXECUTION_QUALIFIED_EDGE_PHASE_A",
+  "disposition": {
+    "mainEngineeringBudget": "STOP",
+    "liveTrading": "NOT_AUTHORIZED_AND_NOT_SUPPORTED",
+    "paperTrading": "NOT_PROMOTED",
+    "backgroundMonitoring": "OPTIONAL",
+    "rationale": "The fixed Phase A sample does not support the intended high-frequency, durable, economically meaningful edge. Preserve the instrumentation and evidence; do not spend further primary engineering budget without a new independent mechanism or materially stronger external reason."
+  }
+}
