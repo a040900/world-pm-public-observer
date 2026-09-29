@@ -27,9 +27,9 @@ def flatten(rows):
     return out
 
 def main():
-    result={"venue":"limitless","queries":{},"books":[]}
+    result={"venue":"limitless","queries":{},"books":[],"capitalEfficiency":{}}
     seen={}
-    for q in ("bitcoin","btc"):
+    for q in ("bitcoin","btc","bitcoin up or down","btc up or down"):
         try:
             payload=get("/markets/search", query=q, limit=50)
             rows=payload.get("markets",[]) if isinstance(payload,dict) else []
@@ -56,6 +56,29 @@ def main():
             })
         except Exception as exc:
             result["books"].append({"slug":slug,"error":f"{type(exc).__name__}:{exc}","rawMarket":row})
+    # Summarize capital-lock horizons and current executable top-of-book capacity.
+    horizons={"lte_1h":0,"lte_1d":0,"lte_7d":0,"gt_7d":0,"unknown":0}
+    from datetime import datetime, timezone
+    now=datetime.now(timezone.utc)
+    for item in result["books"]:
+        row=item.get("rawMarket") or {}
+        raw=row.get("expirationTimestamp") or row.get("expirationDate")
+        try:
+            if raw is None:
+                raise ValueError("missing")
+            if str(raw).isdigit():
+                exp=datetime.fromtimestamp(int(raw)/1000, tz=timezone.utc)
+            else:
+                exp=datetime.fromisoformat(str(raw).replace("Z","+00:00"))
+            hours=max(0,(exp-now).total_seconds()/3600)
+            if hours <= 1: horizons["lte_1h"]+=1
+            elif hours <= 24: horizons["lte_1d"]+=1
+            elif hours <= 168: horizons["lte_7d"]+=1
+            else: horizons["gt_7d"]+=1
+        except Exception:
+            horizons["unknown"]+=1
+    result["capitalEfficiency"]["horizons"]=horizons
+    result["capitalEfficiency"]["bookCount"]=len(result["books"])
     print(json.dumps(result,ensure_ascii=False,indent=2))
 
 if __name__=="__main__":
