@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "WORLD_ACTIONS_ORDER_TRANSPORT_R0",
+  "runId": 36735803165,
+  "verdict": "NO_RESULT_CURRENT_FRONTEND_CONTRACT_UNRESOLVED",
+  "narrowOutcome": "RUNNER_RESTRICTED_AND_REUSED_JWT_REJECTED_ON_RUNNER_AND_LOCAL",
+  "localJurisdiction": "{\"restricted\":false,\"country\":\"MY\"}",
+  "runnerJurisdiction": "{\"restricted\":true,\"country\":\"US\"}",
+  "jwtSecretRemoved": true,
+  "fullJwtPersisted": false,
+  "fileSha256": {
+    "local-jurisdiction.json": "3ea143c386912b0d7924b0b1ced2fcc335c5ddac29a2ef988a33dc95b10129a8",
+    "runner-jurisdiction.json": "61c4705d2303527e81cd5776b58c1d754f272413f5b50e71ae47d872372bf847",
+    "runner-order.json": "09be3360be0f790b47794f7104c2562d62aa782e9df0cfb12ec241ba685e9d61",
+    "local-order.json": "aafece3711f7cf4c34b038c3c916fe728e2aaf6bf924fc55e636dfd9f567b412",
+    "run.json": "a45ed4e480cf8210e0b7c8ed070ad8d3f9cbcf9bd204a0b55b859142c8b4dca1"
+  },
+  "boundary": {
+    "signing": false,
+    "simulation": false,
+    "broadcast": false,
+    "sendTransaction": false,
+    "authorityDecisionModified": false
+  },
+  "limitation": "Runner and local controls observed adjacent current windows, not simultaneous same-market comparison. No authenticated successful quote/build. Country and JWT/IP binding are not causally isolated."
+}

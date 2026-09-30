@@ -1,0 +1,634 @@
+{
+  "schemaVersion": "WORLD_AUTHENTICATED_QUOTE_PROBE_R0",
+  "startedAt": 1790781658.9327815,
+  "NO_TRADE": true,
+  "tokenSource": "User normal World Chrome WebSocket URL",
+  "tokenSha256": "fa49518378a7b2091e1e9708389eb8144783c00de341c7d75cfe7631af570346",
+  "tokenClaimsUnverified": {
+    "iat": 1790779252,
+    "exp": 1790782852
+  },
+  "claimsAreNotSignatureVerification": true,
+  "rpcReceipts": [
+    {
+      "method": "getProgramAccounts",
+      "params": [
+        "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+        {
+          "encoding": "base64",
+          "filters": [
+            {
+              "dataSize": 320
+            },
+            {
+              "memcmp": {
+                "offset": 258,
+                "bytes": "17k24MXtZgK"
+              }
+            }
+          ],
+          "commitment": "confirmed"
+        }
+      ],
+      "at": 1790781658.9327815,
+      "result": [
+        {
+          "pubkey": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWaLoQBdQ+k6OF/WMoo7dmU/KW8RDdpbE8oLNnt2oFWY79Gx+0JiVjtodwAssUeDZEPrcJFIQbOPvEcoXsMI6UnmBVZbl9TIlW4kirxVaPCMf7Na7eO+gk0Rk6JlGbxKs5i2PkLloRuWoAAAAAAAAAAAAA////AAAAamKeAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC7mdX6IIsANJzvDQPwkycr+EjpP8uodvbMZRLx9lfALHm8qABAADgROvyoAEAAAHlmBgRD8EdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiW1/jKr6EW6r/j5ORNNHuVAQJpYa+Y9teTNfF0zmI6s6WkqGTUPeUse8Hue/6iDpQ/3KfXcUQhOFrXjxsVjisNNidQjXH0IAOjS2xi22x6uNN+Od1XCj9i1B6jRGUp3EXdJMWY7hgWopAAAAAAAAAAAAAA////AAAAUXsTAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC+/n1jvickzhXcNKJ18EMAcJQZB2qgRBj4wPuCVWTALHm8qABAADgROvyoAEAAAH1PHDbLPMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWsOOSIAu1k2CbLl+g77Mq7rdn1tBI1ieYxMSPIB5zK8tEOBahlbaAZXXQdYwwDfQA4A/kE2jd1qGDCduOgkkybY7qkzknyw9Iwr1yIEs+gd+YA4M7XH7CSFSjAJ+vJDxKIfhAvTgm/QYAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACj4CRVqCPuxuqkuTn7p8FbdJi6G3w+h50Y3vnclZ2ALHm8qABAADgROvyoAEAAAGSeAk7xwoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWnsAig183diaPPIBNBikL7hDvdZqEIvCwGOEbjUUWvmevw3957L4GWm8goh6IoctqrV4eN7+mFDIcrhIl/2+LZL3KdcC81iwho0WU17I6UsbSj3IiQn9Dxb2AN52geJS2wZyalTDWOI0AAAAAAAAAAAAA///+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACGHtC6bVa5nTQYgr4vbJNtZZMTT+e/7KhesmcXR6FALHm8qABAADgROvyoAEAAAEOL/nNzQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWy4eyXge+fJvhg1fg3KkDy3nXiYaHi1JwmNVV55meZVCTlYCKzG37EAz05uKtKl416Vo8Umc6DRainv+uOjEZJT3Gla/4sfNZ/TBrzxD3IObvZfPrcWNIMXTPrrZ7ezNBzWwa4V1mn3UAAAAAAAAAAAAA///9AAAA4JTCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC2KBRd7kDFCGF33p1t9b9XVNcoQUOm2wFGknuGtPaALHm8qABAADgROvyoAEAAAGaU0XTIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        }
+      ]
+    },
+    {
+      "method": "getMultipleAccounts",
+      "params": [
+        [
+          "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+          "FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE",
+          "CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp",
+          "BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G",
+          "EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo"
+        ],
+        {
+          "encoding": "jsonParsed",
+          "commitment": "confirmed"
+        }
+      ],
+      "at": 1790781659.5847924,
+      "result": {
+        "context": {
+          "apiVersion": "4.3.0",
+          "slot": 452003271
+        },
+        "value": [
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+                        "name": "BTC Up",
+                        "symbol": "BTC-UP",
+                        "updateAuthority": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B",
+                        "uri": "https://m.world.xyz/83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B",
+                  "supply": "27157098"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE",
+                        "name": "ETH Up",
+                        "symbol": "ETH-UP",
+                        "updateAuthority": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg",
+                        "uri": "https://m.world.xyz/FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg",
+                  "supply": "18053969"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp",
+                        "name": "SOL Up",
+                        "symbol": "SOL-UP",
+                        "updateAuthority": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7",
+                        "uri": "https://m.world.xyz/CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G",
+                        "name": "HYPE Up",
+                        "symbol": "HYPE-UP",
+                        "updateAuthority": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua",
+                        "uri": "https://m.world.xyz/BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 468
+            },
+            "executable": false,
+            "lamports": 3068320,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 468
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo",
+                        "name": "XRP Up",
+                        "symbol": "XRP-UP",
+                        "updateAuthority": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf",
+                        "uri": "https://m.world.xyz/EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf",
+                  "supply": "12752096"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          }
+        ]
+      }
+    }
+  ],
+  "probes": [
+    {
+      "url": "https://aggregator-api-proxy.world-xyz.workers.dev/order?prioritizationFeeLamports=auto&dynamicComputeUnitLimit=true&userPublicKey=7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e&inputMint=CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH&outputMint=83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb&amount=1000000&slippageBps=200",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+        "Accept": "application/json",
+        "Origin": "https://world.xyz",
+        "Referer": "https://world.xyz/",
+        "User-agent": "world-pm-public-observer/authenticated-quote-r0",
+        "Authorization": "Bearer <REDACTED>"
+      },
+      "at": 1790781663.350478,
+      "elapsedMs": 1140.362024307251,
+      "status": 404,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 15:21:04 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "0",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": "https://world.xyz",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=1sv%2FeRwPVU19QTPymOnXOu4QCzgeJIsVRU8wE5sQiTUdJq1NSB%2FCYQvjs0lRQkMK5tuQTGQNQ5D5DWMrNzu3E42SntzMTyNbxuqem8ly1VFMeYPtSDZiQfCa%2FxG87cTXMtK5rugmhN93ZIkCIx1N3LK2aNg6kuCIFzzUdVc%3D\"}]}",
+        "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "Server": "cloudflare",
+        "CF-RAY": "a43437194b59795b-NRT",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      },
+      "side": "YES",
+      "parameters": {
+        "prioritizationFeeLamports": "auto",
+        "dynamicComputeUnitLimit": "true",
+        "userPublicKey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+        "amount": "1000000",
+        "slippageBps": "200"
+      },
+      "body": ""
+    },
+    {
+      "url": "https://aggregator-api-proxy.world-xyz.workers.dev/order?prioritizationFeeLamports=auto&dynamicComputeUnitLimit=true&userPublicKey=7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e&inputMint=CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH&outputMint=J328tVk8pfUUi6QJePhvyepvFcYd3gaNAKbuqZXtXkJR&amount=1000000&slippageBps=200",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+        "Accept": "application/json",
+        "Origin": "https://world.xyz",
+        "Referer": "https://world.xyz/",
+        "User-agent": "world-pm-public-observer/authenticated-quote-r0",
+        "Authorization": "Bearer <REDACTED>"
+      },
+      "at": 1790781664.49084,
+      "elapsedMs": 757.4663162231445,
+      "status": 404,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 15:21:05 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "0",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": "https://world.xyz",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=SGtkjZK9oteNLg7M%2Bsgm2MBflN1tuwxTJuLL0Y2JSDM8Hf4wU3w3XbjGQSWEYCJ5XQTfuWnXJAH%2FuRY4DzoTlCDvZr4GgvCsiC%2BBwu%2BBE9p%2FHp508F7I%2FAhubfEmK6WuyAZ0tlPzeK9kc2K2EBIvHn4PcV5GRjPkmweLaW8%3D\"}]}",
+        "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "Server": "cloudflare",
+        "CF-RAY": "a434371f0b916cf5-MRS",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      },
+      "side": "NO",
+      "parameters": {
+        "prioritizationFeeLamports": "auto",
+        "dynamicComputeUnitLimit": "true",
+        "userPublicKey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "J328tVk8pfUUi6QJePhvyepvFcYd3gaNAKbuqZXtXkJR",
+        "amount": "1000000",
+        "slippageBps": "200"
+      },
+      "body": ""
+    }
+  ],
+  "boundary": {
+    "signing": false,
+    "simulation": false,
+    "submission": false,
+    "broadcast": false,
+    "privateKey": false,
+    "recentSignatureDiscovery": false
+  },
+  "discovery": {
+    "market": {
+      "market": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B",
+      "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "yesMint": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+      "noMint": "J328tVk8pfUUi6QJePhvyepvFcYd3gaNAKbuqZXtXkJR",
+      "vault": "7V3fZYA6QNrLWvnqBUY8LEPEa6H78jLBB85xDRyeo7uS",
+      "startTs": 1790781600,
+      "endTs": 1790781900,
+      "yesMetadata": {
+        "name": "BTC Up",
+        "symbol": "BTC-UP",
+        "uri": "https://m.world.xyz/83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+        "decimals": 6
+      },
+      "description": "BTC/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+    },
+    "candidates": [
+      {
+        "market": "5wDgHeA1HPXMKZ7JUz8uek2XXoVc8opK5Nd98Bm9cD4B",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+        "noMint": "J328tVk8pfUUi6QJePhvyepvFcYd3gaNAKbuqZXtXkJR",
+        "vault": "7V3fZYA6QNrLWvnqBUY8LEPEa6H78jLBB85xDRyeo7uS",
+        "startTs": 1790781600,
+        "endTs": 1790781900,
+        "yesMetadata": {
+          "name": "BTC Up",
+          "symbol": "BTC-UP",
+          "uri": "https://m.world.xyz/83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+          "decimals": 6
+        },
+        "description": "BTC/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+      },
+      {
+        "market": "8D67n9WRywdbTW5Q72K8Tb8j1moqTY1HTWsdzaDbcogg",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE",
+        "noMint": "C5knsKMqZxoEwqt1ts5Stk5LqPLiNg7KxqAciiMMdfD7",
+        "vault": "3eU9CERkigphB4UC4zJ8cabgiD5UfFoAhGAm3k9oVb5n",
+        "startTs": 1790781600,
+        "endTs": 1790781900,
+        "yesMetadata": {
+          "name": "ETH Up",
+          "symbol": "ETH-UP",
+          "uri": "https://m.world.xyz/FY4gtQujua9cBg9s7h6U8quKNhNgs3NaFwu7kYh5QHZE",
+          "decimals": 6
+        },
+        "description": "ETH/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+      },
+      {
+        "market": "8uj3gxFPC2FWhRcXvRRMY8Tt6W6awHi8WMXNVA1CS7v7",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp",
+        "noMint": "5bJL3TMKjHSQB4ggdMJT283X16ubGXR59HPKaZK61ajv",
+        "vault": "ActMSkPntEu9tRhnmGSSbAvpRRXqpSBuDv7VLNucXgWV",
+        "startTs": 1790781600,
+        "endTs": 1790781900,
+        "yesMetadata": {
+          "name": "SOL Up",
+          "symbol": "SOL-UP",
+          "uri": "https://m.world.xyz/CuW28rbpvNfKG4ECKStTKF34wjaC22ZjkvH7nGGZMQHp",
+          "decimals": 6
+        },
+        "description": "SOL/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+      },
+      {
+        "market": "FRuon2zacji6eTb7U8Qw5VTD2gUd7tfNyDa1tWXBMQua",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G",
+        "noMint": "Cq7FJC9TnVska75BbSqawMtXpfqTcT2GDjDePMoHsRZu",
+        "vault": "Dms7U6W4pN2qWUSoJKmjdn76uyomiAjfscktt73FXTAu",
+        "startTs": 1790781600,
+        "endTs": 1790781900,
+        "yesMetadata": {
+          "name": "HYPE Up",
+          "symbol": "HYPE-UP",
+          "uri": "https://m.world.xyz/BghLnyTbm7SKzLm5YrQR8gMmuwvyCp884cHG16GsZw1G",
+          "decimals": 6
+        },
+        "description": "HYPE/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+      },
+      {
+        "market": "HoN7ZUj3hzwVHYSLN8wegAa1Z9G6siysdNWPTJHbKJUf",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo",
+        "noMint": "Aw79pLPPXHiV73NqZr4dnDdNuPXyzmA3f378ekMcHcN8",
+        "vault": "5A9VwH4tpaVucRMMen9x9kbJBvRDL3wwHf7PGEgxFs7W",
+        "startTs": 1790781600,
+        "endTs": 1790781900,
+        "yesMetadata": {
+          "name": "XRP Up",
+          "symbol": "XRP-UP",
+          "uri": "https://m.world.xyz/EhVmsBJM2gQ28wjAD3pdqR46pvZ3E7EfdfHYLWyyQvgo",
+          "decimals": 6
+        },
+        "description": "XRP/USD closes at or above its open between 2026-09-30 15:20:00 UTC and 2026-09-30 15:25:00 UTC."
+      }
+    ]
+  },
+  "sameWindowNoJwtControl": {
+    "url": "https://aggregator-api-proxy.world-xyz.workers.dev/order?prioritizationFeeLamports=auto&dynamicComputeUnitLimit=true&userPublicKey=7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e&inputMint=CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH&outputMint=83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb&amount=1000000&slippageBps=200",
+    "method": "GET",
+    "requestHeaders": {
+      "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+      "Accept": "application/json",
+      "Origin": "https://world.xyz",
+      "Referer": "https://world.xyz/",
+      "User-agent": "world-pm-public-observer/authenticated-quote-r0"
+    },
+    "at": 1790781665.2483063,
+    "elapsedMs": 320.29080390930176,
+    "status": 404,
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "responseHeaders": {
+      "Date": "Wed, 30 Sep 2026 15:21:05 GMT",
+      "Content-Type": "application/json",
+      "Content-Length": "0",
+      "Connection": "close",
+      "Access-Control-Allow-Origin": "https://world.xyz",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=Ppo%2FxZJUALZuRmmmjAPu27JsWtvIjOCh%2BW5XW7CJ3G5tTIuFgQ2GG%2BfFAB4LlXcTfEJEfnohUkTnyOsM1p066xFha7A1bHMRHJBwC6lW8BEIK%2F2moy68CbtUQ6pyqe0CIsD7YBOqPgqRMEbWFScuBL1unlQLJqAEaS3DsaM%3D\"}]}",
+      "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+      "Server": "cloudflare",
+      "CF-RAY": "a43437218915ce27-SIN",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "parameters": {
+      "prioritizationFeeLamports": "auto",
+      "dynamicComputeUnitLimit": "true",
+      "userPublicKey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+      "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "outputMint": "83oxQWUrNJPmcoSK7cGZurvvX2W8Bw3Cu1w14uVU45bb",
+      "amount": "1000000",
+      "slippageBps": "200"
+    },
+    "body": ""
+  },
+  "verdict": "NO_RESULT_AUTHENTICATED_ORDER_RESPONSE_REQUIRES_REVIEW",
+  "finishedAt": 1790781665.568597
+}

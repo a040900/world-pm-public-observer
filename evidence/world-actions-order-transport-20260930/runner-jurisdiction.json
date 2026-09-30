@@ -1,0 +1,33 @@
+{
+  "url": "https://markets-api-proxy.world-xyz.workers.dev/check-jurisdiction",
+  "method": "GET",
+  "requestHeaders": {
+    "Host": "markets-api-proxy.world-xyz.workers.dev",
+    "Accept": "application/json",
+    "Origin": "https://world.xyz",
+    "Referer": "https://world.xyz/",
+    "User-agent": "world-pm-public-observer/transport-r0"
+  },
+  "at": 1790781556.8710158,
+  "elapsedMs": 160.38107872009277,
+  "status": 200,
+  "bytes": 34,
+  "sha256": "867caeb51d6f7aa96c87f4c2f784983234ae9b05dc414528d064c4ffb7d43d4d",
+  "responseHeaders": {
+    "Date": "Wed, 30 Sep 2026 15:19:17 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "34",
+    "Connection": "close",
+    "Access-Control-Allow-Origin": "https://world.xyz",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=GAMa3VWTzXi1IkzcGY7Z2Y3UtKm%2F2%2FRJNUhU95m%2FFKdK2siNJ98cUmMTBnl1WYfn4CddoVhBkAeoO6Cbu7MgOI3q2co3pWYedoAk548IYZSm7IYkDySjC2FVJoGgLf%2BVgbZjc7jr07w6GVoLhlV2UNrzesEYM9ihQ0Y%3D\"}]}",
+    "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "Server": "cloudflare",
+    "CF-RAY": "a434347b3aee45f0-DFW",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  },
+  "body": "{\"restricted\":true,\"country\":\"US\"}",
+  "environment": "github-hosted ubuntu-latest",
+  "runId": "36735803165"
+}
