@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "WORLD_FRESH_JWT_QUOTE_CHECK_R1",
+  "verdict": "NO_RESULT_CURRENT_FRONTEND_CONTRACT_UNRESOLVED",
+  "diagnosticOutcome": "FRESH_JWT_AUTH_HANDLING_DIFFERENCE_RESTORED_BOTH_SIDES_SPONSORSHIP_UNAVAILABLE",
+  "sha256": {
+    "jurisdiction.json": "5e022bc01247557547247985f20dd64025cc10bf060656cdc5b13f4d9e8bd908",
+    "result.json": "35ab94ca9f6da3bd7011eb9ae32e10d7ac2fd1bce0be5ceb27603dfcbed0f54d"
+  },
+  "fullTokenPersisted": false,
+  "authorityDecisionModified": false
+}
