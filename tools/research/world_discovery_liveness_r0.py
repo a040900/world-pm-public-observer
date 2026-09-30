@@ -183,7 +183,7 @@ def exact_quote(session: requests.Session, *, output_mint: str, cash_decimals: i
     }
     started = time.time()
     try:
-        response = session.get(r23.WORLD_PROXY_ORDER_URL, params=params, headers=headers, timeout=10.0)
+        response = session.get(endpoint, params=params, headers=headers, timeout=10.0)
     except Exception as exc:
         return {"success": False, "transportError": _safe_error(exc), "requestParams": params}
     received = time.time()
