@@ -254,14 +254,25 @@ async def main(args: argparse.Namespace) -> None:
             yes_decimals = await asyncio.to_thread(r23._token_decimals, market.yes_mint, wp.DEFAULT_SOLANA_RPC)
             no_decimals = await asyncio.to_thread(r23._token_decimals, market.no_mint, wp.DEFAULT_SOLANA_RPC)
             session = requests.Session()
-            result["exactQuote"] = {
-                "yes": await asyncio.to_thread(exact_quote, session, output_mint=market.yes_mint,
-                                                cash_decimals=cash_decimals, outcome_decimals=yes_decimals,
-                                                request_cash=args.request_cash),
-                "no": await asyncio.to_thread(exact_quote, session, output_mint=market.no_mint,
-                                               cash_decimals=cash_decimals, outcome_decimals=no_decimals,
-                                               request_cash=args.request_cash),
+            endpoints = {
+                "worldProxy": r23.WORLD_PROXY_ORDER_URL,
+                "dflowDev": "https://dev-quote-api.dflow.net/order",
+                "dflowProdNoKey": "https://quote-api.dflow.net/order",
             }
+            result["exactQuote"] = {}
+            for name, endpoint in endpoints.items():
+                result["exactQuote"][name] = {
+                    "yes": await asyncio.to_thread(exact_quote, session, endpoint=endpoint,
+                                                   output_mint=market.yes_mint,
+                                                   cash_decimals=cash_decimals,
+                                                   outcome_decimals=yes_decimals,
+                                                   request_cash=args.request_cash),
+                    "no": await asyncio.to_thread(exact_quote, session, endpoint=endpoint,
+                                                  output_mint=market.no_mint,
+                                                  cash_decimals=cash_decimals,
+                                                  outcome_decimals=no_decimals,
+                                                  request_cash=args.request_cash),
+                }
         except Exception as exc:
             result["exactQuoteSetupError"] = _safe_error(exc)
 
@@ -274,8 +285,13 @@ async def main(args: argparse.Namespace) -> None:
         "default80CoversEarliestNeeded": discovery.get("default80CoversEarliestNeeded"),
         "matchedSlots": sorted(discovery.get("matches", {}).keys()),
         "currentMatched": bool(match),
-        "yesHttpStatus": (result.get("exactQuote") or {}).get("yes", {}).get("httpStatus"),
-        "noHttpStatus": (result.get("exactQuote") or {}).get("no", {}).get("httpStatus"),
+        "quoteStatuses": {
+            name: {
+                "yes": pair.get("yes", {}).get("httpStatus"),
+                "no": pair.get("no", {}).get("httpStatus"),
+            }
+            for name, pair in (result.get("exactQuote") or {}).items()
+        },
     }, sort_keys=True))
 
 
