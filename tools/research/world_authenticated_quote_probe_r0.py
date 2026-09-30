@@ -16,9 +16,15 @@ from tools.research import world_frontend_quote_contract_r0 as fc
 from tools.research import world_pm_jupiter_economic_poc_r0 as jp
 
 
-def run(output: Path, matched_control: bool = False):
+def run(output: Path, matched_control: bool = False, user_public_key: str = fc.SIGNER):
     if output.exists():
         raise RuntimeError("EVIDENCE_EXISTS_REFUSE_OVERWRITE")
+    number = 0
+    for char in user_public_key:
+        number = number * 58 + jp.B58.index(char)
+    decoded = b"\0" * (len(user_public_key) - len(user_public_key.lstrip("1"))) + number.to_bytes((number.bit_length() + 7) // 8, "big")
+    if len(decoded) != 32:
+        raise RuntimeError("USER_PUBLIC_KEY_INVALID_LENGTH")
     token = sys.stdin.read().strip()
     parts = token.split(".")
     if len(parts) != 3:
@@ -56,7 +62,7 @@ def run(output: Path, matched_control: bool = False):
             assert market["startTs"] <= time.time() < market["endTs"], "CURRENT_WINDOW_EXPIRED"
             assert time.time() < claims["exp"], "JWT_EXPIRED"
             params = {"prioritizationFeeLamports": "auto", "dynamicComputeUnitLimit": "true",
-                      "userPublicKey": fc.SIGNER, "inputMint": jp.CASH_MINT, "outputMint": mint,
+                      "userPublicKey": user_public_key, "inputMint": jp.CASH_MINT, "outputMint": mint,
                       "amount": "1000000", "slippageBps": "200"}
             raw, meta = fc.receipt(fc.PROXY + "/order?" + urllib.parse.urlencode(params), headers)
             meta["requestHeaders"] = {k: ("Bearer <REDACTED>" if k.lower() == "authorization" else v)
@@ -113,5 +119,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--matched-control", action="store_true")
+    parser.add_argument("--user-public-key", default=fc.SIGNER)
     args = parser.parse_args()
-    verify(args.output) if args.verify else run(args.output, args.matched_control)
+    verify(args.output) if args.verify else run(args.output, args.matched_control, args.user_public_key)
