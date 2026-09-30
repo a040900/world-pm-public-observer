@@ -1,4 +1,4 @@
-# World.xyz <-> Polymarket BTC 5m Economic-First Reassessment R1
+> Cross-project adjudication authority: `a040900/prediction-market-relative-value` / `docs/decisions/2026-09-30-economic-first-research-adjudication-authority-r1.md` (authority branch `research/economic-first-authority-r1-20260930`). This observer document is venue-specific evidence and must not redefine the cross-project policy.\n\n# World.xyz <-> Polymarket BTC 5m Economic-First Reassessment R1
 
 Date: 2026-09-30
 Status: PRELIMINARY_REASSESSMENT_PENDING_SINGLE_ZERO_SCORE_LIVENESS_DIAGNOSTIC
