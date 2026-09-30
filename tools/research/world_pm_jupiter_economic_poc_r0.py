@@ -151,6 +151,8 @@ def describe_candidates(markets: list[dict[str, Any]], deadline: float) -> list[
 def select_btc(markets: list[dict[str, Any]]) -> dict[str, Any]:
     matches = []
     for m in markets:
+        if int(m["endTs"]) - int(m["startTs"]) != 300:
+            continue
         hay = " ".join(
             str(x or "") for x in [m.get("description"), (m.get("yesMetadata") or {}).get("name"), (m.get("yesMetadata") or {}).get("symbol")]
         ).lower()
@@ -158,10 +160,7 @@ def select_btc(markets: list[dict[str, Any]]) -> dict[str, Any]:
             matches.append(m)
     if len(matches) != 1:
         raise RuntimeError(f"WORLD_BTC5M_NOT_UNIQUE:{len(matches)}")
-    m = matches[0]
-    if int(m["endTs"]) - int(m["startTs"]) != 300:
-        raise RuntimeError("WORLD_BTC_NOT_5M")
-    return m
+    return matches[0]
 
 
 def jupiter_quote(input_mint: str, output_mint: str, amount: int, slippage_bps: int = 100) -> dict[str, Any]:
