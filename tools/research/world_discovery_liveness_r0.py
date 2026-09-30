@@ -163,7 +163,7 @@ async def collect_dflow(market: wp.WorldMarket, seconds: float = 6.0) -> dict[st
             task.cancel()
 
 
-def exact_quote(session: requests.Session, *, output_mint: str, cash_decimals: int,
+def exact_quote(session: requests.Session, *, endpoint: str, output_mint: str, cash_decimals: int,
                 outcome_decimals: int, request_cash: float) -> dict[str, Any]:
     amount = max(1, int(round(request_cash * (10 ** cash_decimals))))
     params = {
