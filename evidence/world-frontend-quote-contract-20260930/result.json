@@ -1,0 +1,1329 @@
+{
+  "schemaVersion": "WORLD_FRONTEND_QUOTE_CONTRACT_R0",
+  "startedAt": 1790773517.4477887,
+  "assets": [
+    {
+      "url": "https://world.xyz",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773517.4477887,
+      "elapsedMs": 386.38925552368164,
+      "status": 200,
+      "bytes": 3084,
+      "sha256": "75af12f06beb4255080055ea3f06eb4fde08dbc3593a8ee131dcdaa1e08323bc",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:17 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "20993",
+        "Cache-Control": "public,max-age=0,must-revalidate",
+        "cache-status": "\"Netlify Edge\"; hit; ttl=31515008",
+        "cf-cache-status": "DYNAMIC",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3S6PQGSGAMVFHK4YGR9RZF3",
+        "CF-RAY": "a43370366a9f5f48-SIN"
+      }
+    },
+    {
+      "url": "https://world.xyz/assets/index-BAcxOBUf.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773517.835176,
+      "elapsedMs": 385.4784965515137,
+      "status": 200,
+      "bytes": 222678,
+      "sha256": "7092705158b69d08f83faade515a285d558cc55fe37883acdd499813d6c3b5c7",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:18 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "0",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; fwd=miss; fwd-status=200; stored",
+        "etag": "W/\"bd6cef5e765c52f4ed262eee1566c7de-ssl-df\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3QSPBB3175TNF8E0Z5B30W2",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a4337037efbda5ca-SIN"
+      },
+      "referencedJs": [
+        "AboutPage--h5o9cn1.js",
+        "App-CjFMaGT9.js",
+        "ClockIcon-0dRp6Jr4.js",
+        "ConstantsUtil-BgQDR4ss.js",
+        "DocsApp-BVM8DxKa.js",
+        "FeedbackModal-CJnyyqE_.js",
+        "IconSwap-Cb_BWdVM.js",
+        "ImageAvatar-BJxwX1Rg.js",
+        "LineChart-h_hp1hNf.js",
+        "ModalHeader-CKh3VNJe.js",
+        "PrivacyPage-CUDllPS3.js",
+        "ScrollRail-C_2q7fPE.js",
+        "StretchedLink-B2M0qBoD.js",
+        "TermsPage-DVKbDajL.js",
+        "Transport-TJdEi9c_.js",
+        "XMarkIcon-CxrPSLEf.js",
+        "__vite-browser-external-g5ct2Jkk.js",
+        "_esm-BVRhuG8K.js",
+        "_shortw_utils-BNWR_yEA.js",
+        "adapter-DBwBAdO_.js",
+        "ae.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "btcMarketToMarketCard-BuArPvlg.js",
+        "chunk-4N6VE7H7-CvZchaq0.js",
+        "chunk-Z2EHFHEI-B4KLYsjQ.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "crypto-C0bCPeLD.js",
+        "date-D4l-gBPZ.js",
+        "dijkstra-CemTrCzk.js",
+        "e.js",
+        "errors-Dtr9cQ45.js",
+        "es-B5Ygl8Zu.js",
+        "es-Rb1UqbSp.js",
+        "esm-B-H52d8W.js",
+        "esm-BCV1VLMY.js",
+        "esm-BzZRld4v.js",
+        "eventemitter3-D5xoQCTD.js",
+        "features-animation-DI0J8f8E.js",
+        "format-ntg9apnf.js",
+        "hmac-S3YMU38P.js",
+        "icons-DwHc1EMV.js",
+        "inherits_browser-BqMcAsST.js",
+        "lit-Cbk7b9dC.js",
+        "marketColors-D-mOmrm7.js",
+        "navBand-CosuZef-.js",
+        "node-polyfills-dl2x_dBu.js",
+        "outright-Bn1Gjigo.js",
+        "proxy-CgsiyLCC.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "routes-HhbjvPcp.js",
+        "rules-BTmSmXLR.js",
+        "searchItem-ZC4q3s03.js",
+        "searchListState-Yt8XgriC.js",
+        "sha2-C3Ng_YWO.js",
+        "sha3-B1wae1jJ.js",
+        "social-CFSn-TCr.js",
+        "useAttestX-BboGSkMt.js",
+        "useCryptoRounds-Cx8TBUoq.js",
+        "useEnterExit-BT7WzVLH.js",
+        "useFinalScores-Cy_qNDra.js",
+        "useIsMobile-ZqDyhmO2.js",
+        "usePortfolioPositions-CDpnl0T3.js",
+        "useTheme-Bu9KNZqL.js",
+        "useToast-CJKB_Yf_.js",
+        "useTokenBalances-DPycaCnI.js",
+        "useTradeAndEarnStatus-CAWGo_TX.js",
+        "useWorldEventChart-D-pHfzKE.js",
+        "useWorldEvents-CRbL_yJY.js",
+        "utils-BYG_Jzt4.js",
+        "visual-element-DkpyB2-x.js",
+        "worldInteractions-wuU6LpXP.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/App-CjFMaGT9.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773518.2249212,
+      "elapsedMs": 670.0372695922852,
+      "status": 200,
+      "bytes": 2041504,
+      "sha256": "e52063c6fd2f8174dba3d496620d17e4c0f5daec0532987e0d23f033cebc3bba",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:18 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "0",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; fwd=miss; fwd-status=200; stored",
+        "etag": "W/\"28c2145d3b3572ab06d84b638f8b5a43-ssl-df\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3QTJCKWMHRRK3HQRM4WHD08",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a433703a4fad8089-SIN"
+      },
+      "referencedJs": [
+        "A.js",
+        "AboutPage--h5o9cn1.js",
+        "ClockIcon-0dRp6Jr4.js",
+        "ConnectXCallbackPage-D1z07tuM.js",
+        "ConstantsUtil-BgQDR4ss.js",
+        "CookiesPage-DtLoiCUv.js",
+        "FaqPage-BmZdTOYi.js",
+        "FeedbackModal-CJnyyqE_.js",
+        "IconSwap-Cb_BWdVM.js",
+        "ImageAvatar-BJxwX1Rg.js",
+        "K.js",
+        "LineChart-h_hp1hNf.js",
+        "MarketPage-DyAdF25h.js",
+        "MarketsPage-z58iMoSp.js",
+        "ModalHeader-CKh3VNJe.js",
+        "Node.js",
+        "NotFoundPage-Jk6SfMHI.js",
+        "PortfolioPage-EzG6PrHl.js",
+        "PrivacyPage-CUDllPS3.js",
+        "ScrollRail-C_2q7fPE.js",
+        "SearchPage-5Q86Q_pQ.js",
+        "SelectTokenModal-DHxSBejA.js",
+        "StretchedLink-B2M0qBoD.js",
+        "SupportArticlePage-PdZG2hWu.js",
+        "SupportPage-CUsLwGa2.js",
+        "SupportSearchBar-B4ObUvAN.js",
+        "TermsPage-DVKbDajL.js",
+        "TradeRedirect-BAT_D7rk.js",
+        "Transport-TJdEi9c_.js",
+        "TransportWebHID-56CEhkRi.js",
+        "XMarkIcon-CxrPSLEf.js",
+        "_.js",
+        "__vite-browser-external-g5ct2Jkk.js",
+        "_esm-BVRhuG8K.js",
+        "_options.js",
+        "_shortw_utils-BNWR_yEA.js",
+        "a.js",
+        "adapter-DBwBAdO_.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "ast.js",
+        "basic-CDoMSvy6.js",
+        "bignumber--QIe8ACU.js",
+        "bitcoin-227PTGU3-DLBumw2r.js",
+        "btcMarketToMarketCard-BuArPvlg.js",
+        "chunk-4N6VE7H7-CvZchaq0.js",
+        "chunk-Z2EHFHEI-B4KLYsjQ.js",
+        "circular-buffer.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "crypto-C0bCPeLD.js",
+        "d.js",
+        "date-D4l-gBPZ.js",
+        "dijkstra-CemTrCzk.js",
+        "dist-Bj9AV6Oy.js",
+        "dist-CnJQFMuo.js",
+        "e.js",
+        "errors-Dtr9cQ45.js",
+        "es-B5Ygl8Zu.js",
+        "es-MGaVfMDH.js",
+        "es-Rb1UqbSp.js",
+        "es.js",
+        "es6-CIjnRMG-.js",
+        "esm-B-H52d8W.js",
+        "esm-BCV1VLMY.js",
+        "esm-BjjURbcm.js",
+        "esm-BzZRld4v.js",
+        "esm-DIsdl5oL.js",
+        "esm-DY5ergUn.js",
+        "esm-co7mKofS.js",
+        "esm-sf0rc14A.js",
+        "eventemitter3-D5xoQCTD.js",
+        "features-animation-DI0J8f8E.js",
+        "format-ntg9apnf.js",
+        "hmac-S3YMU38P.js",
+        "i.js",
+        "icons-DwHc1EMV.js",
+        "index-BAcxOBUf.js",
+        "index-v1.js",
+        "inherits_browser-BqMcAsST.js",
+        "lib-CC6Xmc_L.js",
+        "lib-DsT1fGoz.js",
+        "lit-Cbk7b9dC.js",
+        "marketColors-D-mOmrm7.js",
+        "marketsBrowse-CFG28nJw.js",
+        "n.js",
+        "navBand-CosuZef-.js",
+        "node-polyfills-dl2x_dBu.js",
+        "objectSpread2-Cp9FhHJ8.js",
+        "outright-Bn1Gjigo.js",
+        "parser.js",
+        "positionRoute-DE6T6Ir0.js",
+        "proxy-CgsiyLCC.js",
+        "r.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "routes-HhbjvPcp.js",
+        "rules-BTmSmXLR.js",
+        "searchItem-ZC4q3s03.js",
+        "searchListState-Yt8XgriC.js",
+        "sha2-C3Ng_YWO.js",
+        "sha3-B1wae1jJ.js",
+        "social-CFSn-TCr.js",
+        "stats.js",
+        "string_decoder-Cm1JMcz1.js",
+        "t.js",
+        "this.js",
+        "trace.js",
+        "useAttestX-BboGSkMt.js",
+        "useCryptoRounds-Cx8TBUoq.js",
+        "useEnterExit-BT7WzVLH.js",
+        "useFinalScores-Cy_qNDra.js",
+        "useIsMobile-ZqDyhmO2.js",
+        "usePortfolioPositions-CDpnl0T3.js",
+        "useTheme-Bu9KNZqL.js",
+        "useToast-CJKB_Yf_.js",
+        "useTokenBalances-DPycaCnI.js",
+        "useTradeAndEarnStatus-CAWGo_TX.js",
+        "useWorldEventChart-D-pHfzKE.js",
+        "useWorldEvents-CRbL_yJY.js",
+        "utilities.js",
+        "utils-BYG_Jzt4.js",
+        "visual-element-DkpyB2-x.js",
+        "w.js",
+        "w3m-modal-BjHI16Tl.js",
+        "worldInteractions-wuU6LpXP.js",
+        "wui-text-yDqFUtel.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/ScrollRail-C_2q7fPE.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773519.595243,
+      "elapsedMs": 410.89606285095215,
+      "status": 200,
+      "bytes": 193707,
+      "sha256": "b5a2149f03569f9e73470e5918c79e6375e78b0258e1becf474b97768b57e667",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:19 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "0",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; fwd=stale; fwd-status=304; stored",
+        "etag": "W/\"d09b8a5a8b5b3b5dbc86d7d4cd5f1da9-ssl-df\"",
+        "vary": "accept-encoding",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "x-nf-request-id": "01M3QTJCMBHCTCWG4T1W1P35Z0",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a43370430f482035-SIN"
+      },
+      "referencedJs": [
+        "ImageAvatar-BJxwX1Rg.js",
+        "ModalHeader-CKh3VNJe.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "crypto-C0bCPeLD.js",
+        "date-D4l-gBPZ.js",
+        "esm-BzZRld4v.js",
+        "icons-DwHc1EMV.js",
+        "index-BAcxOBUf.js",
+        "k.js",
+        "marketColors-D-mOmrm7.js",
+        "min.js",
+        "proxy-CgsiyLCC.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "useToast-CJKB_Yf_.js",
+        "useTokenBalances-DPycaCnI.js",
+        "useTradeAndEarnStatus-CAWGo_TX.js",
+        "worldInteractions-wuU6LpXP.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/api-CcCaG8Rc.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773520.011134,
+      "elapsedMs": 262.30549812316895,
+      "status": 200,
+      "bytes": 619,
+      "sha256": "d70db74d9564dee3052d1a2892c405cf8b3eabf5abb6ab096e84bc19ba84660e",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:20 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Content-Length": "619",
+        "Connection": "close",
+        "Accept-Ranges": "bytes",
+        "Age": "2730",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; hit; ttl=31533270",
+        "etag": "\"13f93a32861bfd3ebb71ff214c71c7c5-ssl\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "x-nf-request-id": "01M37JMQAA753YB9CGRR5G89MF",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a43370459dc85fb3-SIN"
+      },
+      "referencedJs": []
+    },
+    {
+      "url": "https://world.xyz/assets/client-TeZRcSG0.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773520.2744427,
+      "elapsedMs": 496.48380279541016,
+      "status": 200,
+      "bytes": 474220,
+      "sha256": "6cf31b2febf9303ce2d8d5aba0fbdda4ed55eb1c388dcbbfe439d404a3d7f5e0",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:20 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "0",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; fwd=stale; fwd-status=304; stored",
+        "etag": "W/\"21786cd63e2c63422edef7388fc2198b-ssl-df\"",
+        "vary": "accept-encoding",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "x-nf-request-id": "01M3QTJCKY4368SEG7Y18N3ERC",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a4337047493d0b5f-SIN"
+      },
+      "referencedJs": [
+        "Ge.js",
+        "PostHog.js",
+        "_instance.js",
+        "api-CcCaG8Rc.js",
+        "cache.js",
+        "config.js",
+        "e.js",
+        "i.js",
+        "index-BAcxOBUf.js",
+        "intrinsic.js",
+        "k.js",
+        "object.js",
+        "r.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "string.js",
+        "t.js",
+        "this.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/MarketPage-DyAdF25h.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773520.7834702,
+      "elapsedMs": 254.80055809020996,
+      "status": 200,
+      "bytes": 2780,
+      "sha256": "0e051d86e9adc47b7e5cafca70be2b69f2cc0a08f448bbff9b0532dbb58802d8",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:21 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "11125",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; hit; ttl=31524875",
+        "etag": "W/\"fb6be5abf2547c4b8c4efb578f511471-ssl-df\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3S65C5EBVVYGQVF3MTPVE2T",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a433704a5842de6c-SIN"
+      },
+      "referencedJs": [
+        "ClockIcon-0dRp6Jr4.js",
+        "EventPage-C0B40ghN.js",
+        "IconSwap-Cb_BWdVM.js",
+        "ImageAvatar-BJxwX1Rg.js",
+        "LineChart-h_hp1hNf.js",
+        "MarketPageLayout-DnRa5_bI.js",
+        "ModalHeader-CKh3VNJe.js",
+        "NotFoundPage-Jk6SfMHI.js",
+        "ScrollRail-C_2q7fPE.js",
+        "SelectTokenModal-DHxSBejA.js",
+        "StretchedLink-B2M0qBoD.js",
+        "TradingPage-B0vzQDpr.js",
+        "XMarkIcon-CxrPSLEf.js",
+        "__vite-browser-external-g5ct2Jkk.js",
+        "_shortw_utils-BNWR_yEA.js",
+        "adapter-DBwBAdO_.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "btcMarketToMarketCard-BuArPvlg.js",
+        "chunk-4N6VE7H7-CvZchaq0.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "crypto-C0bCPeLD.js",
+        "date-D4l-gBPZ.js",
+        "errors-Dtr9cQ45.js",
+        "es-Rb1UqbSp.js",
+        "esm-BzZRld4v.js",
+        "eventemitter3-D5xoQCTD.js",
+        "format-ntg9apnf.js",
+        "hmac-S3YMU38P.js",
+        "icons-DwHc1EMV.js",
+        "index-BAcxOBUf.js",
+        "marketColors-D-mOmrm7.js",
+        "marketsBrowse-CFG28nJw.js",
+        "navBand-CosuZef-.js",
+        "outright-Bn1Gjigo.js",
+        "positionRoute-DE6T6Ir0.js",
+        "proxy-CgsiyLCC.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "routes-HhbjvPcp.js",
+        "rules-BTmSmXLR.js",
+        "s.js",
+        "searchItem-ZC4q3s03.js",
+        "sha2-C3Ng_YWO.js",
+        "sha3-B1wae1jJ.js",
+        "useFinalScores-Cy_qNDra.js",
+        "useIsMobile-ZqDyhmO2.js",
+        "useTheme-Bu9KNZqL.js",
+        "useToast-CJKB_Yf_.js",
+        "useTokenBalances-DPycaCnI.js",
+        "useTradeAndEarnStatus-CAWGo_TX.js",
+        "useWorldEventChart-D-pHfzKE.js",
+        "useWorldEvents-CRbL_yJY.js",
+        "utils-BYG_Jzt4.js",
+        "worldInteractions-wuU6LpXP.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/MarketPageLayout-DnRa5_bI.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773521.039276,
+      "elapsedMs": 308.8557720184326,
+      "status": 200,
+      "bytes": 47182,
+      "sha256": "bcb368fa6187c7beeb8a67e977ae821926584c8f3aa4a64cbf5314a4eecbe21f",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:21 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "0",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; fwd=miss; fwd-status=200; stored",
+        "etag": "W/\"dbda0852afdc414290db4ba8ed4d5974-ssl-df\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3S66ZEEAWNF3N6J5KRJ741J",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a433704c1d97ae45-SIN"
+      },
+      "referencedJs": [
+        "ClockIcon-0dRp6Jr4.js",
+        "ModalHeader-CKh3VNJe.js",
+        "ScrollRail-C_2q7fPE.js",
+        "SelectTokenModal-DHxSBejA.js",
+        "Z.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "chunk-4N6VE7H7-CvZchaq0.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "date-D4l-gBPZ.js",
+        "icons-DwHc1EMV.js",
+        "index-BAcxOBUf.js",
+        "marketColors-D-mOmrm7.js",
+        "navBand-CosuZef-.js",
+        "positionRoute-DE6T6Ir0.js",
+        "proxy-CgsiyLCC.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "rules-BTmSmXLR.js",
+        "useToast-CJKB_Yf_.js",
+        "useTokenBalances-DPycaCnI.js",
+        "worldInteractions-wuU6LpXP.js"
+      ]
+    },
+    {
+      "url": "https://world.xyz/assets/TradingPage-B0vzQDpr.js",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "world.xyz",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773521.3502648,
+      "elapsedMs": 262.3000144958496,
+      "status": 200,
+      "bytes": 37819,
+      "sha256": "fbf9b00020e0926667aef223d2163f72aab48ba7b5f15797e54566175c9ba4a4",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:21 GMT",
+        "Content-Type": "application/javascript; charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "Age": "13096",
+        "Cache-Control": "public, max-age=14400, must-revalidate",
+        "cache-status": "\"Netlify Edge\"; hit; ttl=31522905",
+        "etag": "W/\"eaa5ee75f8af0a3580d783c91ac84f49-ssl-df\"",
+        "Server": "cloudflare",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Accept-Encoding",
+        "x-nf-request-id": "01M3S6644TWN9NEMYGJFBA698N",
+        "cf-cache-status": "REVALIDATED",
+        "CF-RAY": "a433704dcad7403c-SIN"
+      },
+      "referencedJs": [
+        "ClockIcon-0dRp6Jr4.js",
+        "IconSwap-Cb_BWdVM.js",
+        "LineChart-h_hp1hNf.js",
+        "MarketPageLayout-DnRa5_bI.js",
+        "ModalHeader-CKh3VNJe.js",
+        "NotFoundPage-Jk6SfMHI.js",
+        "ScrollRail-C_2q7fPE.js",
+        "api-CcCaG8Rc.js",
+        "applyWorldTicker-DrOBWR7A.js",
+        "btcMarketToMarketCard-BuArPvlg.js",
+        "chunk-4N6VE7H7-CvZchaq0.js",
+        "client-TeZRcSG0.js",
+        "cn-CiWFYBCk.js",
+        "crypto-C0bCPeLD.js",
+        "date-D4l-gBPZ.js",
+        "icons-DwHc1EMV.js",
+        "index-BAcxOBUf.js",
+        "marketColors-D-mOmrm7.js",
+        "n.js",
+        "navBand-CosuZef-.js",
+        "r.js",
+        "rolldown-runtime-CJJwijRH.js",
+        "routes-HhbjvPcp.js",
+        "rules-BTmSmXLR.js",
+        "useIsMobile-ZqDyhmO2.js",
+        "useTheme-Bu9KNZqL.js",
+        "useTokenBalances-DPycaCnI.js",
+        "worldInteractions-wuU6LpXP.js"
+      ]
+    }
+  ],
+  "excerpts": {
+    "httpImport": {
+      "needle": "import{o as r,u as i}",
+      "offset": 93,
+      "begin": 93,
+      "text": "import{o as r,u as i}from\"./api-CcCaG8Rc.js\";var a=class{constructor(){this.listeners=new Set,this.s"
+    },
+    "turnstileEnabled": {
+      "needle": "VITE_TURNSTILE_SITE_KEY:",
+      "offset": 176827,
+      "begin": 176777,
+      "text": "KEY_ORG_ID:`57fb7eef-6a1f-436c-9449-c7a96f98e3dd`,VITE_TURNSTILE_SITE_KEY:`0x4AAAAAAEwanVzzTs5-bojG`}.VITE_TURNSTILE_SITE_KEY??``,gd=()=>hd!==``,_d=3500,vd={isOpen:!1,onResolve:null},yd=vd,bd=new Set;function xd(){for(let e of bd)e()}function Sd(e){return bd.add(e),()=>{bd.delete(e)}}function Cd(){return yd}function wd(e){yd={isOpen:!0,onResolve:e},xd()}function Td(){yd!==vd&&(yd=vd,xd())}var M=`u`>typeof window?window:void 0,Ed=`u`>typeof globalThis?globalThis:M,Dd=Ed?.navigator,N=Ed?.document,Od=Ed?.location,kd=Ed?.fetch,Ad=Ed?.XMLHttpRequest"
+    },
+    "authExchange": {
+      "needle": "async function VC(",
+      "offset": 470821,
+      "begin": 470821,
+      "text": "async function VC(e){try{let t=await fetch(`${r}/auth/token`,{method:`POST`,headers:{\"Content-Type\":`application/json`,\"x-turnstile-token\":e},body:JSON.stringify({turnstileToken:e}),signal:AbortSignal.timeout(kC)});if(!t.ok)return CC(`turnstile_exchange_failed`,{reason:`http_${t.status}`}),null;let n=await t.json();return n.token?{token:n.token,expiresIn:n.expiresIn??NC}:(CC(`turnstile_exchange_failed`,{reason:`no_token`}),null)}catch(e){return console.warn(`Failed to exchange Turnstile token for JWT:`,e),CC(`turnstile_exchange_failed`,{reason:e instanceof Error?e.name:`unknown`}),null}}var HC=null;function UC(e){return HC||(HC=(async()=>{let t=await BC(e);if(!t)return null;let n=await VC(t.token);return n?(KC(LC(n.token,n.expiresIn,t.interactive)),n.token):null})().finally(()=>{HC=null}),HC)}async function WC(e=`request`){return hd?IC()||UC(e):null}var GC=null;function KC(e){if(GC!==null&&(clearTimeout(GC),GC=null),!e||e.interactive||typeof window>`u`)return;let t=Math.max(e.expiry-PC-Date.now(),0);GC=setTimeout(qC,t)}function qC(){GC=null;let e=FC();if(e&&e.expiry-Date.now()>PC){KC"
+    },
+    "authCaching": {
+      "needle": "jC=`TURNSTILE_JWT`",
+      "offset": 468694,
+      "begin": 468594,
+      "text": "}function DC(e){yC&&sC.register(e)}function OC(){yC&&sC.reset()}var kC=15e3,AC=()=>window.turnstile,jC=`TURNSTILE_JWT`,MC=6e4,NC=3600,PC=2*6e4;function FC(){if(typeof window>`u`)return null;try{let e=localStorage.getItem(jC);if(!e)return null;let t=JSON.parse(e);return Date.now()>=t.expiry?(localStorage.removeItem(jC),null):t}catch{return null}}function IC(){return FC()?.token??null}function LC(e,t,n){let r=Math.max(t*1e3-MC,1e3),i={token:e,expiry:Date.now()+r,interactive:n};if(typeof window>`u`)return i;try{localStorage.setItem(jC,JSON.stringify(i))}catch{}return i}function RC(e){if(!(typeof window>`u`))try{let t=localStorage.getItem(jC);t&&JSON.parse(t).token===e&&localStorage.removeItem(jC)}catch{}}var zC={sitekey:hd,language:`auto`,size:`normal`,retry:`auto`,\"retry-interval\":8e3,\"refresh-expired\":`auto`,\"refresh-timeout\":`auto`},BC=e=>new Promise(t=>{let n=AC();if(typeof window>`u`||!n||!hd){t(null);return}let r=Date.now(),i=document.createElement(`div`);i.style.cssText=`position:fixed;top:-9999px;left:-9999px;`,document.body.appendChild(i);let a=null,o=!1,s=!1,c=null,l=()=>{if(c!==null&&(clearTimeout(c),c=null),a){try{n.remove(a)}catch{console.warn(`Turnstile widget removal failed during cleanup.`)}a=null}i.parentNode?.removeChild(i)},u=(n,i)=>{o||(o=!0,l(),s&&Td(),n?CC(`turnstile_challenge_solved`,{surface:n.surface,interactive:n.interactive,escalated:s,trigger:e,duration_ms:Date.now()-r}):i&&CC(`turnstile_challenge_failed`,i),t(n))},d=e=>{o||s||(s=!0,e===`challenge`&&l(),CC(`turnstile_challenge_escalated`,{reason:e}),wd(e=>{if(e.token!==null){u({token:e.token,surface:`modal`,interactive:e.interactive});return}if(e.reason!==`dismissed`&&a){s=!1,Td();return}u(null,{s"
+    },
+    "httpWrapper": {
+      "needle": "var tw=[i,r]",
+      "offset": 472951,
+      "begin": 472951,
+      "text": "var tw=[i,r];function nw(e){return tw.some(t=>e.startsWith(t))}async function rw(e,t){let n=n=>{let r=new Headers(t?.headers);return n&&r.set(`Authorization`,`Bearer ${n}`),fetch(e,{...t,headers:r,signal:ew(t?.signal)})};if(!nw(e))return n(null);let r=await WC(),i=await n(r);if(r&&await iw(i)){RC(r);let e=await WC(`rejected`);if(e&&e!==r)return n(e)}return i}async function iw(e){if(e.status!==404)return!1;try{return await e.clone().text()===``}catch{return!1}}async function aw(e,t,n){let r=await rw(e,n),i=await r.json().catch(()=>({}));if(!r.ok){let t=typeof i==`object`&&i&&`message`in i&&typeof i.message==`string`?i.message:`HTTP ${r.status}`;throw new ZC(e,r.status,i,t)}let a=t(i);if(a instanceof md.errors)throw new XC(e,a.summary);return a}export{d as $,tt as A,je as B,gd as C,it as D,ct as E,Xe as F,xe as G,De as H,Je as I,ee as J,ve as K,qe as L,nt as M,et as N,st as O,Ze as P,_ as Q,Le as R,hd as S,lt as T,Ee as U,Me as V,Se as W,le as X,y as Y,v as Z,_C as _,zC as a,c as at,Cd as b,JC as c,TC as d,te as et,SC as f,vC as g,EC as h,rw as i,fe as it,rt as j,ot as k,CC as l,OC as m,aw as n,h as nt,AC as o,o as ot,DC as p,f as q,QC as r,b as rt,YC as s,a as st,ZC as t,re as tt,wC as u,mC as v,md as w,Sd as x,Td as y,Ne as z};"
+    },
+    "orderContract": {
+      "needle": "function Rt(e)",
+      "offset": 10564,
+      "begin": 10564,
+      "text": "function Rt(e){let t=new URLSearchParams,n={prioritizationFeeLamports:`auto`,dynamicComputeUnitLimit:!0,...e};return Object.entries(n).forEach(([e,n])=>{n!==void 0&&t.append(e,String(n))}),t.toString()}var zt=async(e,t)=>{try{return await f(`${b}/order?${Rt(e)}`,wt,{method:`GET`,signal:t})}catch(e){if(e instanceof p){let t=e.body,n=e=>typeof t==`object`&&t&&e in t&&typeof t[e]==`string`?t[e]:null,r=n(`code`)??n(`error`)??`unknown_error`,i=n(`msg`)??e.message,a=Error(i);throw a.code=r,a.msg=i,a.status=e.status,a}throw e}};function Bt(e,t){switch(e){case`simulation_failed`:return Ot(t)?`The price moved and the trade would fail. Try again.`:`This trade couldn’t go through — please try again.`;case`invalid_order_token`:return`This quote expired or was modified — please try again.`;case`sponsorship_unavailable`:return`Gasless trading is temporarily unavailable — please try again shortly.`;cas"
+    },
+    "responseSchema": {
+      "needle": "var St=h(",
+      "offset": 8171,
+      "begin": 8171,
+      "text": "var St=h({inAmount:`string`,inputMint:`string`,outAmount:`string`,outputMint:`string`,venue:`string`}),Ct=h({amount:`string`,feeBps:`number`,mode:`string`}),wt=h({executionMode:`'sync' | 'async'`,inAmount:`string`,inputMint:`string`,outAmount:`string`,outputMint:`string`,slippageBps:`number`,lastValidBlockHeight:`number`,\"routePlan?\":St.array(),transaction:`string`,orderToken:`string`,\"sponsorFee?\":{mint:`string`,amount:`string`},\"platformFee?\":Ct.or(`null`)});h({inputMint:`string`,inAmount:`string`,outputMint:`string`,outAmount:`string`}),h({code:`string`,msg:`string`});var Tt=h({signature:`string`}),Et=15001;function Dt(e){if(typeof e!=`object`||!e)return;let t=e.InstructionError;if(!Array.isArray(t)||t.length<2)return;let n=t[1];if(typeof n!=`object`||!n)return;let r=n.Custom;return typeof r==`number`?r:void 0}function Ot(e){return Dt("
+    },
+    "transactionFlow": {
+      "needle": "Buffer.from(e.transaction",
+      "offset": 15844,
+      "begin": 15694,
+      "text": "y:`trade`}),!1;t(!0),a(`signing`),s(null),d(`trade_submitted`,{...f,...m,side:n,is_redemption:o?.isRedemption===!0,...g.current});let x,S,C;try{let t=Buffer.from(e.transaction,`base64`),s;try{s=r.deserialize(t)}catch{s=i.from(t)}try{s=await c(s),S=Date.now()}catch(e){if(Ft(e))return d(`trade_rejected`,{...f,side:n}),u({type:`error`,title:`Transaction rejected`,key:`trade`}),!1;throw e}a(`sending`),u({type:`loading`,title:`Sending transaction...`,key:`trade`}),x=await Vt({transaction:s instanceof r?Buffer.from(s.serialize()).toString(`base64`):s.serialize({requireAllSignatures:!1}).toString(`base64`),orderToken:e.orderToken}),C=Date.now(),dn(),a(`confirming`),u({type:`loading`,title:`Confirming transaction...`,key:`trade`});let l=await fn(x);if(l.status===`failed`){let e=Ot(l.err);throw v=e?`slippage`:`onchain`,y=Dt(l.err),b=At(l.err),Error(e?`Price moved beyond your slippage tolerance. Try again, or raise slippage in settings.`:`Transaction failed on-chain`)}if(l.status===`timeout`)throw v=`timeout`,Error(`Transaction expired — please try again`);a(`success`);let g=Date.now();d(`trade_confirmed`,{...f,...m,side:n,latency_ms:g-h,sign_ms:S-h,submit_ms:C-S,confirm_ms:g-C});let ee;if(n===`buy`)ee=`$${bt(gt(e.outAmount))} payout if cor"
+    },
+    "tradeParams": {
+      "needle": "function Lt(e,t,n,r)",
+      "offset": 38788,
+      "begin": 38788,
+      "text": "function Lt(e,t,n,r){let{activeMarket:i,direction:a,buySellMode:o,amount:s,inputMint:c,inputTokenPrice:u,inputTokenDecimals:d,outputMint:f,sellAllRawAmount:p}=e;if(!i||!a||s<=0||!r)return null;let m=i.accounts[l];if(!m)return null;let h=a===`up`?m.yesMint:m.noMint,g=c??`CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH`,_=f??`CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH`,v=Rt({buySellMode:o,amount:s,sellAllRawAmount:p,inputMint:c,inputTokenPrice:u,inputTokenDecimals:d});return{userPublicKey:t,inputMint:o===`sell`?h:g,outputMint:o===`sell`?_:h,amount:v,slippageBps:n}}function Rt({buySellMode:e,amount:t,sellAllRawAmount:n,inputMint:r,inputTokenPrice:i,inputTokenDecimals:a}){return e===`sell`&&n!==void 0&&n>0n?n.toString():r!==void 0&&i!==void 0&&i>0&&a!==void 0?Math.round(t/i*10**a).toString():x(t).toString()}function zt(){let{data:e}=q();return e?.restricted}function Bt(e,t,n){return`${e}|${t}|${n}`}function Vt(e,t,n){let r=(0,X.useRef)(null);return(0,X.useCallback)((i,a)=>{i>0&&e!==``&&r.current!==e&&(r.current=e,c(`trade_amount_entered`,{ticker:e,source:a??`typed`,amount:i,...t===void 0?{}:{restricted:t}})),n(i)},[e,t,n])}function Ht({ticker:e,side:t,amount:n,quoteUpdatedAt:r,quoteErrorAt:i,quoteErrorCode:a}){let o=n>0&&e!==``?Bt(e,t,"
+    }
+  },
+  "probes": [
+    {
+      "url": "https://aggregator-api-proxy.world-xyz.workers.dev/order?prioritizationFeeLamports=auto&dynamicComputeUnitLimit=true&userPublicKey=7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e&inputMint=CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH&outputMint=Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA&amount=1000000&slippageBps=200",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+        "Accept": "application/json",
+        "Origin": "https://world.xyz",
+        "Referer": "https://world.xyz/",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773525.132261,
+      "elapsedMs": 446.2878704071045,
+      "status": 404,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:25 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "0",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": "https://world.xyz",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=xmjLxZwNJWApTM3%2FfQVkr24EgpHVBLbieJtcmJoiUI4jdrBQng3IZ4OvTcO1%2B2ImcFMXkfEeDDRLTOOma2xJzKTRlPF030125C4e9hzUAWnY4m%2Fc29KVfaQ5ItCX1CSOcynaWdJ9iltmPr4Tcdl1pKbjpCGaaMwmqROK3Y0%3D\"}]}",
+        "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "Server": "cloudflare",
+        "CF-RAY": "a4337066bbcf4900-SJC",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      },
+      "side": "YES",
+      "parameters": {
+        "prioritizationFeeLamports": "auto",
+        "dynamicComputeUnitLimit": "true",
+        "userPublicKey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+        "amount": "1000000",
+        "slippageBps": "200"
+      },
+      "body": ""
+    },
+    {
+      "url": "https://aggregator-api-proxy.world-xyz.workers.dev/order?prioritizationFeeLamports=auto&dynamicComputeUnitLimit=true&userPublicKey=7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e&inputMint=CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH&outputMint=H3c6FSSRMd7BDV9BTE3WpP4Wup1rx7iGZQ6EJAVvHv9x&amount=1000000&slippageBps=200",
+      "method": "GET",
+      "requestHeaders": {
+        "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+        "Accept": "application/json",
+        "Origin": "https://world.xyz",
+        "Referer": "https://world.xyz/",
+        "User-agent": "world-pm-public-observer/frontend-contract-r0"
+      },
+      "at": 1790773525.578549,
+      "elapsedMs": 437.9544258117676,
+      "status": 404,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "responseHeaders": {
+        "Date": "Wed, 30 Sep 2026 13:05:25 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "0",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": "https://world.xyz",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=wCbKtUnQljwoXvu4pQ4sJfBdzizebCVEfiUZi5aWJUDR1Bsv%2BLGe%2Bz2NV5dQP9EQVJYHT9%2FiHBbpUGaof%2Ba5AxhAiMg%2Fse6iYzfM3s9ckHF1RDe4LW2MiyBY94sQ5%2F20JYlLXo29aixPHRxW%2F8UljVuzzNKrUaTNd7UG3OU%3D\"}]}",
+        "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "Server": "cloudflare",
+        "CF-RAY": "a43370696e30f3db-SJC",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      },
+      "side": "NO",
+      "parameters": {
+        "prioritizationFeeLamports": "auto",
+        "dynamicComputeUnitLimit": "true",
+        "userPublicKey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "H3c6FSSRMd7BDV9BTE3WpP4Wup1rx7iGZQ6EJAVvHv9x",
+        "amount": "1000000",
+        "slippageBps": "200"
+      },
+      "body": ""
+    }
+  ],
+  "discovery": {
+    "startTs": 1790773500,
+    "market": {
+      "market": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ",
+      "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "yesMint": "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+      "noMint": "H3c6FSSRMd7BDV9BTE3WpP4Wup1rx7iGZQ6EJAVvHv9x",
+      "vault": "3J1u3Up4vDaHgK1jC6tUUCXYcgR5xopP54cdjxmamtGW",
+      "startTs": 1790773500,
+      "endTs": 1790773800,
+      "yesMetadata": {
+        "name": "BTC Up",
+        "symbol": "BTC-UP",
+        "uri": "https://m.world.xyz/Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+        "decimals": 6
+      },
+      "description": "BTC/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+    },
+    "candidates": [
+      {
+        "market": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ",
+        "noMint": "3xV8UiuoLbuwsok9m7pTekGjzoZi7nxo3z4DKcPpWQGs",
+        "vault": "8h5mEsQuN7GgyHmst7ThYEU2dvuhUyNAHqRbfGmkpNCN",
+        "startTs": 1790773500,
+        "endTs": 1790773800,
+        "yesMetadata": {
+          "name": "SOL Up",
+          "symbol": "SOL-UP",
+          "uri": "https://m.world.xyz/6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ",
+          "decimals": 6
+        },
+        "description": "SOL/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+      },
+      {
+        "market": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo",
+        "noMint": "A8bqxknXQAVXVCsqV4entqRfMQLjU1ykFJM2uk6TamHv",
+        "vault": "9qAJJewRL3awisJsZsScAHjXQKipJLKo3GzRuRzRn5Du",
+        "startTs": 1790773500,
+        "endTs": 1790773800,
+        "yesMetadata": {
+          "name": "HYPE Up",
+          "symbol": "HYPE-UP",
+          "uri": "https://m.world.xyz/HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo",
+          "decimals": 6
+        },
+        "description": "HYPE/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+      },
+      {
+        "market": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3",
+        "noMint": "EXf18GTgKqBMGXsUMgHBJoPLGj56sHbVpJE59uyheyKM",
+        "vault": "38JSNFgphCtvUnpXg1ZNJiixbptrv7e5jaqWdZwmYXA9",
+        "startTs": 1790773500,
+        "endTs": 1790773800,
+        "yesMetadata": {
+          "name": "ETH Up",
+          "symbol": "ETH-UP",
+          "uri": "https://m.world.xyz/8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3",
+          "decimals": 6
+        },
+        "description": "ETH/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+      },
+      {
+        "market": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN",
+        "noMint": "6R3GBD1WEdSbkojpdgjKguZfK5TQpkSWGMHvzKb615Mh",
+        "vault": "46K6aSAFd6xRLcQoiovVPpEvLyC65drGwwMhnARuAD56",
+        "startTs": 1790773500,
+        "endTs": 1790773800,
+        "yesMetadata": {
+          "name": "XRP Up",
+          "symbol": "XRP-UP",
+          "uri": "https://m.world.xyz/93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN",
+          "decimals": 6
+        },
+        "description": "XRP/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+      },
+      {
+        "market": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ",
+        "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "yesMint": "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+        "noMint": "H3c6FSSRMd7BDV9BTE3WpP4Wup1rx7iGZQ6EJAVvHv9x",
+        "vault": "3J1u3Up4vDaHgK1jC6tUUCXYcgR5xopP54cdjxmamtGW",
+        "startTs": 1790773500,
+        "endTs": 1790773800,
+        "yesMetadata": {
+          "name": "BTC Up",
+          "symbol": "BTC-UP",
+          "uri": "https://m.world.xyz/Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+          "decimals": 6
+        },
+        "description": "BTC/USD closes at or above its open between 2026-09-30 13:05:00 UTC and 2026-09-30 13:10:00 UTC."
+      }
+    ],
+    "methods": [
+      "getProgramAccounts",
+      "getMultipleAccounts",
+      "GET token metadata URI"
+    ],
+    "recentSignatureDiscovery": false
+  },
+  "rpcReceipts": [
+    {
+      "method": "getProgramAccounts",
+      "params": [
+        "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+        {
+          "encoding": "base64",
+          "filters": [
+            {
+              "dataSize": 320
+            },
+            {
+              "memcmp": {
+                "offset": 258,
+                "bytes": "H5FFdANKDxT"
+              }
+            }
+          ],
+          "commitment": "confirmed"
+        }
+      ],
+      "at": 1790773521.6145635,
+      "result": [
+        {
+          "pubkey": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWViN3SLeg/G17OvkSnlCysw/1E0WaL/iHDGCeF9CrqBQr7h+zp9V9tsienlAqjlgrZ0dqJi6Z2w2MzmL3zvdvzHJGbRTOXBL2IkHJJ3cMYAv+PBJADZtX4h/pzuy1YhvPfN1Qi2U7ZxYAAAAAAAAAAAAA///+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACj4CRVqCPuxuqkuTn7p8FbdJi6G3w+h50Y3vnclZ2YBhr8qABAABArG/yoAEAAAHXZ+2SGgsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiW/G1wXOCmxZ9xdg5/IW8qa63YDL94X6UIeIzsNa74V3qHq6V7qmsLx7SbywAbCkTDoA+v3l+NqzwVNfnp082grYMz408cDkWCOuS6mVx7OQHKcMRhGintvA0DiCvIeyCkFgTMyOZYj8sAAAAAAAAAAAAA///9AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACGHtC6bVa5nTQYgr4vbJNtZZMTT+e/7KhesmcXR6FYBhr8qABAABArG/yoAEAAAHk+lwG9gcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWbs+mVFsL3J6UbBEkei5AJrjKP4V4NzL5JDlLNaG/s9LJAlLQhK77XM92sxw5nELcJPt3TFIof2Lb1t4cPurcUB+WJ+8uSiFem/LWY0ZhV9nFCVre8AOBzdxXD2/ubtiipPZFwySQoCgAAAAAAAAAAAAA///+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC+/n1jvickzhXcNKJ18EMAcJQZB2qgRBj4wPuCVWTYBhr8qABAABArG/yoAEAAAGSvM6yQfgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWd3q0HEBS7bigO7q9iadyIPD0wSIcwSLTcXULwEYgPNNQcu5qZBtUDVgIIpbXar+2xR7JGTVYkNO64ORIOH8t0C3vbRuKc3ByneQP//DgHuA06TI5Ow/c7xTZiQs9UjEFmEoVTL6NB5wAAAAAAAAAAAAA///7AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC2KBRd7kDFCGF33p1t9b9XVNcoQUOm2wFGknuGtPaYBhr8qABAABArG/yoAEAAAGQnWGyIwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWu0wnW+KeuWRDNSezB4PPktdONu5WRfB/+bkstJvA4hnuZdRTIaM6g0a+ov84IS8hatSsjP204vc8k9ITO8CUiyITQx3g1nak4U8OTJ/Q6le/3M1bdy0VyJUSWWqvNvXfB0IjhXYJFyIAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC7mdX6IIsANJzvDQPwkycr+EjpP8uodvbMZRLx9lfYBhr8qABAABArG/yoAEAAAGWTcyyEkQeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        }
+      ]
+    },
+    {
+      "method": "getMultipleAccounts",
+      "params": [
+        [
+          "6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ",
+          "HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo",
+          "8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3",
+          "93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN",
+          "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA"
+        ],
+        {
+          "encoding": "jsonParsed",
+          "commitment": "confirmed"
+        }
+      ],
+      "at": 1790773522.064336,
+      "result": {
+        "context": {
+          "apiVersion": "4.3.0",
+          "slot": 451972926
+        },
+        "value": [
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ",
+                        "name": "SOL Up",
+                        "symbol": "SOL-UP",
+                        "updateAuthority": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM",
+                        "uri": "https://m.world.xyz/6oFRqirxE7D23Nwiqv1rjWzzwqKng96BiYNvH7FWkEVZ"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "6hVitt18N96Wzm8wNCyJvCEtJ8uyvng6QYEBxUNDqRAM",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo",
+                        "name": "HYPE Up",
+                        "symbol": "HYPE-UP",
+                        "updateAuthority": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb",
+                        "uri": "https://m.world.xyz/HzNXdm7HzQBf7qkFphudBqk9UyNv7oBMPwJtCTteNujo"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "6uKaX4xVmJtX1pzzSaCbcRVFz9BtwXhiZBxupQKbZnEb",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 468
+            },
+            "executable": false,
+            "lamports": 3068320,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 468
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3",
+                        "name": "ETH Up",
+                        "symbol": "ETH-UP",
+                        "updateAuthority": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3",
+                        "uri": "https://m.world.xyz/8TZVcChpdzHhtGS16qraaW7jBxArfUHZQitmC7FYavj3"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "8VB3o9Wv8edhcd9YaJgNeuRSFP8vwcDiCyhaVXToNKb3",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN",
+                        "name": "XRP Up",
+                        "symbol": "XRP-UP",
+                        "updateAuthority": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb",
+                        "uri": "https://m.world.xyz/93Q352iZGbpv7N3hW5f5D29n7njfV18CjzpQ5LmM73YN"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "8dEG4A5UiXsion4GiwG4zyXLxXqLWw4v2iNvTgZMvJyb",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          },
+          {
+            "data": {
+              "parsed": {
+                "info": {
+                  "decimals": 6,
+                  "extensions": [
+                    {
+                      "extension": "mintCloseAuthority",
+                      "state": {
+                        "closeAuthority": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ"
+                      }
+                    },
+                    {
+                      "extension": "permanentDelegate",
+                      "state": {
+                        "delegate": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ"
+                      }
+                    },
+                    {
+                      "extension": "metadataPointer",
+                      "state": {
+                        "authority": null,
+                        "metadataAddress": "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA"
+                      }
+                    },
+                    {
+                      "extension": "tokenMetadata",
+                      "state": {
+                        "additionalMetadata": [],
+                        "mint": "Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA",
+                        "name": "BTC Up",
+                        "symbol": "BTC-UP",
+                        "updateAuthority": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ",
+                        "uri": "https://m.world.xyz/Dc8bEZwqYdNQcfhgtFUtFTxXHHq1vNJtLCU3TPwNGoyA"
+                      }
+                    }
+                  ],
+                  "freezeAuthority": null,
+                  "isInitialized": true,
+                  "mintAuthority": "8zvdZniqXLaAwACcrqDuBuVZvKiskGto2eE2gG2YM6dQ",
+                  "supply": "0"
+                },
+                "type": "mint"
+              },
+              "program": "spl-token-2022",
+              "space": 466
+            },
+            "executable": false,
+            "lamports": 3058160,
+            "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "rentEpoch": 18446744073709551615,
+            "space": 466
+          }
+        ]
+      }
+    }
+  ],
+  "NO_TRADE": true,
+  "publicSigner": {
+    "pubkey": "7mwwqMKUeoWrCYefWYzczpFnNy5BMyBEfmfGV9SpzC9e",
+    "transaction": "38SYKSL8XhrrDkbb1hgHCpqnA8wvHCakKMCAwYLAE5ZBRE9mSiDupxxuRSM355843wByw4WpfwmGvGqfyvdWb6sX"
+  },
+  "requestContract": {
+    "endpoint": "https://aggregator-api-proxy.world-xyz.workers.dev/order",
+    "method": "GET",
+    "body": null,
+    "queryKeys": [
+      "prioritizationFeeLamports",
+      "dynamicComputeUnitLimit",
+      "userPublicKey",
+      "inputMint",
+      "outputMint",
+      "amount",
+      "slippageBps"
+    ],
+    "frontendDefaults": {
+      "prioritizationFeeLamports": "auto",
+      "dynamicComputeUnitLimit": "true"
+    },
+    "authentication": "Authorization: Bearer <anonymous Turnstile-exchanged JWT>",
+    "authEndpoint": "https://aggregator-api-proxy.world-xyz.workers.dev/auth/token",
+    "authMethod": "POST",
+    "authHeaders": {
+      "Content-Type": "application/json",
+      "x-turnstile-token": "<Turnstile token>"
+    },
+    "authBody": {
+      "turnstileToken": "<same Turnstile token>"
+    },
+    "predictionSpecificFlags": [],
+    "frontendGeneratedOrderNonce": null,
+    "userPublicKey": "Frontend requires connected wallet; backend necessity untested behind authentication.",
+    "cookies": "No explicit credentials/include or cookie injection in quote wrapper.",
+    "originReferer": "Browser-generated; backend requirement unestablished."
+  },
+  "authMissingTokenControl": {
+    "url": "https://aggregator-api-proxy.world-xyz.workers.dev/auth/token",
+    "method": "POST",
+    "requestHeaders": {
+      "Content-length": "2",
+      "Host": "aggregator-api-proxy.world-xyz.workers.dev",
+      "Accept": "application/json",
+      "Origin": "https://world.xyz",
+      "Referer": "https://world.xyz/",
+      "User-agent": "world-pm-public-observer/frontend-contract-r0",
+      "Content-type": "application/json"
+    },
+    "at": 1790773526.0165033,
+    "elapsedMs": 442.10243225097656,
+    "status": 404,
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "responseHeaders": {
+      "Date": "Wed, 30 Sep 2026 13:05:26 GMT",
+      "Content-Type": "application/json",
+      "Content-Length": "0",
+      "Connection": "close",
+      "Access-Control-Allow-Origin": "https://world.xyz",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, x-turnstile-token",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=AOCrLBQN5uCSSuo5lAcKqBK%2BTlgwHmxK1ZxktVPx%2F1WUsmWXRPtgbMdOmdliTBdfep0OV9RkVS%2FLvzBABNVoTjl0qjOj96InDjKW87ceYITzAD5%2FC9%2B%2F4wjEQwD1o4n6OK01l78Itia79zuTEtW1neDvUD1kTdIHen%2FmxNg%3D\"}]}",
+      "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+      "Server": "cloudflare",
+      "CF-RAY": "a433706c296898ce-SJC",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "requestBody": {},
+    "body": ""
+  },
+  "verdict": "WORLD_PUBLIC_FILLABLE_QUOTE_PATH_NOT_CURRENTLY_OPEN",
+  "finishedAt": 1790773526.4586058
+}

@@ -1,0 +1,93 @@
+{
+  "finishedAt": 1790772215.8949718,
+  "mode": "PUBLIC_READ_ONLY_QUOTE_BUILD_ONLY",
+  "requests": [
+    {
+      "body": {
+        "_raw": ""
+      },
+      "elapsedMs": 147.40419387817383,
+      "httpStatus": 404,
+      "mint": "5YeGh3eQ1H6hoaR5TPHrPDCNzvZiSb3vvYCdirzt8orM",
+      "request": {
+        "amount": "1000000",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "5YeGh3eQ1H6hoaR5TPHrPDCNzvZiSb3vvYCdirzt8orM",
+        "slippageBps": "200"
+      },
+      "side": "YES",
+      "summary": {
+        "errorCode": null,
+        "errorMessage": null,
+        "keys": [
+          "_raw"
+        ],
+        "otherAmountThreshold": null,
+        "outAmount": null,
+        "priceImpactPct": null,
+        "routeLabels": [],
+        "routePlanCount": null,
+        "transactionFieldsPresent": []
+      }
+    },
+    {
+      "body": {
+        "_raw": ""
+      },
+      "elapsedMs": 26.452064514160156,
+      "httpStatus": 404,
+      "mint": "4zMDHL1mfXS353eQB1sCWc4cQTCQkNFpmYJZ7D2DwUj",
+      "request": {
+        "amount": "1000000",
+        "inputMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+        "outputMint": "4zMDHL1mfXS353eQB1sCWc4cQTCQkNFpmYJZ7D2DwUj",
+        "slippageBps": "200"
+      },
+      "side": "NO",
+      "summary": {
+        "errorCode": null,
+        "errorMessage": null,
+        "keys": [
+          "_raw"
+        ],
+        "otherAmountThreshold": null,
+        "outAmount": null,
+        "priceImpactPct": null,
+        "routeLabels": [],
+        "routePlanCount": null,
+        "transactionFieldsPresent": []
+      }
+    }
+  ],
+  "schemaVersion": "WORLD_PUBLIC_AGGREGATOR_PROXY_BTC5M_PROBE_R0",
+  "startTs": 1790772000,
+  "startedAt": 1790772215.7210114,
+  "summary": {
+    "httpStatuses": {
+      "NO": 404,
+      "YES": 404
+    },
+    "routeLabelsBySide": {
+      "NO": [],
+      "YES": []
+    },
+    "successCount": 0,
+    "transactionBuildCount": 0
+  },
+  "worldMarket": {
+    "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+    "description": "BTC/USD closes at or above its open between 2026-09-30 12:40:00 UTC and 2026-09-30 12:45:00 UTC.",
+    "endTs": 1790772300,
+    "market": "ALxCes5DGeZSajNLHXEjLpUhKxGzTYVahcn9WTcxwnBN",
+    "noMint": "4zMDHL1mfXS353eQB1sCWc4cQTCQkNFpmYJZ7D2DwUj",
+    "startTs": 1790772000,
+    "vault": "GhkmD1FdCrFV39CvfV3xuidP8rkJCeCEuUDV29QVfjec",
+    "yesMetadata": {
+      "decimals": 6,
+      "name": "BTC Up",
+      "symbol": "BTC-UP",
+      "uri": "https://m.world.xyz/5YeGh3eQ1H6hoaR5TPHrPDCNzvZiSb3vvYCdirzt8orM"
+    },
+    "yesMint": "5YeGh3eQ1H6hoaR5TPHrPDCNzvZiSb3vvYCdirzt8orM"
+  }
+}
