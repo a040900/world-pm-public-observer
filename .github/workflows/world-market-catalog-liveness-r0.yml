@@ -1,0 +1,41 @@
+name: WORLD_MARKET_CATALOG_LIVENESS_R0
+
+on:
+  push:
+    branches:
+      - research/economic-first-reassessment-r1-20260930
+    paths:
+      - tools/research/world_market_catalog_liveness_r0.py
+      - .github/workflows/world-market-catalog-liveness-r0.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install requests==2.32.3
+      - name: Run catalog liveness probe
+        run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python tools/research/world_market_catalog_liveness_r0.py
+      - name: Hash artifact
+        if: always()
+        run: |
+          if [ -f artifacts/world-market-catalog-liveness-r0.json ]; then
+            sha256sum artifacts/world-market-catalog-liveness-r0.json > artifacts/world-market-catalog-liveness-r0.sha256
+            cat artifacts/world-market-catalog-liveness-r0.sha256
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-market-catalog-liveness-r0-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
