@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "WORLD_OWNER_QUOTE_CHECK_R0",
+  "verdict": "NO_RESULT_CURRENT_FRONTEND_CONTRACT_UNRESOLVED",
+  "diagnosticOutcome": "OWNER_PUBLIC_KEY_BOTH_SIDES_SPONSORSHIP_UNAVAILABLE",
+  "localOriginalReceiptSha256": "27a140e69b25b53d21acfd0339889d01e3a86e211879b57709cdddc05db282c1",
+  "redactedReceiptSha256": "32a676e0de5cda8982b6f29ebefab1f069254823c4d4e003d71148ead2a0f999",
+  "ownerPublicKeyRedacted": true,
+  "fullJwtPersisted": false,
+  "turnstileTokenUsed": false,
+  "authorityDecisionModified": false
+}
