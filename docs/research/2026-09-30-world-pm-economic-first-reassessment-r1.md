@@ -174,3 +174,87 @@ World-specific incremental lead beyond CEX:
 - not promoted by R1.
 
 NO_TRADE remains binding.
+
+
+## 2026-09-30 zero-score liveness findings
+
+These diagnostics carry zero research score. They exist only to determine whether the current public execution/discovery surfaces used by Phase A still behave as assumed.
+
+### Discovery horizon
+
+Run 36650837024 demonstrated that the original on-chain discovery horizon of 80 recent prediCt signatures is too narrow under current transaction density.
+
+Observed:
+- 263 recent signatures in the expanded query;
+- the 80th signature was still newer than the earliest slot needed;
+- default80CoversEarliestNeeded = false;
+- the immediately prior BTC5m market required scanOrdinal 96 to recover;
+- the current BTC5m market was recovered and validated from an exact World metadata description.
+
+Interpretation:
+WORLD_CURRENT_BTC5M_MARKET_NOT_DISCOVERED can be a discovery false negative under the old 80-signature bound. This failure must not be interpreted as evidence that the market does not exist or that the economic route is absent.
+
+### World public catalog
+
+Run 36651034590 called:
+https://markets-api-proxy.world-xyz.workers.dev/api/v1/markets
+
+Observed:
+- HTTP 401
+- response body: {"error":"Unauthorized"}
+
+A third-party technical reference had verified this catalog as open on 2026-09-11. The current 2026-09-30 observation shows that public access behavior has changed. The catalog cannot presently be treated as an unauthenticated discovery authority.
+
+### Current executable-quote surface comparison
+
+Run 36651423451 attempt 2 recovered a live current BTC5m World market and received healthy DFlow indicative quotes for both outcomes.
+
+Current market:
+- start: 1790728800
+- market: 9Y3vPcw5iMcjEC2VPH2Ds6uQkAzEDhEhmoHWFFcdNYtq
+- YES mint: 8tBWSPAA5fin515Hdc1DpN4fXA4fCs2Qxdm8wCHxkLYN
+- NO mint: A23t3YJXKV9Jex6JfyZD1RjaghYkCsxrgGW8wV4t7MBP
+
+DFlow indicative observations:
+- YES ask approximately 0.67753907
+- NO ask approximately 0.36554836
+- both sides healthy and fresh
+
+Read-only exact quote probes at the same live market:
+- World proxy aggregator-api-proxy.world-xyz.workers.dev/order:
+  - YES HTTP 404, empty body
+  - NO HTTP 404, empty body
+- DFlow dev dev-quote-api.dflow.net/order:
+  - YES HTTP 400, {"msg":"Route not found","code":"route_not_found"}
+  - NO HTTP 400, {"msg":"Route not found","code":"route_not_found"}
+- DFlow production quote-api.dflow.net/order without API key:
+  - YES HTTP 403, empty body
+  - NO HTTP 403, empty body
+
+DFlow current public documentation states that userPublicKey is optional for quote-only GET /order calls, so the World proxy 404 is not explained merely by omission of a wallet public key.
+
+### Reassessment impact
+
+The Phase A taker result paperTradeDecisionCount=0 remains valid as an observation about that runtime, but it is not clean economic negative evidence.
+
+The current public environment demonstrates:
+1. World BTC5m markets still exist and can be identified on-chain.
+2. DFlow still emits live indicative quotes for the outcome mints.
+3. The previously used World unauthenticated exact-quote proxy currently returns 404.
+4. DFlow's dev endpoint currently reports route_not_found for the same live outcome mints.
+5. DFlow production /order requires authenticated access.
+
+Therefore the taker route is currently classified:
+EDGE_OBSERVED + EXECUTION_ACCESS_BLOCKED
+
+This does not establish executable positive EV. It also prevents the old public exact-quote failure rate from being interpreted as proof that the displayed relative-value discrepancy itself was economically false.
+
+### Minimum next work
+
+Do not start another long prospective campaign.
+
+The next economically relevant branch point is:
+- obtain a supported current executable quote surface for World outcome tokens, or
+- accept that unauthenticated public execution access is currently unavailable and park the taker route on operational-access grounds.
+
+Any future fresh economic POC should begin only after executable quote access is restored or independently reproduced.
