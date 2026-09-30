@@ -1,4 +1,4 @@
-# World BTC5m Self-Build Execution Feasibility R0
+> NON-AUTHORITATIVE VENUE-SPECIFIC EVIDENCE. Authoritative research-state adjudication lives in `a040900/prediction-market-relative-value/main` at `docs/decisions/2026-09-30-world-pm-btc5m-economic-first-self-build-reassessment-r1.md`.\n\n# World BTC5m Self-Build Execution Feasibility R0
 
 Date: 2026-09-30
 Repository: a040900/world-pm-public-observer
