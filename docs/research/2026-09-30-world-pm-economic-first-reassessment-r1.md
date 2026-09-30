@@ -258,3 +258,106 @@ The next economically relevant branch point is:
 - accept that unauthenticated public execution access is currently unavailable and park the taker route on operational-access grounds.
 
 Any future fresh economic POC should begin only after executable quote access is restored or independently reproduced.
+
+
+## Economic-first repricing of accepted Phase A taker candidates
+
+This section is a post-hoc prioritization diagnostic over already prospective Phase A artifacts. It does not create a new confirmatory research score and does not establish executable PnL.
+
+### New DFlow semantic authority
+
+Current DFlow documentation states that the quote stream:
+- computes each quote from an approximately USD 10 equivalent routed trade;
+- reports bid/ask rates that this routed trade would execute at;
+- remains an approximation and may differ from the quote returned at actual order time.
+
+The existing Phase A World radar used this DFlow quote stream for the World-side ask.
+
+The Phase A candidate trigger already used:
+- World DFlow ask;
+- Polymarket best ask;
+- Polymarket frozen taker fee adjustment;
+- sub-1 combined indicative unit cost.
+
+Therefore the DFlow leg has stronger economic meaning than a generic UI/display midpoint, while remaining insufficient for EXECUTABLE_EDGE without a supported production order quote.
+
+### Accepted 54-window reprice diagnostic
+
+Inputs:
+- accepted Phase A batches 04 attempt 2, 05, 06, 07, 08 attempt 2, 09, 10, 11, and 12 attempt 2;
+- 54 valid prospective windows;
+- 211 taker candidates;
+- 210 candidates with a valid post-request Polymarket response-state ask book;
+- one candidate excluded from this reprice because PM transport was invalid at the response anchor.
+
+For each analyzable candidate:
+1. freeze the observed World DFlow ask from the prospective trigger;
+2. use USD 10 / World ask as the approximately USD 10 World outcome-share quantity implied by the documented quote-stream construction;
+3. use the Polymarket response-state full ask book recorded after the failed World exact-quote request;
+4. walk Polymarket asks to acquire the same number of net outcome shares using the frozen Phase A fee schedule and fee rounding;
+5. compute conditional package unit cost as:
+   (USD 10 World approximate cost + PM depth-walk cost) / matched outcome shares.
+
+Important limitation:
+The World DFlow ask is frozen at trigger time while the PM response-state book is observed after the failed World /order attempt. World is not re-quoted at that later anchor. This diagnostic therefore measures whether the PM side still leaves room under the earlier approximately USD 10 World pre-trade rate; it is not synchronized two-leg executable proof.
+
+Observed World exact-quote request latency:
+- median approximately 330 ms;
+- 90th percentile approximately 422 ms;
+- maximum approximately 1901 ms.
+
+Results among 210 analyzable candidates:
+- PM depth could cover the approximately USD 10 World-equivalent share quantity in 210/210 using the recorded full ask books;
+- positive conditional package edge after PM fee and depth at the response anchor: 173/210;
+- >25 bps: 154/210;
+- >50 bps: 143/210;
+- >100 bps: 116/210;
+- >200 bps: 65/210;
+- >300 bps: 41/210;
+- >500 bps: 20/210;
+- >1000 bps: 2/210;
+- median response-anchor conditional edge: approximately 122.8 bps;
+- 90th percentile: approximately 485.3 bps;
+- maximum observed diagnostic edge: approximately 2273.1 bps.
+
+Window-level results:
+- 54/54 windows had at least one positive response-anchor conditional candidate;
+- 49/54 had a best candidate >=100 bps;
+- 38/54 >=200 bps;
+- 26/54 >=300 bps;
+- 15/54 >=500 bps;
+- median best candidate per window: approximately 284.7 bps;
+- minimum best candidate among the 54 windows: approximately 39.4 bps;
+- median positive candidate count per window: 3.
+
+Direction counts:
+- analyzable WORLD_YES + PM_DOWN candidates: 107; positive at response anchor: 94;
+- analyzable WORLD_NO + PM_UP candidates: 103; positive at response anchor: 79.
+
+Settlement observations for these 54 accepted windows:
+- 44 resolved with same-direction World/Polymarket outcomes;
+- 10 remained pending/unknown in the stored Phase A artifact;
+- zero observed resolved direction mismatches in this 54-window subset.
+
+This settlement observation does not prove payoff equivalence or eliminate basis risk.
+
+### Economic-first interpretation
+
+The prior statement that the taker route had no economic result was too pessimistic for prioritization.
+
+A more accurate current interpretation is:
+- prospective sub-1 discrepancies were frequent;
+- the DFlow World quote has documented approximately USD 10 pre-trade routing semantics;
+- the Polymarket side had enough recorded depth for the corresponding small-size hedge in all 210 analyzable candidates;
+- a large majority retained positive conditional economics after the approximately 330 ms World exact-quote request delay when the later PM book was used;
+- actual World order-time execution remains unverified because the public World proxy now returns 404 and DFlow production /order requires x-api-key authentication.
+
+Primary classification remains:
+EDGE_OBSERVED
+
+Additional qualifiers:
+- ECONOMIC_POC_POSITIVE
+- EXECUTION_ACCESS_BLOCKED
+- SETTLEMENT_BASIS_RISK_UNRESOLVED
+
+The route should now be prioritized for a bounded production-quote execution POC if supported DFlow production API access becomes available. It should not be sent back through maker queue engineering or another long Phase A capture first.
