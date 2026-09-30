@@ -1,0 +1,29 @@
+name: WORLD_PUBLIC_AGGREGATOR_PROXY_BTC5M_PROBE_R0
+on:
+  push:
+    branches: [research/economic-first-reassessment-r1-20260930]
+    paths:
+      - tools/research/world_public_aggregator_proxy_btc5m_probe_r0.py
+      - .github/workflows/world-public-aggregator-proxy-btc5m-probe-r0.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - run: python -m py_compile tools/research/world_public_aggregator_proxy_btc5m_probe_r0.py
+      - run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python tools/research/world_public_aggregator_proxy_btc5m_probe_r0.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-public-aggregator-proxy-btc5m-probe-r0-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
