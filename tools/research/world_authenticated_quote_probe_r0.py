@@ -16,7 +16,7 @@ from tools.research import world_frontend_quote_contract_r0 as fc
 from tools.research import world_pm_jupiter_economic_poc_r0 as jp
 
 
-def run(output: Path):
+def run(output: Path, matched_control: bool = False):
     if output.exists():
         raise RuntimeError("EVIDENCE_EXISTS_REFUSE_OVERWRITE")
     token = sys.stdin.read().strip()
@@ -65,6 +65,12 @@ def run(output: Path):
             if token in body:
                 raise RuntimeError("TOKEN_ECHO_REFUSE_PERSISTENCE")
             result["probes"].append({**meta, "side": side, "parameters": params, "body": body})
+        if matched_control:
+            assert market["startTs"] <= time.time() < market["endTs"], "CURRENT_WINDOW_EXPIRED"
+            control_headers = {k:v for k,v in headers.items() if k != "Authorization"}
+            params = result["probes"][0]["parameters"]
+            raw, meta = fc.receipt(fc.PROXY + "/order?" + urllib.parse.urlencode(params), control_headers)
+            result["sameWindowNoJwtControl"] = {**meta, "parameters": params, "body": raw.decode("utf-8", "replace")}
         result["verdict"] = "NO_RESULT_AUTHENTICATED_ORDER_RESPONSE_REQUIRES_REVIEW"
     except Exception as error:
         # Do not serialize exception text which could contain authorization material.
@@ -106,5 +112,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify", action="store_true")
+    parser.add_argument("--matched-control", action="store_true")
     args = parser.parse_args()
-    verify(args.output) if args.verify else run(args.output)
+    verify(args.output) if args.verify else run(args.output, args.matched_control)

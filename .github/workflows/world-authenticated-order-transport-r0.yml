@@ -1,0 +1,41 @@
+name: WORLD_AUTHENTICATED_ORDER_TRANSPORT_R0
+on:
+  push:
+    branches: [research/economic-first-reassessment-r1-20260930]
+    paths:
+      - .github/workflows/world-authenticated-order-transport-r0.yml
+permissions:
+  contents: read
+jobs:
+  bounded-read-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - name: World public jurisdiction receipt, no token
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import json, time
+          from pathlib import Path
+          from tools.research.world_frontend_quote_contract_r0 import receipt
+          url = "https://markets-api-proxy.world-xyz.workers.dev/check-jurisdiction"
+          raw, meta = receipt(url, {"Accept":"application/json", "Origin":"https://world.xyz", "Referer":"https://world.xyz/", "User-Agent":"world-pm-public-observer/transport-r0"})
+          Path("artifacts/jurisdiction.json").write_text(json.dumps({**meta,"body":raw.decode("utf-8","replace"),"environment":"github-hosted ubuntu-latest","runId":"${{ github.run_id }}"},indent=2)+"\n")
+          print(json.dumps({"jurisdictionHttpStatus":meta["status"]}))
+          PY
+      - name: Two authenticated quotes and one same-window no-JWT control
+        env:
+          WORLD_DIAGNOSTIC_JWT: ${{ secrets.WORLD_DIAGNOSTIC_JWT_R0 }}
+        run: |
+          printf '%s' "$WORLD_DIAGNOSTIC_JWT" | python -m tools.research.world_authenticated_quote_probe_r0 --output artifacts/order --matched-control
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-authenticated-order-transport-r0-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 7
+          if-no-files-found: error
