@@ -1,0 +1,33 @@
+name: DIRECT_MAKER_ACCESS_POC_R0
+on:
+  push:
+    branches: [research/economic-first-reassessment-r1-20260930]
+    paths:
+      - tools/research/direct_maker_access_poc_r0.py
+      - .github/workflows/direct-maker-access-poc-r0.yml
+permissions:
+  contents: read
+jobs:
+  poc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python tools/research/direct_maker_access_poc_r0.py
+      - if: always()
+        run: |
+          if [ -f artifacts/direct-maker-access-poc-r0.json ]; then
+            sha256sum artifacts/direct-maker-access-poc-r0.json > artifacts/direct-maker-access-poc-r0.sha256
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: direct-maker-access-poc-r0-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
