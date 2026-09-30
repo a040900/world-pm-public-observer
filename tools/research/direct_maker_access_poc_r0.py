@@ -75,7 +75,7 @@ def main(args):
         sig=str(row.get("signature") or "")
         if not sig:continue
         try:
-            tx=wp._rpc(args.rpc,"getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":0,"commitment":"confirmed"}],deadline=deadline,trace=trace)
+            tx=wp._rpc(args.rpc,"getTransaction",[sig,{"encoding":"jsonParsed","maxSupportedTransactionVersion":1,"commitment":"confirmed"}],deadline=deadline,trace=trace)
         except Exception as e:
             out["errors"].append(f"{sig}:{type(e).__name__}:{e}"); continue
         if not isinstance(tx,Mapping) or tx.get("meta",{}).get("err") is not None:continue
@@ -113,8 +113,8 @@ def main(args):
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--rpc",default="https://solana-rpc.publicnode.com")
-    p.add_argument("--signature-limit",type=int,default=300)
+    p.add_argument("--signature-limit",type=int,default=800)
     p.add_argument("--max-trades",type=int,default=30)
-    p.add_argument("--deadline-seconds",type=float,default=180)
+    p.add_argument("--deadline-seconds",type=float,default=300)
     p.add_argument("--output",default="artifacts/direct-maker-access-poc-r0.json")
     main(p.parse_args())
