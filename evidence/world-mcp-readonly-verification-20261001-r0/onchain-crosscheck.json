@@ -1,0 +1,111 @@
+{
+  "startedAt": 1790797234.7606504,
+  "startTs": 1790796900,
+  "rpcReceipts": [
+    {
+      "method": "getProgramAccounts",
+      "params": [
+        "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+        {
+          "encoding": "base64",
+          "filters": [
+            {
+              "dataSize": 320
+            },
+            {
+              "memcmp": {
+                "offset": 258,
+                "bytes": "TnfwYEaoUh5"
+              }
+            }
+          ],
+          "commitment": "confirmed"
+        }
+      ],
+      "result": [
+        {
+          "pubkey": "2rZkD42LonjCzwS3ENBz66y7ofmcg73CpruQ56HrZfqv",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWEdE1KhJDi68WUEcer5gfwgxz0aUVB4yWBVBEUaHP14fisCRaU/MXkWe/Inj7/B+oVW1dzP9S0m0d39puC4E7gPNAe4bcUAL/HhqBDBdClvPqfJ/i8HUQC6dbCa5mf6su34Vwu4PtaZ9K6PEaAAAAABAn////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC7mdX6IIsANJzvDQPwkycr+EjpP8uodvbMZRLx9lfoCbQ86ABAACAutTzoAEAAAF/ohSmwsYdAAEqDegTFssdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "3E3ecKVF17CAoJgNY1cg5bCfzQBsGSXdKBz5xKg7dTpF",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWtY2JyxSihOmY+eao21+HKqCaJEr93NuSPUVloXlf3dKm8oo4bVxwxVP8A+zMRgQimgrImKzT5qCEyeopNXg6nFdnJ5lEKNFCD45WJHkwzgaxI4lP2PrOZT6f/47jSAzUvim24W6wNBpK6PEaAAAAABAn///+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACj4CRVqCPuxuqkuTn7p8FbdJi6G3w+h50Y3vnclZ2oCbQ86ABAACAutTzoAEAAAGn1bnEugoAAAEeuiMyvQoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "85gMVkZhnaJdNjJoCuUrWdYqVmxdjoMdpDvBjVQrbrAM",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWHZEcbmW/IRqajiW5/onW+NyODZ0ptbWmcaLm5NcVdfSrd5Yl5XOxa8/SwxsOGbvfqykQClcwi/8iLDQmbUtAbQxFxhQ0ZqbZxI4vEkSg5UCWC5SLy7y4izfY1tZG9hAIse5cpQdUGQFL6PEaAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACGHtC6bVa5nTQYgr4vbJNtZZMTT+e/7KhesmcXR6FoCbQ86ABAACAutTzoAEAAAFosW4yJwgAAAFjJzlzIggAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "DkWR3Yt9Q1k6C2cysfEiducTkQcR1AShQjfmEE5itWmY",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWDoTWcS/JIqfPbJpF3xBPT5KFmjavfoBPiNU/80YaKNXgiA8AUUAcqNJyzNYj1p1dV8Co9l4545MIvOUcxV7PWXyTrrhuepulVTAWv3D1WnSx3O7GsHRB5UprSOFfbkOEOJVYDDFHQGhK6PEaAAAAABAn////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC2KBRd7kDFCGF33p1t9b9XVNcoQUOm2wFGknuGtPaoCbQ86ABAACAutTzoAEAAAFstx/JIgAAAAEaj8zNIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        },
+        {
+          "pubkey": "HAqdkWCnKfhEaSdSZWXXinfT7mHLA9oREqoAgj9HiFx9",
+          "account": {
+            "lamports": 2275840,
+            "data": [
+              "277VNwDjxpq1mrWlZrAzUh9KfsVVbZVY8REqEwaCWNRiN6CfNgSbU6XbYarxVp2nEjTMABwSMBLpgxFnhO+e2VjrUl8Z+oiWDppXjHjeHkwKOmYnccNL2Jb4Oa6DwZ6qjP/Up6uqHEBni4UOhJZVI/1Dfns5Zs/bC74WQYzMZp4KAWBY6rzg9xAKf8hLsbG07zNuF02bUPcaj/D/EzOJDkO/dzzu/LgL2eoAYE8E8RZL6PEaAAAAABAn///7AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAC+/n1jvickzhXcNKJ18EMAcJQZB2qgRBj4wPuCVWToCbQ86ABAACAutTzoAEAAAHWYFQ+VfMAAAEZWlkOjvMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+              "base64"
+            ],
+            "owner": "prediCtPZCttYMvm2W3PtxmMxLmT1dtN7riU6Cxh6tM",
+            "executable": false,
+            "rentEpoch": 18446744073709551615,
+            "space": 320
+          }
+        }
+      ]
+    }
+  ],
+  "NO_TRADE": true,
+  "matchedMarket": {
+    "market": "2rZkD42LonjCzwS3ENBz66y7ofmcg73CpruQ56HrZfqv",
+    "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+    "yesMint": "2CYxQFmsPfq6vJY9Q2PMrQ2X74VjDjAbEmkBZbU54eAr",
+    "noMint": "GFtvPpAm6e8XtJ2885ANqaWQrRQhstS4CpinKFhmsKJF",
+    "vault": "HNZ6koqeGvP89sBx3o5G2TVnYWxeFuMrQ8hinqmAZVau",
+    "startTs": 1790796900,
+    "endTs": 1790797200
+  },
+  "mintAndWindowMatch": true,
+  "finishedAt": 1790797235.2225268
+}

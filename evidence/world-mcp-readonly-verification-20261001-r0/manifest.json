@@ -1,0 +1,8 @@
+{
+  "verdict": "WORLD_CONNECTOR_READONLY_MARKET_AND_INDICATIVE_ORDERBOOK_CONFIRMED_AT_RECEIPT_TIME",
+  "files": {
+    "mcp-receipts.json": "ccb5afa547bf5c66d842b7532d40d4d0ac803052f7b1e85a933a369df477c898",
+    "onchain-crosscheck.json": "3f179903d5353db85c46758c93ebfc97b0d71fdd8595c1438dd76ed3c232d1d2"
+  },
+  "NO_TRADE": true
+}
