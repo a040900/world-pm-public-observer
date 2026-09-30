@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "WORLD_NORMAL_AUTHENTICATED_QUOTE_CHECK_R0",
+  "recordedAtUtc": "2026-09-30T13:28:56Z",
+  "target": "https://world.xyz",
+  "mode": "NORMAL_BROWSER_PUBLIC_ANONYMOUS_AUTH_QUOTE_BUILD_ONLY",
+  "verdict": "NO_RESULT_NORMAL_BROWSER_RUNTIME_UNAVAILABLE",
+  "contractEvidenceCommit": "08bea76381e7509d0a025a5db063b064c9fd40f7",
+  "attempts": [
+    {
+      "tool": "mcp__cua_repl.js",
+      "operation": "cua.createBrowserTab(iab, https://world.xyz, visible=true)",
+      "afterExplicitKernelReset": true,
+      "result": "trusted Node process exited unexpectedly; kernel reset, rerun your request"
+    },
+    {
+      "tool": "mcp__cua_repl.js",
+      "operation": "cua.createBrowserTab(iab, https://world.xyz, visible=true)",
+      "result": "trusted Node process exited unexpectedly; kernel reset, rerun your request"
+    },
+    {
+      "tool": "mcp__node_repl__js",
+      "operation": "initialize bundled @oai/sky Computer Use API",
+      "result": "node_repl kernel exited unexpectedly",
+      "diagnostic": "windows sandbox failed: permission path cannot be represented losslessly"
+    }
+  ],
+  "displayRequest": {
+    "tool": "mcp__codex_app__open_in_codex",
+    "targetType": "browser",
+    "url": "https://world.xyz",
+    "result": "queued",
+    "pageRenderedConfirmed": false
+  },
+  "normalTurnstileAcquisitionAttempted": false,
+  "validJwtAcquired": false,
+  "authenticatedOrderRequestAttempted": false,
+  "builtTransactionObtained": false,
+  "interpretation": "Local browser/helper startup failure. This is not an authenticated World response and does not establish whether the normal Turnstile/JWT/order path works.",
+  "boundary": {
+    "storedBrowserTokensRead": false,
+    "captchaSolvedOrBypassed": false,
+    "credentialsOrPrivateKeysAccessed": false,
+    "walletConnected": false,
+    "simulation": false,
+    "signature": false,
+    "transactionSubmission": false,
+    "broadcast": false
+  },
+  "authorityDecisionModified": false
+}

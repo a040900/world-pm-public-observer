@@ -1,0 +1,330 @@
+{
+  "candidateCount": 10,
+  "finishedAt": 1790775213.6452205,
+  "manifestProgram": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+  "rpcCanonicalHashMethod": "sha256(json.dumps(receipt.response, sort_keys=True, separators=(',', ':')).encode('utf-8'))",
+  "mode": "PUBLIC_READ_ONLY_NO_TRADE",
+  "noTrade": true,
+  "offlineVerification": {
+    "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+    "currentWindowEndTs": 1790775300,
+    "currentWindowStartTs": 1790775000,
+    "noMint": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+    "ownerExpected": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+    "yesMint": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if"
+  },
+  "reverseProbeStartedAt": 1790775213.0729764,
+  "rpcReceipts": [
+    {
+      "endedAt": 1790775023.924368,
+      "endpoint": "https://api.mainnet-beta.solana.com",
+      "httpStatus": 200,
+      "method": "getProgramAccounts",
+      "params": [
+        "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+        {
+          "commitment": "confirmed",
+          "dataSlice": {
+            "length": 0,
+            "offset": 0
+          },
+          "encoding": "base64",
+          "filters": [
+            {
+              "memcmp": {
+                "bytes": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if",
+                "offset": 16
+              }
+            },
+            {
+              "memcmp": {
+                "bytes": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+                "offset": 48
+              }
+            }
+          ]
+        }
+      ],
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": []
+      },
+      "responseHeaders": {
+        "access-control-allow-headers": "authorization, *",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "access-control-allow-origin": "backend_traffic",
+        "access-control-max-age": "86400",
+        "allow": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=60",
+        "connection": "close",
+        "content-type": "application/json",
+        "date": "Wed, 30 Sep 2026 13:30:23 GMT",
+        "transfer-encoding": "chunked",
+        "x-ratelimit-conn-limit": "40",
+        "x-ratelimit-conn-remaining": "39",
+        "x-ratelimit-connrate-limit": "40",
+        "x-ratelimit-connrate-remaining": "39",
+        "x-ratelimit-endpoint-limit": "unlimited",
+        "x-ratelimit-endpoint-remaining": "-2463",
+        "x-ratelimit-method-limit": "10",
+        "x-ratelimit-method-remaining": "8",
+        "x-ratelimit-pubsub-limit": "10",
+        "x-ratelimit-pubsub-remaining": "10",
+        "x-ratelimit-rps-limit": "250",
+        "x-ratelimit-rps-remaining": "247",
+        "x-ratelimit-tier": "free",
+        "x-rpc-node": "tyo263"
+      },
+      "responseCanonicalSha256": "5458704bd0a3e61af2904b30e4be8a36081bcda2b4712d4008404c6cc4d74db1",
+      "responseSha256": "592c9d1e800beb2c1beea99da37d53f0436ef85b1cb9858fc0a3ca9c543e2409",
+      "startedAt": 1790775023.780496
+    },
+    {
+      "endedAt": 1790775024.0775063,
+      "endpoint": "https://api.mainnet-beta.solana.com",
+      "httpStatus": 200,
+      "method": "getProgramAccounts",
+      "params": [
+        "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+        {
+          "commitment": "confirmed",
+          "dataSlice": {
+            "length": 0,
+            "offset": 0
+          },
+          "encoding": "base64",
+          "filters": [
+            {
+              "memcmp": {
+                "bytes": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+                "offset": 16
+              }
+            },
+            {
+              "memcmp": {
+                "bytes": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+                "offset": 48
+              }
+            }
+          ]
+        }
+      ],
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": []
+      },
+      "responseHeaders": {
+        "access-control-allow-headers": "authorization, *",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "access-control-allow-origin": "backend_traffic",
+        "access-control-max-age": "86400",
+        "allow": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=60",
+        "connection": "close",
+        "content-type": "application/json",
+        "date": "Wed, 30 Sep 2026 13:30:24 GMT",
+        "transfer-encoding": "chunked",
+        "x-ratelimit-conn-limit": "40",
+        "x-ratelimit-conn-remaining": "39",
+        "x-ratelimit-connrate-limit": "40",
+        "x-ratelimit-connrate-remaining": "39",
+        "x-ratelimit-endpoint-limit": "unlimited",
+        "x-ratelimit-endpoint-remaining": "-2461",
+        "x-ratelimit-method-limit": "10",
+        "x-ratelimit-method-remaining": "7",
+        "x-ratelimit-pubsub-limit": "10",
+        "x-ratelimit-pubsub-remaining": "10",
+        "x-ratelimit-rps-limit": "250",
+        "x-ratelimit-rps-remaining": "246",
+        "x-ratelimit-tier": "free",
+        "x-rpc-node": "tyo263"
+      },
+      "responseCanonicalSha256": "5458704bd0a3e61af2904b30e4be8a36081bcda2b4712d4008404c6cc4d74db1",
+      "responseSha256": "592c9d1e800beb2c1beea99da37d53f0436ef85b1cb9858fc0a3ca9c543e2409",
+      "startedAt": 1790775023.924368
+    },
+    {
+      "endedAt": 1790775213.3608289,
+      "endpoint": "https://api.mainnet-beta.solana.com",
+      "httpStatus": 200,
+      "method": "getProgramAccounts",
+      "params": [
+        "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+        {
+          "commitment": "confirmed",
+          "dataSlice": {
+            "length": 0,
+            "offset": 0
+          },
+          "encoding": "base64",
+          "filters": [
+            {
+              "memcmp": {
+                "bytes": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+                "offset": 16
+              }
+            },
+            {
+              "memcmp": {
+                "bytes": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if",
+                "offset": 48
+              }
+            }
+          ]
+        }
+      ],
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": []
+      },
+      "responseHeaders": {
+        "access-control-allow-headers": "authorization, *",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "access-control-allow-origin": "backend_traffic",
+        "access-control-max-age": "86400",
+        "allow": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=60",
+        "connection": "close",
+        "content-type": "application/json",
+        "date": "Wed, 30 Sep 2026 13:33:33 GMT",
+        "transfer-encoding": "chunked",
+        "x-ratelimit-conn-limit": "40",
+        "x-ratelimit-conn-remaining": "39",
+        "x-ratelimit-connrate-limit": "40",
+        "x-ratelimit-connrate-remaining": "39",
+        "x-ratelimit-endpoint-limit": "unlimited",
+        "x-ratelimit-endpoint-remaining": "-2599",
+        "x-ratelimit-method-limit": "10",
+        "x-ratelimit-method-remaining": "9",
+        "x-ratelimit-pubsub-limit": "10",
+        "x-ratelimit-pubsub-remaining": "10",
+        "x-ratelimit-rps-limit": "250",
+        "x-ratelimit-rps-remaining": "249",
+        "x-ratelimit-tier": "free",
+        "x-rpc-node": "tyo263"
+      },
+      "responseCanonicalSha256": "5458704bd0a3e61af2904b30e4be8a36081bcda2b4712d4008404c6cc4d74db1",
+      "responseSha256": "592c9d1e800beb2c1beea99da37d53f0436ef85b1cb9858fc0a3ca9c543e2409",
+      "startedAt": 1790775213.0729764
+    },
+    {
+      "endedAt": 1790775213.6452205,
+      "endpoint": "https://api.mainnet-beta.solana.com",
+      "httpStatus": 200,
+      "method": "getProgramAccounts",
+      "params": [
+        "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+        {
+          "commitment": "confirmed",
+          "dataSlice": {
+            "length": 0,
+            "offset": 0
+          },
+          "encoding": "base64",
+          "filters": [
+            {
+              "memcmp": {
+                "bytes": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+                "offset": 16
+              }
+            },
+            {
+              "memcmp": {
+                "bytes": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+                "offset": 48
+              }
+            }
+          ]
+        }
+      ],
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": []
+      },
+      "responseHeaders": {
+        "access-control-allow-headers": "authorization, *",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "access-control-allow-origin": "backend_traffic",
+        "access-control-max-age": "86400",
+        "allow": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=60",
+        "connection": "close",
+        "content-type": "application/json",
+        "date": "Wed, 30 Sep 2026 13:33:33 GMT",
+        "transfer-encoding": "chunked",
+        "x-ratelimit-conn-limit": "40",
+        "x-ratelimit-conn-remaining": "39",
+        "x-ratelimit-connrate-limit": "40",
+        "x-ratelimit-connrate-remaining": "39",
+        "x-ratelimit-endpoint-limit": "unlimited",
+        "x-ratelimit-endpoint-remaining": "-2600",
+        "x-ratelimit-method-limit": "10",
+        "x-ratelimit-method-remaining": "8",
+        "x-ratelimit-pubsub-limit": "10",
+        "x-ratelimit-pubsub-remaining": "10",
+        "x-ratelimit-rps-limit": "250",
+        "x-ratelimit-rps-remaining": "248",
+        "x-ratelimit-tier": "free",
+        "x-rpc-node": "tyo263"
+      },
+      "responseCanonicalSha256": "5458704bd0a3e61af2904b30e4be8a36081bcda2b4712d4008404c6cc4d74db1",
+      "responseSha256": "592c9d1e800beb2c1beea99da37d53f0436ef85b1cb9858fc0a3ca9c543e2409",
+      "startedAt": 1790775213.3608289
+    }
+  ],
+  "schemaVersion": "WORLD_MANIFEST_BTC5M_DEPTH_PROBE_R0",
+  "sides": {
+    "no": {
+      "baseMint": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+      "bookCount": 0,
+      "books": [],
+      "mint": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+      "quoteMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "status": "NO_EXISTING_BOOK"
+    },
+    "noReverse": {
+      "baseMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "bookCount": 0,
+      "books": [],
+      "quoteMint": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+      "status": "NO_EXISTING_BOOK"
+    },
+    "yes": {
+      "baseMint": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if",
+      "bookCount": 0,
+      "books": [],
+      "mint": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if",
+      "quoteMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "status": "NO_EXISTING_BOOK"
+    },
+    "yesReverse": {
+      "baseMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "bookCount": 0,
+      "books": [],
+      "quoteMint": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if",
+      "status": "NO_EXISTING_BOOK"
+    }
+  },
+  "startTs": 1790775000,
+  "startedAt": 1790775017.033603,
+  "worldMarket": {
+    "cashMint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+    "description": "BTC/USD closes at or above its open between 2026-09-30 13:30:00 UTC and 2026-09-30 13:35:00 UTC.",
+    "endTs": 1790775300,
+    "market": "7MhFoXPPZi9CbGp78buCwoKHuuMYqtyomip3VJkZ2eEt",
+    "noMint": "J835HJeBt7jLD8MSjgd2ZMrNys34MT9SPcHyk3PmD787",
+    "startTs": 1790775000,
+    "vault": "J8bS98wPfq6AcuKfHjRk2HpCeSs2bxoDzRYuv5tQzwLa",
+    "yesMetadata": {
+      "decimals": 6,
+      "name": "BTC Up",
+      "symbol": "BTC-UP",
+      "uri": "https://m.world.xyz/8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if"
+    },
+    "yesMint": "8jsirD4PSu21Bf4gsiVmsoPYmpeaXGzRQRQqVsWJG5if"
+  }
+}
