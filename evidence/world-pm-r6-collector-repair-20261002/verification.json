@@ -1,0 +1,18 @@
+{
+  "scope": "OFFLINE_COLLECTOR_REPAIR_ONLY",
+  "baseCommit": "e109b244dd0172e492d8b6a2162bae49179c4ca7",
+  "NO_TRADE": true,
+  "freshSampleStarted": false,
+  "testsRun": 13,
+  "failures": 0,
+  "errors": 0,
+  "success": true,
+  "testLog": "test_all_twelve_consecutive_windows_discover_identity (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_all_twelve_consecutive_windows_discover_identity) ... ok\ntest_book_timeout_preserves_failure_and_actual_times (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_book_timeout_preserves_failure_and_actual_times) ... ok\ntest_cross_boundary_reply_is_not_success_and_down_is_not_requested (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_cross_boundary_reply_is_not_success_and_down_is_not_requested) ... ok\ntest_expired_window_never_discovers_or_requests (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_expired_window_never_discovers_or_requests) ... ok\ntest_identity_failure_retains_reason_and_bounds_retries (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_identity_failure_retains_reason_and_bounds_retries) ... ok\ntest_identity_reply_after_end_is_rejected (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_identity_reply_after_end_is_rejected) ... ok\ntest_incomplete_window_remains_in_fixed_denominator (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_incomplete_window_remains_in_fixed_denominator) ... ok\ntest_invalid_cadence_rejected_before_requests (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_invalid_cadence_rejected_before_requests) ... ok\ntest_late_start_skips_elapsed_targets (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_late_start_skips_elapsed_targets) ... ok\ntest_original_failure_reproduced_at_exact_start (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_original_failure_reproduced_at_exact_start) ... ok\ntest_push_workflow_only_runs_offline_tests (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_push_workflow_only_runs_offline_tests) ... ok\ntest_real_transport_is_stopped_at_network_guard (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_real_transport_is_stopped_at_network_guard) ... ok\ntest_slow_http_does_not_burst_catch_up_or_cross_window (test_world_pm_r6_fixed_12_window_pm_r0.CaptureBoundaryTests.test_slow_http_does_not_burst_catch_up_or_cross_window) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 1.631s\n\nOK\n",
+  "hashBasis": "Git index blob bytes, before commit; platform-independent LF content",
+  "sha256": {
+    "tools/research/world_pm_r6_fixed_12_window_pm_r0.py": "07f9bc69a5826bed4693bad95237d25bc8d92687464dfc590200df3f79e6f538",
+    "tests/test_world_pm_r6_fixed_12_window_pm_r0.py": "fe4568528e3f193898ae3f549a68b09c22c675b1e85ebebe1b9658de433ae994",
+    ".github/workflows/world-pm-r6-fixed-12-window-pm-r0.yml": "97d52d04b8dab0ae10c78e697cea969c9b2c326c55d7ff09224fb899d6872632"
+  },
+  "authorityModified": false
+}

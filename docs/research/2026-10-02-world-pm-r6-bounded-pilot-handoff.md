@@ -30,3 +30,20 @@ authorization follows from this handoff.
 See:
 `docs/research/2026-10-02-world-pm-r6-bounded-pilot-execution-record.md`
 and `evidence/world-pm-r6-bounded-pilot-20261002/`.
+
+## Engineering repair update (2026-10-02)
+
+The owner separately authorized a bounded collector repair and Git delivery.
+Exact-start/late identity discovery, skipped cadence targets, and cross-window
+request/reply guards are now covered by thirteen offline deterministic tests.
+The push workflow now runs offline validation only; pushing this repair does
+not launch a new capture. PM capture completeness is explicitly reported in
+the collector JSON, separately from full qualification and signal verdicts.
+
+The prior run and NO_RESULT remain unchanged. No new cohort was started.
+Next step: independent authority review of the repair, then a new explicit
+sample/launch authorization if warranted. No paper/live/canary authorization.
+The CLI remains a fresh-cohort selector per invocation, not a resume mechanism;
+a future launch must bind its newly authorized frozen sample explicitly.
+
+Details: `docs/research/2026-10-02-world-pm-r6-collector-boundary-repair-r0.md`.

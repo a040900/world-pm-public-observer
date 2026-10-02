@@ -4,7 +4,7 @@ Selection is frozen before the first window begins. Exactly 12 consecutive BTC 5
 windows remain in the denominator. Public read-only; NO_TRADE.
 """
 from __future__ import annotations
-import argparse, json, time, urllib.parse, urllib.request
+import argparse, json, math, time, urllib.parse, urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -23,9 +23,9 @@ def plist(v):
         if isinstance(x,list):return x
     raise ValueError("LIST_INVALID")
 
-def market(start:int):
+def market(start:int,timeout:float=8.0):
     slug=f"btc-updown-5m-{start}"
-    rows=get_json(GAMMA+"?"+urllib.parse.urlencode({"slug":slug}))
+    rows=get_json(GAMMA+"?"+urllib.parse.urlencode({"slug":slug}),timeout=timeout)
     if not isinstance(rows,list) or len(rows)!=1:raise RuntimeError(f"EVENT_NOT_UNIQUE:{slug}")
     ev=rows[0]; ms=ev.get("markets") or []
     if len(ms)!=1:raise RuntimeError(f"MARKET_NOT_UNIQUE:{slug}")
@@ -37,10 +37,12 @@ def market(start:int):
             "acceptingOrdersAtIdentity":m.get("acceptingOrders"),
             "description":ev.get("description") or m.get("description")}
 
-def book(token:str):
+def book(token:str,end:float):
     st=time.time()
+    if st>=end:
+        return {"success":False,"startedAt":st,"receivedAt":st,"error":"WINDOW_ENDED_NO_REQUEST"}
     try:
-        body=get_json(BOOK+"?"+urllib.parse.urlencode({"token_id":token}))
+        body=get_json(BOOK+"?"+urllib.parse.urlencode({"token_id":token}),timeout=min(8.0,end-st))
         rc=time.time()
         def norm(rows,rev=False):
             out=[]
@@ -49,10 +51,12 @@ def book(token:str):
                 except Exception:pass
             out.sort(key=lambda z:z["price"],reverse=rev);return out
         a=norm(body.get("asks"));b=norm(body.get("bids"),True)
-        return {"success":True,"startedAt":st,"receivedAt":rc,"elapsedMs":(rc-st)*1000,
+        result={"success":rc<end,"startedAt":st,"receivedAt":rc,"elapsedMs":(rc-st)*1000,
                 "sourceTimestamp":body.get("timestamp"),"hash":body.get("hash"),
                 "bestAsk":a[0]["price"] if a else None,"bestBid":b[0]["price"] if b else None,
                 "asks":a,"bids":b}
+        if rc>=end:result["error"]="RECEIVED_AFTER_WINDOW"
+        return result
     except Exception as e:return {"success":False,"startedAt":st,"receivedAt":time.time(),"error":f"{type(e).__name__}:{e}"}
 
 def settlement(slug:str):
@@ -73,14 +77,22 @@ def choose_start(min_lead:int):
     return s
 
 def capture_window(start:int,cad:float):
-    end=start+300; rec={"startTs":start,"endTs":end,"snapshots":[]}
+    if not math.isfinite(cad) or cad<=0:raise ValueError("CADENCE_MUST_BE_POSITIVE_FINITE")
+    end=start+300; rec={"startTs":start,"endTs":end,"snapshots":[],"skippedTargets":0}
     while time.time()<start-20:time.sleep(min(10,start-20-time.time()))
     m=None; err=None
-    while time.time()<start and m is None:
-        try:m=market(start)
-        except Exception as e:err=f"{type(e).__name__}:{e}";time.sleep(2)
+    # The prior sequential window may finish after this frozen start. Keep the
+    # exact identity, allow bounded late discovery, and record real capture time.
+    while time.time()<end and m is None:
+        try:
+            m=market(start,timeout=min(8.0,end-time.time()))
+            rec["identityReceivedAt"]=time.time()
+            if rec["identityReceivedAt"]>=end:
+                m=None;err="IDENTITY_RECEIVED_AFTER_WINDOW";break
+        except Exception as e:
+            err=f"{type(e).__name__}:{e}";time.sleep(max(0,min(2,end-time.time())))
     if m is None:
-        rec["identityError"]=err or "UNKNOWN"
+        rec["identityError"]=err or "WINDOW_EXPIRED_BEFORE_IDENTITY"
         while time.time()<end:time.sleep(min(10,end-time.time()))
         rec["settlement"]={"success":False,"error":"NO_MARKET_IDENTITY"}
         return rec
@@ -90,14 +102,20 @@ def capture_window(start:int,cad:float):
         now=time.time()
         if now<target:time.sleep(target-now)
         cap=time.time()
+        if cap>=end:break
+        # Do not burst through past targets with current books after a slow call.
+        missed=max(0,math.floor((cap-target)/cad))
+        rec["skippedTargets"]+=missed;i+=missed;target=start+i*cad
+        if target>=end:break
         rec["snapshots"].append({"index":i,"targetAt":target,"capturedAt":cap,
-                                 "up":book(m["upToken"]),"down":book(m["downToken"])})
+                                 "up":book(m["upToken"],end),"down":book(m["downToken"],end)})
         i+=1;target=start+i*cad
     time.sleep(max(0,min(2.0,end+2-time.time())))
     rec["settlement"]=settlement(m["slug"])
     return rec
 
 def main(args):
+    if not math.isfinite(args.cadence) or args.cadence<=0:raise ValueError("CADENCE_MUST_BE_POSITIVE_FINITE")
     first=choose_start(args.min_lead_seconds)
     starts=[first+i*300 for i in range(12)]
     out={"schemaVersion":"WORLD_PM_R6_FIXED_12_WINDOW_PM_R0","mode":"PUBLIC_READ_ONLY_NO_TRADE",
@@ -110,6 +128,10 @@ def main(args):
     out["summary"]={"windowsFrozen":12,"windowsRecorded":len(out["windows"]),
                     "windowsWithIdentity":sum("market" in w for w in out["windows"]),
                     "pairedSuccessSnapshots":sum(sum(1 for x in w.get("snapshots",[]) if x["up"].get("success") and x["down"].get("success")) for w in out["windows"])}
+    # This is PM capture completeness only; full frozen qualification and signal
+    # adjudication still belong to the analyzer/reviewer.
+    sufficient=all("market" in w and sum(x["up"].get("success") and x["down"].get("success") for x in w["snapshots"])>=120 for w in out["windows"])
+    out["summary"]["captureDataStatus"]="PM_CAPTURE_RECORDED_PENDING_QUALIFICATION" if sufficient else "NO_RESULT_PM_CAPTURE_INCOMPLETE"
     Path(args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
     print(json.dumps(out["summary"],sort_keys=True))
 
