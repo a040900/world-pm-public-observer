@@ -1,7 +1,7 @@
 name: WORLD_PM_R6_COLLECTOR_OFFLINE_REPAIR_CHECK
 on:
   push:
-    branches: [research/economic-first-reassessment-r1-20260930]
+    branches: [research/economic-first-reassessment-r1-20260930, research/r6-capture-region-frozen-anchors]
     paths:
       - tools/research/world_pm_r6_fixed_12_window_pm_r0.py
       - .github/workflows/world-pm-r6-fixed-12-window-pm-r0.yml

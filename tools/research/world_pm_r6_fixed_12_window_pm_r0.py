@@ -78,7 +78,9 @@ def choose_start(min_lead:int):
 
 def capture_window(start:int,cad:float):
     if not math.isfinite(cad) or cad<=0:raise ValueError("CADENCE_MUST_BE_POSITIVE_FINITE")
-    end=start+300; rec={"startTs":start,"endTs":end,"snapshots":[],"skippedTargets":0}
+    end=start+300; cap_start=start+5; cap_end=end-5
+    rec={"startTs":start,"endTs":end,"snapshots":[],"skippedTargets":0,
+         "captureRegionStart":cap_start,"captureRegionEnd":cap_end}
     while time.time()<start-20:time.sleep(min(10,start-20-time.time()))
     m=None; err=None
     # The prior sequential window may finish after this frozen start. Keep the
@@ -97,19 +99,19 @@ def capture_window(start:int,cad:float):
         rec["settlement"]={"success":False,"error":"NO_MARKET_IDENTITY"}
         return rec
     rec["market"]=m
-    i=0; target=float(start)
-    while target<end:
+    i=0; target=cap_start+i*cad
+    while target<cap_end:
         now=time.time()
         if now<target:time.sleep(target-now)
         cap=time.time()
-        if cap>=end:break
+        if cap>=cap_end:break
         # Do not burst through past targets with current books after a slow call.
         missed=max(0,math.floor((cap-target)/cad))
-        rec["skippedTargets"]+=missed;i+=missed;target=start+i*cad
-        if target>=end:break
+        rec["skippedTargets"]+=missed;i+=missed;target=cap_start+i*cad
+        if target>=cap_end:break
         rec["snapshots"].append({"index":i,"targetAt":target,"capturedAt":cap,
                                  "up":book(m["upToken"],end),"down":book(m["downToken"],end)})
-        i+=1;target=start+i*cad
+        i+=1;target=cap_start+i*cad
     time.sleep(max(0,min(2.0,end+2-time.time())))
     rec["settlement"]=settlement(m["slug"])
     return rec

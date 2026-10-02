@@ -52,7 +52,7 @@ class CaptureBoundaryTests(unittest.TestCase):
         rec = capture.capture_window(1000, 2)
         self.assertIn('market', rec)
         self.assertEqual(self.identities, [1000])
-        self.assertEqual(len(rec['snapshots']), 150)
+        self.assertEqual(len(rec['snapshots']), 145)
 
     def test_all_twelve_consecutive_windows_discover_identity(self):
         self.clock.now = 979
@@ -70,18 +70,27 @@ class CaptureBoundaryTests(unittest.TestCase):
         self.assertEqual(data['summary']['captureDataStatus'], 'PM_CAPTURE_RECORDED_PENDING_QUALIFICATION')
         for w in data['windows']:
             self.assertGreaterEqual(len(w['snapshots']), 120)
+            self.assertEqual(w['captureRegionStart'], w['startTs'] + 5)
+            self.assertEqual(w['captureRegionEnd'], w['endTs'] - 5)
             for s in w['snapshots']:
                 self.assertTrue(w['startTs'] <= s['capturedAt'] < w['endTs'])
                 self.assertTrue(s['capturedAt'] >= s['targetAt'])
+                self.assertTrue(w['startTs'] + 5 <= s['targetAt'] < w['startTs'] + 295)
+
+    def test_frozen_capture_region_first_and_last_anchor(self):
+        rec = capture.capture_window(1000, 2)
+        self.assertEqual(rec['snapshots'][0]['targetAt'], 1005)
+        self.assertEqual(rec['snapshots'][-1]['targetAt'], 1293)
+        self.assertTrue(all(1005 <= s['targetAt'] < 1295 for s in rec['snapshots']))
 
     def test_late_start_skips_elapsed_targets(self):
         self.clock.now = 1007.25
         rec = capture.capture_window(1000, 2)
         first = rec['snapshots'][0]
-        self.assertEqual(first['index'], 3)
-        self.assertEqual(first['targetAt'], 1006)
+        self.assertEqual(first['index'], 1)
+        self.assertEqual(first['targetAt'], 1007)
         self.assertEqual(first['capturedAt'], 1007.25)
-        self.assertEqual(rec['skippedTargets'], 3)
+        self.assertEqual(rec['skippedTargets'], 1)
 
     def test_slow_http_does_not_burst_catch_up_or_cross_window(self):
         self.latency = 3
@@ -93,8 +102,8 @@ class CaptureBoundaryTests(unittest.TestCase):
         self.assertTrue(all(timeout <= 1300-at for at, timeout in self.http_times))
 
     def test_cross_boundary_reply_is_not_success_and_down_is_not_requested(self):
-        self.clock.now = 1299
-        self.latency = 2
+        self.clock.now = 1294
+        self.latency = 7
         rec = capture.capture_window(1000, 2)
         self.assertEqual(len(self.http_times), 1)
         snap = rec['snapshots'][0]
