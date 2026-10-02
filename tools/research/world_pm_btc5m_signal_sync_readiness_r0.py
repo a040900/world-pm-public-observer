@@ -47,6 +47,26 @@ def main(args):
     local_after=time.time()
     local_mid=(local_before+local_after)/2
     start=args.start_ts if args.start_ts else (clob_time//300)*300
+    if start > clob_time:
+        time.sleep(max(0.0, start + 5 - time.time()))
+        local_before=time.time()
+        clob_time=wp._server_time()
+        local_after=time.time()
+        local_mid=(local_before+local_after)/2
+    remaining=start+300-clob_time
+    if remaining < args.min_remaining_seconds:
+        result={
+          "schemaVersion":"WORLD_PM_BTC5M_SIGNAL_SYNC_READINESS_R0",
+          "mode":"PUBLIC_READ_ONLY_NO_TRADE",
+          "startTs":start,"endTs":start+300,"clobServerTime":clob_time,
+          "remainingAtStartSeconds":remaining,
+          "verdict":"NO_RESULT","reason":"INSUFFICIENT_WINDOW_LIFETIME",
+          "limitations":["No readiness conclusion is drawn when less than the frozen minimum lifetime remains."]
+        }
+        Path(args.output).parent.mkdir(parents=True,exist_ok=True)
+        Path(args.output).write_text(json.dumps(result,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+        print(json.dumps({"verdict":"NO_RESULT","reason":"INSUFFICIENT_WINDOW_LIFETIME","remaining":remaining},sort_keys=True))
+        return
     market=wp.fetch_polymarket_market(start)
 
     snaps=[]
