@@ -126,5 +126,6 @@ if __name__=="__main__":
     p.add_argument("--start-ts",type=int,default=0)
     p.add_argument("--snapshots",type=int,default=4)
     p.add_argument("--interval-seconds",type=float,default=2.0)
+    p.add_argument("--min-remaining-seconds",type=int,default=120)
     p.add_argument("--output",default="artifacts/world-pm-btc5m-signal-sync-readiness-r0.json")
     main(p.parse_args())
