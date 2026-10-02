@@ -1,0 +1,28 @@
+name: WORLD_PM_BTC5M_SIGNAL_SYNC_READINESS_R2_ONESHOT
+on:
+  push:
+    branches: [research/economic-first-reassessment-r1-20260930]
+    paths:
+      - .github/workflows/world-pm-btc5m-signal-sync-readiness-r2-oneshot.yml
+permissions:
+  contents: read
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - run: python -m py_compile tools/research/world_pm_btc5m_signal_sync_readiness_r0.py
+      - run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python tools/research/world_pm_btc5m_signal_sync_readiness_r0.py --start-ts 1790901600 --min-remaining-seconds 120
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-pm-btc5m-signal-sync-readiness-r2-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
