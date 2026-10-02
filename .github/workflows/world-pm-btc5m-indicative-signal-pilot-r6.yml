@@ -1,0 +1,36 @@
+name: WORLD_PM_BTC5M_INDICATIVE_SIGNAL_PILOT_R6
+on:
+  push:
+    branches: [research/economic-first-reassessment-r1-20260930]
+    paths:
+      - .github/workflows/world-pm-btc5m-indicative-signal-pilot-r6.yml
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install requests==2.32.3 websockets==14.2 pycryptodome==3.23.0
+      - run: python -m py_compile tools/research/world_pm_btc5m_indicative_signal_pilot_pm_capture_r0.py
+      - run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python tools/research/world_pm_btc5m_indicative_signal_pilot_pm_capture_r0.py \
+            --first-start-ts 1790902200 \
+            --windows 12 \
+            --cadence-seconds 2.0
+      - if: always()
+        run: |
+          if [ -f artifacts/world-pm-btc5m-indicative-signal-pilot-pm-capture-r0.json ]; then
+            sha256sum artifacts/world-pm-btc5m-indicative-signal-pilot-pm-capture-r0.json > artifacts/world-pm-btc5m-indicative-signal-pilot-pm-capture-r0.sha256
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-pm-btc5m-indicative-signal-pilot-r6-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
