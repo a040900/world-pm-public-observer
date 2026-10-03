@@ -1,0 +1,39 @@
+name: WORLD_PM_R6_COHORT_CAPTURE_R1
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: r6-cohort-capture
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fc91a2300d932fd2dd51cf7d1452eff5a345e671
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m py_compile tools/research/world_pm_r6_fixed_12_window_pm_r0.py
+      - name: Capture the authorized 12-window cohort
+        run: |
+          mkdir -p artifacts
+          python tools/research/world_pm_r6_fixed_12_window_pm_r0.py \
+            --cadence 2.0 \
+            --output artifacts/world-pm-r6-cohort-capture-r1.json
+      - name: Hash capture if present
+        if: always()
+        run: |
+          if [ -f artifacts/world-pm-r6-cohort-capture-r1.json ]; then
+            sha256sum artifacts/world-pm-r6-cohort-capture-r1.json > artifacts/world-pm-r6-cohort-capture-r1.json.sha256
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-pm-r6-cohort-capture-r1
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
