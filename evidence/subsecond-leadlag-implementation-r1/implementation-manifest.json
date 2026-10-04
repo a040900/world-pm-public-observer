@@ -1,0 +1,26 @@
+{
+  "mode": "OFFLINE_ONLY_NO_SAMPLING",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1",
+    "websocket-client": "1.9.2",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0"
+  },
+  "sourceHashNormalization": "UTF-8, CRLF normalized to LF (matches Git text blobs)",
+  "sourceSha256NormalizedLF": {
+    "requirements-subsecond-r1.txt": "94cff95f0dbd225416038bedac4af2f7374e05f63a9439b8104d8dbcdcbcc5aa",
+    "tests/test_world_pm_subsecond_analyze_r1.py": "2820db1d8e39f4ddf27ca59e4a171199464e8160e1293b7c289239a0a5ebcab6",
+    "tests/test_world_pm_subsecond_capture_r1.py": "ba4ff3344f7b55dc70baa0e01cfc66b84d59417321db5789cbcfb4611a12b0dd",
+    "tests/test_world_pm_subsecond_cli_r1.py": "c7a1b5d088e6e7439f0e1cbe8fb8a21262917e23841fc2dc5ebef0131b85f477",
+    "tests/test_world_pm_subsecond_cohort_r1.py": "438271c9e3bf4019e759b3e436dd3861214108bbd1f15c7fd168ba94e14db475",
+    "tests/test_world_pm_subsecond_model_r1.py": "eccb33fd6323d515a7df8f7ed1f45a33051adce93da3c395e33c1f125e89ca88",
+    "tools/research/world_pm_subsecond_analyze_r1.py": "e952b478e8a090b77c1993672cac80e5620f3761aba6832e0646194dc8327026",
+    "tools/research/world_pm_subsecond_capture_r1.py": "92a4743542b5f6759b0e02e3b009c2bf517b4a8f5b67ba76839d7dd4259db59f",
+    "tools/research/world_pm_subsecond_model_r1.py": "696908b77e4f0c71d1115841cb5ccaa42a63c298225800ec44853aad3f5f46f8",
+    "tools/research/world_pm_subsecond_offline_acceptance_r1.py": "96c4c9718d79f49344fcde9f5b670916dab5536d8e56f1dc0efedef60703f4ee"
+  }
+}

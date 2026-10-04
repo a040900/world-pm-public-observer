@@ -1,0 +1,7 @@
+# Isolated measurement dependencies; existing requirements/workflows unchanged.
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.1
+websocket-client==1.9.2
+joblib==1.6.0
+threadpoolctl==3.7.0
