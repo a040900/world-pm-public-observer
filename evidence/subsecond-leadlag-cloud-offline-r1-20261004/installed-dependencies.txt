@@ -1,0 +1,15 @@
+certifi==2026.7.22
+charset-normalizer==3.5.2
+cloudpickle==3.1.2
+idna==3.20
+joblib==1.6.0
+narwhals==2.26.0
+numpy==2.4.6
+pycryptodome==3.23.0
+requests==2.32.3
+scikit-learn==1.9.1
+scipy==1.17.1
+threadpoolctl==3.7.0
+urllib3==2.8.0
+websocket-client==1.9.2
+websockets==14.2

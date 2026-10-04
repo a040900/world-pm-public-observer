@@ -1,0 +1,69 @@
+{
+  "authority": {
+    "repository": "a040900/prediction-market-relative-value",
+    "spec": {
+      "path": "docs/decisions/2026-10-04-subsecond-leadlag-measurement-precommit-r6.md",
+      "blob": "0003d90615245309c3b152fe8a2d0a3fb04bb091"
+    },
+    "binding": {
+      "path": "docs/decisions/2026-10-04-subsecond-leadlag-measurement-binding-r2.md",
+      "blob": "b26a1e48ed8dfcd688ac6c978dd24f42bd37d707"
+    },
+    "ownerClarification": {
+      "firstHalfCoverage": "four-horizon intersection; same inner comparison rows",
+      "secondHalfCoverage": "selected horizon only",
+      "worldIntegrityGaps": false,
+      "labelPurge": "upfront across 4h/6h; exclude labels beyond capture end"
+    }
+  },
+  "runtime": {
+    "numpy": "2.4.6",
+    "scikitLearn": "1.9.1",
+    "dtype": "float64",
+    "standardDeviationDDoF": 0,
+    "olsRcond": 1e-12,
+    "residualTolerance": 1e-10,
+    "ridgeObjective": "MSE + 1.0 * squared_l2(coef); intercept unpenalized",
+    "ridgeSolver": "svd",
+    "numpyGelsdVerification": {
+      "verifiedVersion": "2.4.6",
+      "installedVersionMatches": true,
+      "releaseCommit": "b832a09cf2a169c833dd2371e7c07aa00b293242",
+      "pythonSourceSha256Lf": "e47d0e2aed21361291cd6651999a59e6479ba5866abb8eabb1dbea5b0d1618ac",
+      "kernel": "numpy/linalg/umath_linalg.cpp:lstsq -> call_gelsd -> dgelsd (float64)",
+      "verificationScope": "official release source + installed Python wrapper; reverify after version changes"
+    }
+  },
+  "dataKind": "SYNTHETIC_OFFLINE_ONLY_NOT_ECONOMIC_EVIDENCE",
+  "linearCopy": {
+    "pass": true,
+    "maximumTrainingResidualStd": 7.353595402179449e-16,
+    "delta": 0.0,
+    "bootstrap5minCI": [
+      0.0,
+      0.0
+    ],
+    "bothResidualsDroppedAllFits": true
+  },
+  "noLeakage": {
+    "pass": true,
+    "innerTrainingParametersUnchanged": true,
+    "outerTrainingParametersUnchanged": true,
+    "outerSelectedLagUnchanged": true
+  },
+  "missingEndpointVsZero": {
+    "test": "SubsecondAnalyzerTests.test_b4_missing_endpoint_drops_row_but_valid_zero_label_survives",
+    "missingRowReason": "WORLD_MID_INVALID",
+    "missingTargetAt": 33.5,
+    "validZeroTargetAt": 33.5,
+    "validZeroTarget": 0.0,
+    "assertionsExecutedInAcceptanceSuite": true
+  },
+  "tests": {
+    "run": 37,
+    "failures": 0,
+    "errors": 0,
+    "pass": true
+  },
+  "pass": true
+}

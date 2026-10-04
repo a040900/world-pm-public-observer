@@ -1,0 +1,17 @@
+Official NumPy source release: b832a09cf2a169c833dd2371e7c07aa00b293242
+Installed wrapper equals official source after LF normalization: true
+Wrapper SHA256: e47d0e2aed21361291cd6651999a59e6479ba5866abb8eabb1dbea5b0d1618ac
+
+Dynamic linker binding observed during float64 lstsq verification process:
+         5:	binding file /workspace/scratch/ce64e7c945e3/subsecond-venv/lib/python3.11/site-packages/numpy/linalg/_umath_linalg.cpython-311-x86_64-linux-gnu.so [0] to /workspace/scratch/ce64e7c945e3/subsecond-venv/lib/python3.11/site-packages/numpy/_core/../../numpy.libs/libscipy_openblas64_-32a4b2a6.so [0]: normal symbol `scipy_dgelsd_64_'
+
+Official source excerpts:
+3827: call_gelsd(GELSD_PARAMS_t<fortran_real> *params)
+3845: call_gelsd(GELSD_PARAMS_t<fortran_doublereal> *params)
+3849:     LAPACK(dgelsd)(&params->M, &params->N, &params->NRHS,
+3920:         if (call_gelsd(params) != 0) {
+3955: call_gelsd(GELSD_PARAMS_t<fortran_complex> *params)
+3972: call_gelsd(GELSD_PARAMS_t<fortran_doublecomplex> *params)
+4049:         if (call_gelsd(params) != 0) {
+4125: lstsq(char **args, npy_intp const *dimensions, npy_intp const *steps,
+4154:             not_ok = call_gelsd(&params);

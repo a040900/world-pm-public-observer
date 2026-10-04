@@ -1,0 +1,244 @@
+{
+  "mode": "OFFLINE_ONLY_NO_SAMPLING",
+  "status": "CLOUD_HANDOVER_OFFLINE_ACCEPTED",
+  "nextState": "SECTION_2_5_BINDING_PENDING",
+  "tradeState": "NO_TRADE",
+  "cloudRuntime": {
+    "executable": "/workspace/scratch/ce64e7c945e3/subsecond-venv/bin/python",
+    "python": "3.11.9 (main, Aug 14 2024, 05:07:28) [Clang 18.1.8 ]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "uname": [
+      "Linux",
+      "0a7312f53528",
+      "6.18.44",
+      "#1 SMP Sat Sep 26 20:02:31 UTC 2026",
+      "x86_64",
+      "x86_64"
+    ],
+    "cwd": "/workspace/scratch/ce64e7c945e3/world-pm-public-observer",
+    "venvOutsideRepository": true,
+    "persistentVmGuaranteed": false,
+    "note": "Executable cloud Linux session verified; transient workspace, runtime recreated from recorded pins when needed."
+  },
+  "repository": {
+    "name": "a040900/world-pm-public-observer",
+    "branch": "research/subsecond-leadlag-measurement-r1",
+    "verifiedBaseCommit": "85e1f0d54ae4139e2d5b16e99b05f4b704ad39e9",
+    "githubReadability": "PASS: authorized connector ref + actual git clone",
+    "initialWorkingTree": "CLEAN",
+    "implementationChanges": false,
+    "evidenceOnlyAddition": "evidence/subsecond-leadlag-cloud-offline-r1-20261004",
+    "agentsFilesFound": []
+  },
+  "authorityRead": {
+    "authorizedConnector": true,
+    "bothRatifiedByOwner": true,
+    "bothBlobVersionsUnchanged": true,
+    "privateCheckoutCreated": false,
+    "privateContentCopiedIntoObserver": false,
+    "blobs": [
+      "0003d90615245309c3b152fe8a2d0a3fb04bb091",
+      "b26a1e48ed8dfcd688ac6c978dd24f42bd37d707"
+    ]
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1",
+    "websocket-client": "1.9.2",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "requests": "2.32.3",
+    "websockets": "14.2",
+    "pycryptodome": "3.23.0"
+  },
+  "numpyBuildConfiguration": {
+    "Compilers": {
+      "c": {
+        "name": "gcc",
+        "linker": "ld.bfd",
+        "version": "14.2.1",
+        "commands": "cc"
+      },
+      "cython": {
+        "name": "cython",
+        "linker": "cython",
+        "version": "3.2.4",
+        "commands": "cython"
+      },
+      "c++": {
+        "name": "gcc",
+        "linker": "ld.bfd",
+        "version": "14.2.1",
+        "commands": "c++"
+      }
+    },
+    "Machine Information": {
+      "host": {
+        "cpu": "x86_64",
+        "family": "x86_64",
+        "endian": "little",
+        "system": "linux"
+      },
+      "build": {
+        "cpu": "x86_64",
+        "family": "x86_64",
+        "endian": "little",
+        "system": "linux"
+      }
+    },
+    "Build Dependencies": {
+      "blas": {
+        "name": "scipy-openblas",
+        "found": true,
+        "version": "0.3.31.188.0",
+        "detection method": "pkgconfig",
+        "include directory": "/opt/_internal/cpython-3.11.14/lib/python3.11/site-packages/scipy_openblas64/include",
+        "lib directory": "/opt/_internal/cpython-3.11.14/lib/python3.11/site-packages/scipy_openblas64/lib",
+        "openblas configuration": "OpenBLAS 0.3.31.188.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64",
+        "pc file directory": "/project/.openblas"
+      },
+      "lapack": {
+        "name": "scipy-openblas",
+        "found": true,
+        "version": "0.3.31.188.0",
+        "detection method": "pkgconfig",
+        "include directory": "/opt/_internal/cpython-3.11.14/lib/python3.11/site-packages/scipy_openblas64/include",
+        "lib directory": "/opt/_internal/cpython-3.11.14/lib/python3.11/site-packages/scipy_openblas64/lib",
+        "openblas configuration": "OpenBLAS 0.3.31.188.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64",
+        "pc file directory": "/project/.openblas"
+      }
+    },
+    "Python Information": {
+      "path": "/tmp/build-env-gjolnpt6/bin/python",
+      "version": "3.11"
+    },
+    "SIMD Extensions": {
+      "baseline": [
+        "X86_V2"
+      ],
+      "found": [
+        "X86_V3",
+        "X86_V4",
+        "AVX512_ICL"
+      ],
+      "not found": [
+        "AVX512_SPR"
+      ]
+    }
+  },
+  "loadedBlasLibraries": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 9,
+      "prefix": "libscipy_openblas",
+      "filepath": "/workspace/scratch/ce64e7c945e3/subsecond-venv/lib/python3.11/site-packages/numpy.libs/libscipy_openblas64_-32a4b2a6.so",
+      "version": "0.3.31.188.0",
+      "threading_layer": "pthreads",
+      "architecture": "SkylakeX"
+    }
+  ],
+  "cloudGelsdVerification": {
+    "pass": true,
+    "numpyVersion": "2.4.6",
+    "officialReleaseCommit": "b832a09cf2a169c833dd2371e7c07aa00b293242",
+    "officialSources": [
+      "https://raw.githubusercontent.com/numpy/numpy/b832a09cf2a169c833dd2371e7c07aa00b293242/numpy/linalg/_linalg.py",
+      "https://raw.githubusercontent.com/numpy/numpy/b832a09cf2a169c833dd2371e7c07aa00b293242/numpy/linalg/umath_linalg.cpp"
+    ],
+    "installedWrapperMatchesOfficial": true,
+    "wrapperSha256NormalizedLF": "e47d0e2aed21361291cd6651999a59e6479ba5866abb8eabb1dbea5b0d1618ac",
+    "kernelPath": "/workspace/scratch/ce64e7c945e3/subsecond-venv/lib/python3.11/site-packages/numpy/linalg/_umath_linalg.cpython-311-x86_64-linux-gnu.so",
+    "kernelSha256": "ff1141bebaf0b681b329dfdab7153a78eb2b7c12e54e365ed70d385c495ec792",
+    "cppSha256": "36095328926fbe45f39236bcbc9d7900eaba336107c5774476611f41a1b7c879",
+    "float64Path": "numpy.linalg.lstsq -> _umath_linalg.lstsq -> call_gelsd -> dgelsd",
+    "dynamicLinkerSymbol": "scipy_dgelsd_64_",
+    "scope": "Official version source + installed wrapper equality + installed ELF symbol import/export + dynamic linker binding; not an instrumented function-call trace. Acceptance report contains static implementation metadata; this independent cloud verification is the runner evidence."
+  },
+  "checks": {
+    "fullRegression": {
+      "run": 125,
+      "failures": 0,
+      "errors": 0,
+      "pass": true
+    },
+    "newAcceptance": {
+      "run": 37,
+      "failures": 0,
+      "errors": 0,
+      "pass": true
+    },
+    "b4": {
+      "linearCopy": {
+        "pass": true,
+        "maximumTrainingResidualStd": 7.353595402179449e-16,
+        "delta": 0.0,
+        "bootstrap5minCI": [
+          0.0,
+          0.0
+        ],
+        "bothResidualsDroppedAllFits": true
+      },
+      "noLeakage": {
+        "pass": true,
+        "innerTrainingParametersUnchanged": true,
+        "outerTrainingParametersUnchanged": true,
+        "outerSelectedLagUnchanged": true
+      },
+      "missingEndpointVsZero": {
+        "test": "SubsecondAnalyzerTests.test_b4_missing_endpoint_drops_row_but_valid_zero_label_survives",
+        "missingRowReason": "WORLD_MID_INVALID",
+        "missingTargetAt": 33.5,
+        "validZeroTargetAt": 33.5,
+        "validZeroTarget": 0.0,
+        "assertionsExecutedInAcceptanceSuite": true
+      }
+    },
+    "compile": {
+      "command": "python -m py_compile tools/research/*.py",
+      "files": 52,
+      "exitCode": 0
+    }
+  },
+  "networkIsolation": {
+    "method": "Python sitecustomize audit hook inherited by subprocesses, blocking socket.connect/socket.sendto/socket.getaddrinfo",
+    "blockedEvents": 0,
+    "namespaceIsolationAvailable": false,
+    "limitations": "Python-level guard, not OS network namespace; audited Python transport attempts only."
+  },
+  "notPerformed": [
+    "capture flag",
+    "real market API/WS probes",
+    "12h live sampling",
+    "workflow dispatch",
+    "orders/wallet/sign/simulation/transactions/funds operations",
+    "authority/main/workflow/threshold/specification/history artifact modifications"
+  ],
+  "pending": [
+    "Section 2.5 exact World endpoint/request/auth binding",
+    "Formal UTC start/end binding",
+    "World public GET adapter does not implement MCP/OAuth/JWT; prospective transport remains unverified",
+    "PM endpoint/heartbeat binding and runner UTC clock synchronization before prospective sampling"
+  ],
+  "sourceSha256NormalizedLF": {
+    "requirements-subsecond-r1.txt": "94cff95f0dbd225416038bedac4af2f7374e05f63a9439b8104d8dbcdcbcc5aa",
+    "tests/test_world_pm_subsecond_analyze_r1.py": "2820db1d8e39f4ddf27ca59e4a171199464e8160e1293b7c289239a0a5ebcab6",
+    "tests/test_world_pm_subsecond_capture_r1.py": "ba4ff3344f7b55dc70baa0e01cfc66b84d59417321db5789cbcfb4611a12b0dd",
+    "tests/test_world_pm_subsecond_cli_r1.py": "c7a1b5d088e6e7439f0e1cbe8fb8a21262917e23841fc2dc5ebef0131b85f477",
+    "tests/test_world_pm_subsecond_cohort_r1.py": "438271c9e3bf4019e759b3e436dd3861214108bbd1f15c7fd168ba94e14db475",
+    "tests/test_world_pm_subsecond_model_r1.py": "eccb33fd6323d515a7df8f7ed1f45a33051adce93da3c395e33c1f125e89ca88",
+    "tools/research/world_pm_subsecond_analyze_r1.py": "e952b478e8a090b77c1993672cac80e5620f3761aba6832e0646194dc8327026",
+    "tools/research/world_pm_subsecond_capture_r1.py": "92a4743542b5f6759b0e02e3b009c2bf517b4a8f5b67ba76839d7dd4259db59f",
+    "tools/research/world_pm_subsecond_model_r1.py": "696908b77e4f0c71d1115841cb5ccaa42a63c298225800ec44853aad3f5f46f8",
+    "tools/research/world_pm_subsecond_offline_acceptance_r1.py": "96c4c9718d79f49344fcde9f5b670916dab5536d8e56f1dc0efedef60703f4ee"
+  },
+  "evidenceSha256": {
+    "b4-offline-acceptance.json": "a98581f46493df837c13e81aa1f35dffe0cf408ac4d7ced2580f46adb477717f",
+    "b4-offline-acceptance.log": "635fd98720311cdde9c0950182a8fe0524eff9107064b8cafb51ad2b5209e209",
+    "full-regression.log": "44f53f929ba35583e629cef4718160649816477cb49d1505202620d89ac1a1eb",
+    "installed-dependencies.txt": "ef827a72e990ba2b6f3ab0cde41bcf9c57a04e5179bc27aa8c43acfeb41efaf4",
+    "numpy-gelsd-verification.log": "41fa107e9e3620582e59ed5665c0dd78282b16148be2eadf956fd9c2d2965137",
+    "offline-network-guard.py": "f25584ff562ac2baf688e2011e7ce9a58ce65c5d2c6bd67e344e4bb06e6a95dc"
+  }
+}
